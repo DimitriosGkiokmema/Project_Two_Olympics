@@ -2,7 +2,18 @@
 \usepackage{amsmath}
 \usepackage[utf8]{inputenc}
 \usepackage[margin=0.75in]{geometry}
-
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=blue,
+    pdftitle={Overleaf Example},
+    pdfpagemode=FullScreen,
+    }
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+\urlstyle{same}
 \title{CSC111 Project 2 Proposal: 
 
 The Analysis of Summer Olympics Through External Effects 
@@ -50,14 +61,23 @@ Analyze the impact of hosting the Olympics on a country's performance. Calculate
 Analyze the impact of team sports versus individual sports on a country's overall medal count. Identify countries that excel in one category over the other.
 
 
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{tree_representation.jpg}
+    \caption{Our representation of the Node-based Tree structure}
+    \label{fig:enter-label}
+\end{figure}
+
 \section*{3., References}
 
-TODO
-
-% NOTE: LaTeX does have a built-in way of generating references automatically,
-% but it's a bit tricky to use so you are allowed to write your references manually
-% using a standard academic format like MLA or IEEE.
-% See project proposal handout for details.
+\begin{enumerate}
+    \item Carter, Jimmy. 1995. \textit{Keeping Faith: Memoirs of a President}. University of Arkansas pbk. ed. Fayetteville, AR: University of Arkansas Press.
+    \item Grannan, Cydney. 2016. “7 Significant Political Events at the Olympic Games | Britannica.” Encyclopedia Britannica. July 29, 2016.  \url{https://www.britannica.com/list/7-significant-political-events-at-the-olympic-games}.
+    \item International Organization on Standardization. 1999. “UNSD — Methodology.” United Nations: Statistics Division. 1999. \url{https://unstats.un.org/unsd/methodology/m49/}.
+    \item IOC Research and Reference Service. 2017. “Olympic Sports and Medals, 1896-2014.” Kaggle. 2017. \url{https://www.kaggle.com/datasets/the-guardian/olympic-games?select=summer.csv}.
+    \item Johnston, Mindy. 2024. “Moscow 1980 Olympic Games | Boycott, Cold War, USSR, \& Summer Games | Britannica.” Encyclopedia Britannica. February 28, 2024. \url{https://www.britannica.com/event/Moscow-1980-Olympic-Games}.
+    \item Miller, David. 2012. \textit{The Official History of the Olympic Games and the IOC: Athens to London}, 1894-2012. Edinburgh: Mainstream Pub.
+    \item Ritchie, Hannah, Lucas Rodés-Guirao, Edouard Mathieu, Marcel Gerber, Esteban Ortiz-Ospina, Joe Hasell, and Max Roser. 2023. “Data Page: Population.” Our World in Data. 2023. \url{https://ourworldindata.org/grapher/population}.
+\end{enumerate}
 
 \end{document}
-
