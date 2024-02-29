@@ -68,7 +68,27 @@ Analyze the impact of team sports versus individual sports on a country's overal
     \label{fig:enter-label}
 \end{figure}
 
-\section*{3., References}
+\section*{3., Computational Plan}
+
+Our project will incorporate datasets on world population and outcomes of the Olympic games to show the interconnectedness of these factors. These datasets will be downloaded as csv files. The process of extracting (reading) the data from these files should not be too dissimilar to the txt files used in project one. All this data will be stored in a single tree, which will be the central part of our main. Methods we create will use the data stored in the tree to perform calculations, whose results will be displayed on graphs in PyGame. The hierarchy of the tree will be world, continents, continent sections (northern, eastern, central, etc.), countries, years. The years will be objects of the year class, which contain information about the type and number of medals won, players who participated in the games, where the game was held at that year, etc. The countries will be objects of the country dataset, which holds information about the games it hosted. We might make object classes for the other levels of the hierarchy later in the project, but currently we are thinking of simply writing the hierarchy's name in the tree's roots, for example: since continents don't have a class, the name of the continent will be a tree's root. Our code will utilize numerous datasets to provide a clear visualization of just how connected they are (population, Olympic games, and maybe some other data). One of these datasets has information on the games from 1896-2020. Here is its citation: 
+
+  
+
+“Summer Olympic Medals 1896 - 2020.” Www.kaggle.com, www.kaggle.com/datasets/ramontanoeiro/summer-olympic-medals-1986-2020. Accessed 28 Feb. 2024. 
+
+  
+
+This is a csv file, and an example of its data is: 1896, Greece, Athens, Great Britain, GBR, 2, 3, 2 
+
+  
+
+One computation we will perform (after creating the tree from the datasets) is to see if host countries win more often by counting the number of games won by the host country and seeing if this is greater than the total number of games held. Another calculation we will do is to find if historical events (wars, stock market crash, etc.) had an impact on the Olympics. We will measure the impact by calculating the standard deviation of the medals given at the Olympic games each year, and seeing if the number of medals lies far away from the mean. An outlier is a data point that is “three standard deviations from the mean may be considered an outlier” (Peter K Dunn, Scientific Research and Methodology) 
+
+Dunn, Peter K. Scientific Research Methods. Bookdown.org, bookdown.org/pkaldunn/Book/. 
+
+If such outliers coincide with historical events, our hypothesis is proven correct. Lastly, our results will be displayed on graphs drawn in PyGame. The graphs will clearly show the interaction of population and historical events on the Olympic games.
+
+\section*{4., References}
 
 \begin{enumerate}
     \item Carter, Jimmy. 1995. \textit{Keeping Faith: Memoirs of a President}. University of Arkansas pbk. ed. Fayetteville, AR: University of Arkansas Press.
