@@ -6,17 +6,13 @@ Additionally, this file also deals with mouse and key inputs
 """
 import pygame
 import matplotlib
-
 pygame.init()
-
-clock = pygame.time.Clock()
 
 screen_width = 700
 screen_height = 700
-tile_size = 50
-main_menu = True
+background_colour = (255, 255, 255)
 
-screen = pygame.display.set_mode((screen_width, screen_height))
+window = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('CSC111 Project 2: The Analysis of Summer Olympics Through External Effects')
 
 ####################################################
@@ -26,42 +22,34 @@ pygame.display.set_caption('CSC111 Project 2: The Analysis of Summer Olympics Th
 
 class Button:
     """ template for the buttons"""
-    def __init__(self, x: int, y: int, image: str):
-        self.image = None
+    def __init__(self, colour, x, y, width, height, text=''):
+        self.colour = colour
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.text = text
 
-        if image == 'start':
-            img = pygame.image.load('C:\\Users\\')
-            img = pygame.transform.scale(img, (6 * tile_size, 3 * tile_size))
-            self.image = img
-        elif image == 'exit':
-            img = pygame.image.load('C:\\Users\\')
-            img = pygame.transform.scale(img, (6 * tile_size, 3 * tile_size))
-            self.image = img
+    def draw(self, window, outline=None):
+        # Call this method to draw the button on the screen
+        if outline:
+            pygame.draw.rect(window, outline, (self.x - 2, self.y - 2, self.width + 4, self.height + 4), 0)
 
-        self.rect = self.image.get_rect()
-        self.rect.x = x - 2 * tile_size
-        self.rect.y = y - tile_size
-        self.clicked = False
+        pygame.draw.rect(window, self.colour, (self.x, self.y, self.width, self.height), 0)
 
-    def draw(self):
-        """ draws the button"""
-        action = False
+        if self.text != '':
+            font = pygame.font.SysFont('comicsans', 60)
+            text = font.render(self.text, 1, (0, 0, 0))
+            window.blit(text, (self.x + (self.width / 2 - text.get_width() / 2), self.y + (self.height / 2 -
+                                                                                        text.get_height() / 2)))
 
-        # get mouse position
-        pos = pygame.mouse.get_pos()
+    def is_over(self, position):
+        # Pos is the mouse position or a tuple of (x,y) coordinates
+        if self.x < position[0] < self.x + self.width:
+            if self.y < position[1] < self.y + self.height:
+                return True
 
-        # check mouse over and clicked conditions
-        if self.rect.collidepoint(pos):
-            if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
-                action = True
-                self.clicked = True
-
-        if pygame.mouse.get_pressed()[0] == 0:
-            self.clicked = False
-
-        # draw button
-        screen.blit(self.image, self.rect)
-        return action
+        return False
 
 
 ####################################################
@@ -69,21 +57,28 @@ class Button:
 ####################################################
 
 
-start_button = Button(screen_width // 5, screen_height // 2, 'start')
-exit_button = Button(4 * screen_width // 5, screen_height // 2, 'exit')
+button = Button((0, 255, 0), 150, 225, 250, 100, 'Click Me')
+
+
+def redraw_window():
+    window.fill((255, 255, 255))
+    button.draw(window, (0, 0, 0))
+
 
 run = True
 while run:
-    if main_menu:
-        if exit_button.draw():
-            run = False
-        if start_button.draw():
-            main_menu = False
-
     for event in pygame.event.get():
+        pos = pygame.mouse.get_pos()
         if event.type == pygame.QUIT:
-            run = False
+            pygame.quit()
+        if event.type == pygame.MOUSEBUTTONDOWN and button.is_over(pos):
+            print('red clicked')
+        if event.type == pygame.MOUSEMOTION:
+            if button.is_over(pos):
+                button.colour = (255, 0, 0)
+            else:
+                button.colour = (0, 255, 0)
 
+    # # updates the visuals
+    redraw_window()
     pygame.display.update()
-
-pygame.quit()
