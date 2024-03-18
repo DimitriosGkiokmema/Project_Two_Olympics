@@ -5,6 +5,11 @@ from __future__ import annotations
 
 import csv
 from typing import Any
+import pandas as pd
+
+olympics = pd.read_csv("summer.csv")
+olympics = olympics.dropna()
+olympics.to_csv('summer_modified.csv')
 
 
 class _Vertex:
