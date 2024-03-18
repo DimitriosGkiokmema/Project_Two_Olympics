@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import csv
 from typing import Any
-import pandas as pd
+import pandas as pd  # remember to install the package pandas! (my version is 2.2.1)
 
 olympics = pd.read_csv("summer.csv")
 olympics = olympics.dropna()
