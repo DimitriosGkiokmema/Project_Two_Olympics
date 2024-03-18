@@ -12,6 +12,12 @@ olympics = olympics.dropna()
 olympics.to_csv('summer_modified.csv')
 
 
+country_codes = pd.read_csv("country_codes.csv")
+country_codes_english = country_codes['Region Name_en (M49)', 'Country or Area_en (M49)', 'ISO-alpha3 Code (M49)']
+country_codes_english.dropna()
+country_codes_english.to_csv('country_codes_modified.csv')
+
+
 class _Vertex:
     """A vertex in a book review graph, used to represent a user or a book.
 
