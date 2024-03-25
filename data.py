@@ -7,12 +7,12 @@ import csv
 from typing import Any
 import pandas as pd  # remember to install the package pandas! (my version is 2.2.1)
 
-olympics = pd.read_csv("summer.csv")
+olympics = pd.read_csv("data/summer.csv")
 olympics = olympics.dropna()
 olympics.to_csv('summer_modified.csv')
 
 
-country_codes = pd.read_csv("country_codes.csv")
+country_codes = pd.read_csv("data/country_codes.csv")
 country_codes_english = country_codes['Region Name_en (M49)', 'Country or Area_en (M49)', 'ISO-alpha3 Code (M49)']
 country_codes_english.dropna()
 country_codes_english.to_csv('country_codes_modified.csv')
