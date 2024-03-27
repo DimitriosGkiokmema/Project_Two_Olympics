@@ -103,9 +103,9 @@ class Graph:
             - kind in {'year', 'country', 'region'}
         """
         if item not in self._vertices:
-            self._vertices[item] = _Vertex(item, kind)
+            self._vertices[item] = _SportVertex(item, kind)
 
-    def add_edge(self, item1: Any, item2: Any) -> None:
+    def add_edge(self, item1: Any, item2: Any, sport: Sport) -> None:
         """Add an edge between the two vertices with the given items in this graph.
 
         Raise a ValueError if item1 or item2 do not appear as vertices in this graph.
@@ -117,8 +117,8 @@ class Graph:
             v1 = self._vertices[item1]
             v2 = self._vertices[item2]
 
-            v1.neighbours.add(v2)
-            v2.neighbours.add(v1)
+            v1.neighbours[v2] = sport
+            v2.neighbours[v1] = sport
         else:
             raise ValueError
 
@@ -191,6 +191,13 @@ class Medal:
     def total_medal(self) -> int:
         """Return the total number of medals."""
         return sum([self.num_g, self.num_s, self.num_b])
+
+    def weighted_score(self) -> int:
+        """Calculate weighted score according to the number of medals.
+        Each gold medal worths 3 points.
+        Each silver medal worths 2 points
+        Each bronze medal worths 1 point."""
+        return 3 * self.num_g + 2 * self.num_s + self.num_b
 
 
 class Sport:
