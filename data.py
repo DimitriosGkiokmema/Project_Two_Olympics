@@ -14,7 +14,7 @@ olympics.to_csv('summer_modified.csv')
 
 country_codes = pd.read_csv("country_codes.csv")
 country_codes = country_codes[['Region Name_en (M49)', 'Country or Area_en (M49)', 'ISO-alpha3 Code (M49)']]
-country_codes.dropna()
+country_codes = country_codes.dropna()
 country_codes.to_csv('country_codes_modified.csv')
 
 
