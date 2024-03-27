@@ -131,6 +131,39 @@ class Graph:
             return set(self._vertices.keys())
 
 
+class Medal:
+    """A place to store number of medals for a given edge (which country - in which year - on which sport).
+    Instance Attributes:
+        - num_g: Number of gold medals for that edge
+        - num_s: Number of silver medals for that edge
+        - num_b: Number of bronze medals for that edge
+    """
+    num_g: int
+    num_s: int
+    num_b: int
+
+    def __init__(self) -> None:
+        """Initialize."""
+        self.num_g = 0
+        self.num_s = 0
+        self._num_b = 0
+
+    def add_medal(self, kind: str) -> None:
+        """Add a medal with the given kind."""
+        if kind == 'Gold':
+            self.num_g += 1
+        elif kind == 'Silver':
+            self.num_s += 1
+        elif kind == 'Bronze':
+            self.num_b += 1
+        else:  # Should not reach this branch
+            raise ValueError
+
+    def total_medal(self) -> int:
+        """Return the total number of medals."""
+        return sum([self.num_g, self.num_s, self.num_b])
+
+
 def load_graph(olympic_games: str, countries: str) -> Graph:
     """ Return a Summer Olympic Medal Graph.
     The input for olympic_games is 'summer_modified.csv', and the input for countries is
