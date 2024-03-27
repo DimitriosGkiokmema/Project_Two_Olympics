@@ -177,14 +177,14 @@ class Medal:
         self.num_s = 0
         self._num_b = 0
 
-    def add_medal(self, kind: str) -> None:
-        """Add a medal with the given kind."""
+    def add_medal(self, kind: str, num: int = 1) -> None:
+        """Add a medal with the given kind. The default is 1 medal per time added."""
         if kind == 'Gold':
-            self.num_g += 1
+            self.num_g += num
         elif kind == 'Silver':
-            self.num_s += 1
+            self.num_s += num
         elif kind == 'Bronze':
-            self.num_b += 1
+            self.num_b += num
         else:  # Should not reach this branch
             raise ValueError
 
