@@ -7,15 +7,15 @@ import csv
 from typing import Any
 import pandas as pd  # remember to install the package pandas! (my version is 2.2.1)
 
-olympics = pd.read_csv("data/summer.csv")
+olympics = pd.read_csv("summer.csv")
 olympics = olympics.dropna()
 olympics.to_csv('summer_modified.csv')
 
 
-country_codes = pd.read_csv("data/country_codes.csv")
-country_codes_english = country_codes['Region Name_en (M49)', 'Country or Area_en (M49)', 'ISO-alpha3 Code (M49)']
-country_codes_english.dropna()
-country_codes_english.to_csv('country_codes_modified.csv')
+country_codes = pd.read_csv("country_codes.csv")
+country_codes = country_codes[['Region Name_en (M49)', 'Country or Area_en (M49)', 'ISO-alpha3 Code (M49)']]
+country_codes.dropna()
+country_codes.to_csv('country_codes_modified.csv')
 
 
 class _Vertex:
@@ -131,18 +131,20 @@ class Graph:
             return set(self._vertices.keys())
 
 
-def load_graph(reviews_file: str, book_names_file: str) -> Graph:
-    """
-        TODO
+def load_graph(olympic_games: str, countries: str) -> Graph:
+    """ Return a Summer Olympic Medal Graph.
+    The input for olympic_games is 'summer_modified.csv', and the input for countries is
+    'country_codes_modified.csv'.
+
     """
     graph = Graph()
     book_dict = {}
-    with open(book_names_file, 'r') as file:
+    with open(olympic_games, 'r') as file:
         reader = csv.reader(file)
         for row in reader:
             book_dict[row[0]] = row[1]
 
-    with open(reviews_file, 'r') as file:
+    with open(countries, 'r') as file:
         reader = csv.reader(file)
         for row in reader:
             graph.add_vertex(row[0], 'user')
