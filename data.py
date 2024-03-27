@@ -159,6 +159,56 @@ class Graph:
         else:
             return set(self._vertices.keys())
 
+##################################################################################
+# Our additional methods
+##################################################################################
+    def annual_data_sentence(self, country: str, year: int) -> None:
+        """Print out annual data based on user's input about a country name and a year.
+        Annual data includes:
+        - total number of sports
+        - number of team sports and individual sports that country participated in
+        - total number of medals, and number of kind of medals
+        """
+        if country in self._vertices and year in self._vertices:
+            v_country = self._vertices[country]
+            v_year = self._vertices[year]
+            if v_country not in v_year.neighbours:  # or vice versa
+                print(f"Unfortunately, {country} didn't attend or didn't achieve any medals in {year}."
+                      f"Please try looking for other data.")
+            else:
+                sport_data = v_country.neighbours[v_year]  # type Sport
+
+                print(f"In {year}, {country} participated and had medals on {sport_data.total_num_sport()} sports,\n"
+                      f"including {sport_data.total_num_sport('team')} team sports and "
+                      f"{sport_data.total_num_sport('individual')} sports. \n In terms of the number of medals, "
+                      f"{country} in that year has achieved the total of {sport_data.total_medal()} medals, with \n"
+                      f"{sport_data.total_medal('team')} medals on team sports and the other "
+                      f"{sport_data.total_medal('individual')} on individuals.")
+        else:
+            print(f"Something went wrong. Please check your input and try again.")
+
+    def annual_data_dict(self, country: str, year: int) -> Any:
+        """Return the annual data of a country in a specific year, dimilar to annual_data_sentence, but presented as
+        a dictionary for further code usage.
+        The dictionary will have the form like:
+        {'total sports': ..., 'team sports': ..., 'indiv sports': ..., 'total medals': ..., 'team medals':...,
+        'indiv medals': ...}"""
+        if country in self._vertices and year in self._vertices:
+            v_country = self._vertices[country]
+            v_year = self._vertices[year]
+            if v_country not in v_year.neighbours:
+                return None
+            else:
+                sport_data = v_country.neighbours[v_year]
+                return {'total sports': sport_data.total_num_sport(),
+                        'team sports': sport_data.total_num_sport('team'),
+                        'indiv sports': sport_data.total_num_sport('individual'),
+                        'total medals': sport_data.total_medal(),
+                        'team medals': sport_data.total_medal('team'),
+                        'indiv medals': sport_data.total_medal('individual')}
+        else:
+            raise ValueError
+
 
 class Medal:
     """A place to store number of medals for a given edge (which country - in which year - on which sport).
@@ -225,6 +275,36 @@ class Sport:
             self.team_sports[name] = medals
         elif kind == 'individual' and name not in self.individual_sports:
             self.individual_sports[name] = medals
+
+    def total_medal(self, kind: str = '') -> int:
+        """Return the total number of medals for all sports, according to whether kind is team or individual.
+        If kind is left blanked, return total medals from both groups.
+        Representation Invariants:
+            - kind in {'', 'team', 'individual'}
+        """
+        if kind == '':
+            total_team_medals = sum([medal.total_medal for medal in self.team_sports.values()])
+            total_indi_medals = sum([medal.total_medal for medal in self.individual_sports.values()])
+            return total_team_medals + total_indi_medals
+        elif kind == 'team':
+            return sum([medal.total_medal for medal in self.team_sports.values()])
+        else:  # kind == 'individual'
+            return sum([medal.total_medal for medal in self.individual_sports.values()])
+
+    def total_num_sport(self, kind: str = '') -> int:
+        """Return the total number of sports according to the kind (either team or individual).
+        If kind is left blanked, return total sports from both groups.
+        However, there is a flaw that a sport might be double counted. For example, tennis, which can be played
+        individually or as a team, could be potentially counted twice if it appeared in both groups.
+        Representation Invariants:
+            - kind in {'', 'team', 'individual'}
+        """
+        if kind == '':
+            return len(self.individual_sports) + len(self.team_sports)
+        elif kind == 'team':
+            return len(self.team_sports)
+        else:
+            return len(self.individual_sports)
 
 
 ####################################################################################################################
