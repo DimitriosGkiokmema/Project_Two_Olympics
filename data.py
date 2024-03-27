@@ -32,7 +32,7 @@ class _Vertex:
     Representation Invariants:
         - self not in self.neighbours
         - all(self in u.neighbours for u in self.neighbours)
-        - self.kind in {'year', 'country'}
+        - self.kind in {'year', 'country', 'region'}  # Amy added region to this RI !?
     """
     item: Any
     kind: str
@@ -51,6 +51,35 @@ class _Vertex:
         self.neighbours = set()
 
 
+class _SportVertex(_Vertex):
+    """A vertex representing the weight of sports and medals.
+    Instance Attributes:
+        - item: The data stored in this vertex, representing a year, country, or region.
+        - kind: The type of this vertex: 'year', 'country', or 'region'.
+        - neighbours: The vertices that are adjacent to this vertex, and their corresponding
+            edge weights.
+
+    Representation Invariants:
+        - self not in self.neighbours
+        - all(self in u.neighbours for u in self.neighbours)
+        - self.kind in {'year', 'country', 'region'}
+    """
+    item: Any
+    kind: str
+    neighbours: dict[_SportVertex, Sport]
+
+    def __init__(self, item: Any, kind: str) -> None:
+        """Initialize a new vertex with the given item and kind.
+
+        This vertex is initialized with no neighbours.
+
+        Preconditions:
+            - kind in {'year', 'country', 'region'}
+        """
+        super().__init__(item, kind)
+        self.neighbours = {}
+
+
 class Graph:
     """A graph used to represent a book review network.
     """
@@ -58,7 +87,7 @@ class Graph:
     #     - _vertices:
     #         A collection of the vertices contained in this graph.
     #         Maps item to _Vertex object.
-    _vertices: dict[Any, _Vertex]
+    _vertices: dict[Any, _SportVertex]  # Amy changed this into _SportVertex !?
 
     def __init__(self) -> None:
         """Initialize an empty graph (no vertices or edges)."""
@@ -71,7 +100,7 @@ class Graph:
         Do nothing if the given item is already in this graph.
 
         Preconditions:
-            - kind in {'year', 'country'}
+            - kind in {'year', 'country', 'region'}
         """
         if item not in self._vertices:
             self._vertices[item] = _Vertex(item, kind)
@@ -164,6 +193,34 @@ class Medal:
         return sum([self.num_g, self.num_s, self.num_b])
 
 
+class Sport:
+    """A class storing the sports that a country partook as the key, and the medals they got at that sport in
+    that year. Here we divided into group kind of sports: team sports and individual sports.
+    Instance Attributes:
+        - team_sports: A dictionary that matches a team sport name to its achievement, representing as the class Medal.
+        - individual_sports: A dictionary that matches an individual sport name to its achievement, representing
+        as the class Medal.
+    """
+    team_sports: dict[str, Medal]
+    individual_sports: dict[str, Medal]
+
+    def __init__(self) -> None:
+        """Initialize"""
+        self.team_sports = {}
+        self.individual_sports = {}
+
+    def add_sport(self, name: str, kind: str, medals: Medal) -> None:
+        """Add new sport into this collection. Do nothing if the sport has already in here.
+        Representation Invariants:
+            - kind in {'team', 'individual'}
+        """
+        if kind == 'team' and name not in self.team_sports:
+            self.team_sports[name] = medals
+        elif kind == 'individual' and name not in self.individual_sports:
+            self.individual_sports[name] = medals
+
+
+####################################################################################################################
 def load_graph(olympic_games: str, countries: str) -> Graph:
     """ Return a Summer Olympic Medal Graph.
     The input for olympic_games is 'summer_modified.csv', and the input for countries is
