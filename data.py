@@ -173,7 +173,7 @@ class Graph:
         """
         if year not in [year.item for year in self._vertices]:
             return 'Invalid input for year'
-        
+
         gold = {}
         silver = {}
         bronze = {}
@@ -202,6 +202,39 @@ class Graph:
             bronze[country.item] = b
 
         return [gold, silver, bronze]
+
+    def compare_medals(self, country1: str, country2: str, year: int) -> str:
+        """Compare the number of Gold, Silver, and Bronze medals between two countries for a specific year.
+        Return a string summarizing the comparison of medals between the two countries.
+
+            country1 : The name of the first country.
+            country2 : The name of the second country.
+            year : The year for which to compare the medals.
+        """
+        try:
+            # Get the annual data for both countries
+            country1_data = self.annual_data_dict(country1, year)
+            country2_data = self.annual_data_dict(country2, year)
+
+            # Extract medal counts for each country
+            country1_gold = country1_data.get('total medals', 0)
+            country1_silver = country1_data.get('team medals', 0)
+            country1_bronze = country1_data.get('indiv medals', 0)
+
+            country2_gold = country2_data.get('total medals', 0)
+            country2_silver = country2_data.get('team medals', 0)
+            country2_bronze = country2_data.get('indiv medals', 0)
+
+            # Generate the comparison summary string
+            comparison_summary = f"Comparison of Medals in {year}:\n"
+            comparison_summary += f"{country1}:\n"
+            comparison_summary += f"Gold: {country1_gold}, Silver: {country1_silver}, Bronze: {country1_bronze}\n"
+            comparison_summary += f"{country2}:\n"
+            comparison_summary += f"Gold: {country2_gold}, Silver: {country2_silver}, Bronze: {country2_bronze}\n"
+
+            return comparison_summary
+        except ValueError as e:
+            return str(e)
 
 ##################################################################################
 # Our additional methods
