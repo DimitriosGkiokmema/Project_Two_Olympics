@@ -9,12 +9,14 @@ import pandas as pd  # remember to install the package pandas! (my version is 2.
 
 olympics = pd.read_csv("summer.csv")
 olympics = olympics.dropna()
+olympics = olympics.iloc[1:]  # I REMOVED THE HEADER FOR EASIER GRAPH LOAD
 olympics.to_csv('summer_modified.csv')
 
 
 country_codes = pd.read_csv("country_codes.csv")
 country_codes = country_codes[['Region Name_en (M49)', 'Country or Area_en (M49)', 'ISO-alpha3 Code (M49)']]
 country_codes = country_codes.dropna()
+country_codes = country_codes.iloc[1:]  # I REMOVED THE HEADER FOR EASIER GRAPH LOAD
 country_codes.to_csv('country_codes_modified.csv')
 
 
@@ -105,7 +107,7 @@ class Graph:
         if item not in self._vertices:
             self._vertices[item] = _SportVertex(item, kind)
 
-    def add_edge(self, item1: Any, item2: Any, sport: Sport) -> None:
+    def add_edge(self, item1: Any, item2: Any, sport: Sport = None) -> None:
         """Add an edge between the two vertices with the given items in this graph.
 
         Raise a ValueError if item1 or item2 do not appear as vertices in this graph.
@@ -201,10 +203,20 @@ class Graph:
 
         return [gold, silver, bronze]
 
-
 ##################################################################################
 # Our additional methods
 ##################################################################################
+    def get_edge(self, item1: Any, item2: Any) -> Sport:
+        """Return the Sport class of that edge if item1 and item2 are adjacent and are in the graph.
+        Raise ValueError otherwise."""
+        if item1 in self._vertices and item2 in self._vertices and self.adjacent(item1, item2):
+            v1 = self._vertices[item1]
+            v2 = self._vertices[item2]
+            return v1.neighbours[v2]
+
+    def update_sport(self) -> None:
+        """Update sport, as we want to add more sport data into the edge during load_graph."""
+
     def annual_data_sentence(self, country: str, year: int) -> None:
         """Print out annual data based on user's input about a country name and a year.
         Annual data includes:
@@ -235,13 +247,16 @@ class Graph:
         a dictionary for further code usage.
         The dictionary will have the form like:
         {'total sports': ..., 'team sports': ..., 'indiv sports': ..., 'total medals': ..., 'team medals':...,
-        'indiv medals': ...}"""
+        'indiv medals': ...}
+
+        Raise ValueError when country or year are not in self._vertices.
+        If the country didn't participate in Summer Olympics that year, do nothing.
+        """
         if country in self._vertices and year in self._vertices:
             v_country = self._vertices[country]
             v_year = self._vertices[year]
-            if v_country not in v_year.neighbours:
-                return None
-            else:
+
+            if v_country in v_year.neighbours:
                 sport_data = v_country.neighbours[v_year]
                 return {'total sports': sport_data.total_num_sport(),
                         'team sports': sport_data.total_num_sport('team'),
@@ -264,11 +279,11 @@ class Medal:
     num_s: int
     num_b: int
 
-    def __init__(self) -> None:
+    def __init__(self, g: int = 0, s: int = 0, b: int = 0) -> None:
         """Initialize."""
-        self.num_g = 0
-        self.num_s = 0
-        self._num_b = 0
+        self.num_g = g
+        self.num_s = s
+        self._num_b = b
 
     def add_medal(self, kind: str, num: int = 1) -> None:
         """Add a medal with the given kind. The default is 1 medal per time added."""
@@ -319,6 +334,17 @@ class Sport:
         elif kind == 'individual' and name not in self.individual_sports:
             self.individual_sports[name] = medals
 
+    def update_medal(self, name: str, kind_sport: str, kind_medal: str, num: int=1) -> None:
+        """Update number of medal into existing Medal.
+        Representation Invariants:
+            - name in {self.team_sports, self.individual_sports}
+            - kind_sport in {'team', 'individual'}
+        """
+        if kind_sport == 'team':
+            self.team_sports[name].add_medal(kind_medal, num)
+        else:
+            self.individual_sports[name].add_medal(kind_medal, num)
+
     def total_medal(self, kind: str = '') -> int:
         """Return the total number of medals for all sports, according to whether kind is team or individual.
         If kind is left blanked, return total medals from both groups.
@@ -351,23 +377,61 @@ class Sport:
 
 
 ####################################################################################################################
-def load_graph(olympic_games: str, countries: str) -> Graph:
+def load_graph(olympic_games: str, countries: str, groups: dict[str, str]) -> Graph:
     """ Return a Summer Olympic Medal Graph.
     The input for olympic_games is 'summer_modified.csv', and the input for countries is
     'country_codes_modified.csv'.
 
     """
     graph = Graph()
-    book_dict = {}
-    with open(olympic_games, 'r') as file:
-        reader = csv.reader(file)
-        for row in reader:
-            book_dict[row[0]] = row[1]
 
+    country_dict = {}  # will be {isocode: (countryname, region)}
     with open(countries, 'r') as file:
         reader = csv.reader(file)
         for row in reader:
-            graph.add_vertex(row[0], 'user')
-            graph.add_vertex(book_dict[row[1]], 'book')
-            graph.add_edge(row[0], book_dict[row[1]])
+            country_dict[row[3]] = (row[2], row[1])
+
+    with open(olympic_games, 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            graph.add_vertex(country_dict[row[6]][0], 'country')
+            graph.add_vertex(country_dict[row[6]][1], 'region')
+            graph.add_vertex(row[1], 'year')
+            # We still need to find a way to
+            # Have: edge - Sport class -> Sport - Medal class
+
+            # Add edge for country and its corresponding region
+            graph.add_edge(country_dict[row[6]][0], country_dict[row[6]][1])
+
+            # Add new edge (empty Sport) if not already adjacent
+            if not graph.adjacent(country_dict[row[6]][0], row[1]):
+                graph.add_edge(country_dict[row[6]][0], row[1], Sport())
+
+            # Update Sport
+            sport_class = graph.get_edge()
+            group = find_group(groups, row[4])
+
+            # Check to access the sport name if available, or create new key if not.
+            if row[4] not in sport_class.team_sports and row[4] not in sport_class.individual_sports:
+                # Create new medal
+                if row[9] == 'Gold':
+                    new_medal = Medal(g=1)
+                elif row[9] == 'Silver':
+                    new_medal = Medal(s=1)
+                else:
+                    new_medal = Medal(b=1)
+                sport_class.add_sport(row[4], group, new_medal)
+            else:
+                # Add new data to medal
+                sport_class.update_medal(row[4], group, row[9])
+
     return graph
+
+
+def find_group(groups: dict[str, str], sport: str) -> str:
+    """Return the group (team or individual) that the sport belongs to.
+    Note: the parameter groups has the form of {sportname: kind}, in which kind is either 'team' or 'individual'
+    Representation Invariants:
+        - sport in groups
+    """
+    return groups[sport]
