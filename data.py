@@ -9,12 +9,14 @@ import pandas as pd  # remember to install the package pandas! (my version is 2.
 
 olympics = pd.read_csv("summer.csv")
 olympics = olympics.dropna()
+olympics = olympics.iloc[1:]  # I REMOVED THE HEADER FOR EASIER GRAPH LOAD
 olympics.to_csv('summer_modified.csv')
 
 
 country_codes = pd.read_csv("country_codes.csv")
 country_codes = country_codes[['Region Name_en (M49)', 'Country or Area_en (M49)', 'ISO-alpha3 Code (M49)']]
 country_codes = country_codes.dropna()
+country_codes = country_codes.iloc[1:]  # I REMOVED THE HEADER FOR EASIER GRAPH LOAD
 country_codes.to_csv('country_codes_modified.csv')
 
 
@@ -162,6 +164,9 @@ class Graph:
 ##################################################################################
 # Our additional methods
 ##################################################################################
+    def update_sport(self) -> None:
+        """Update sport, as we want to add more sport data into the edge during load_graph."""
+
     def annual_data_sentence(self, country: str, year: int) -> None:
         """Print out annual data based on user's input about a country name and a year.
         Annual data includes:
@@ -192,13 +197,16 @@ class Graph:
         a dictionary for further code usage.
         The dictionary will have the form like:
         {'total sports': ..., 'team sports': ..., 'indiv sports': ..., 'total medals': ..., 'team medals':...,
-        'indiv medals': ...}"""
+        'indiv medals': ...}
+
+        Raise ValueError when country or year are not in self._vertices.
+        If the country didn't participate in Summer Olympics that year, do nothing.
+        """
         if country in self._vertices and year in self._vertices:
             v_country = self._vertices[country]
             v_year = self._vertices[year]
-            if v_country not in v_year.neighbours:
-                return None
-            else:
+
+            if v_country in v_year.neighbours:
                 sport_data = v_country.neighbours[v_year]
                 return {'total sports': sport_data.total_num_sport(),
                         'team sports': sport_data.total_num_sport('team'),
@@ -308,23 +316,38 @@ class Sport:
 
 
 ####################################################################################################################
-def load_graph(olympic_games: str, countries: str) -> Graph:
+def load_graph(olympic_games: str, countries: str, groups: dict[str, str]) -> Graph:
     """ Return a Summer Olympic Medal Graph.
     The input for olympic_games is 'summer_modified.csv', and the input for countries is
     'country_codes_modified.csv'.
 
     """
     graph = Graph()
-    book_dict = {}
-    with open(olympic_games, 'r') as file:
-        reader = csv.reader(file)
-        for row in reader:
-            book_dict[row[0]] = row[1]
 
+    country_dict = {}  # will be {isocode: (countryname, region)}
     with open(countries, 'r') as file:
         reader = csv.reader(file)
         for row in reader:
-            graph.add_vertex(row[0], 'user')
-            graph.add_vertex(book_dict[row[1]], 'book')
-            graph.add_edge(row[0], book_dict[row[1]])
+            country_dict[row[3]] = (row[2], row[1])
+
+    with open(olympic_games, 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            graph.add_vertex(country_dict[row[6]][0], 'country')
+            graph.add_vertex(country_dict[row[6]][1], 'region')
+            graph.add_vertex(row[1], 'year')
+            # We still need to find a way to
+            graph.add_edge(country_dict[row[6]][0], row[1], Sport())
+            group = find_group(groups, row[3])
+
+            graph.add_edge(row[0], country_dict[row[1]])
     return graph
+
+
+def find_group(groups: dict[str, str], sport: str) -> str:
+    """Return the group (team or individual) that the sport belongs to.
+    Note: the parameter groups has the form of {sportname: kind}, in which kind is either 'team' or 'individual'
+    Representation Invariants:
+        - sport in groups
+    """
+    return groups[sport]
