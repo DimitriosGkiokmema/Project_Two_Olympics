@@ -161,6 +161,46 @@ class Graph:
         else:
             return set(self._vertices.keys())
 
+    def i_th_place(self, year: int) -> list[dict[str, int]]:
+        """ Ranking (which country, continent, or region ranked the ith place for the number of
+        (gold/silver/bronze/total) medals in the given year?)
+
+        Pseudocode:
+        - loop through dict of countries connected to the year
+        - for each country, access its Sport and count its Medals
+        - to count medals, iterate through indi and team dicts, use dict.i.total_medals to get [g, s, b]
+        - add g, s, b values to this function's dicts
+        """
+        gold = {}
+        silver = {}
+        bronze = {}
+
+        for country in self._vertices[year].neighbours:
+            sport = self._vertices[year].neighbours[country]
+            g, s, b = 0, 0, 0
+
+            # Records the number of total medals won in team sports
+            for team_sport in sport.team_sports:
+                medals = sport.team_sports[team_sport]
+                g += medals.num_g
+                s += medals.num_s
+                b += medals.num_b
+
+            # Records the number of total medals won in individual sports
+            for individual_sport in sport.team_sports:
+                medals = sport.team_sports[individual_sport]
+                g += medals.num_g
+                s += medals.num_s
+                b += medals.num_b
+
+            # Records the number of medals in dicts
+            gold[country.item] = g
+            silver[country.item] = s
+            bronze[country.item] = b
+
+        return [gold, silver, bronze]
+
+
 ##################################################################################
 # Our additional methods
 ##################################################################################
