@@ -61,16 +61,16 @@ class Button:
 
 # Create buttons
 annual_medals = Button((0, 255, 0), 100, 50, 'Annual Medals')
-given_area = Button((0, 255, 0), 100, 100, 'Given Area')
-gsb = Button((0, 255, 0), 100, 150, 'Gold, Silver, and Bronze')
-rankings = Button((0, 255, 0), 100, 200, 'Rank')
-annual_data = Button((0, 255, 0), 100, 250, 'Annual Data')
-historical = Button((0, 255, 0), 100, 300, 'Impact of Historical Events')
-host_effect = Button((0, 255, 0), 100, 350, 'Host Effect')
-team_vs_indi = Button((0, 255, 0), 100, 400, 'Team vs Individual Sports')
-performance = Button((0, 255, 0), 100, 450, 'Performance')
-countries = Button((0, 255, 0), 100, 500, 'Country Statistics')
-sports = Button((0, 255, 0), 100, 550, 'Sport Statistics')
+given_area = Button((0, 255, 0), 100, 110, 'Given Area')
+gsb = Button((0, 255, 0), 100, 170, 'Gold, Silver, and Bronze')
+rankings = Button((0, 255, 0), 100, 230, 'Rank')
+annual_data = Button((0, 255, 0), 100, 290, 'Annual Data')
+historical = Button((0, 255, 0), 100, 350, 'Impact of Historical Events')
+host_effect = Button((0, 255, 0), 100, 410, 'Host Effect')
+team_vs_indi = Button((0, 255, 0), 100, 470, 'Team vs Individual Sports')
+performance = Button((0, 255, 0), 100, 530, 'Performance')
+countries = Button((0, 255, 0), 100, 590, 'Country Statistics')
+sports = Button((0, 255, 0), 100, 650, 'Sport Statistics')
 
 # Store buttons in a list
 buttons_main = [annual_medals, given_area, gsb, rankings, annual_data, historical, host_effect, team_vs_indi]
