@@ -159,7 +159,7 @@ class Graph:
         else:
             return set(self._vertices.keys())
 
-    def i_th_place(self, year: int) -> list[dict[str, int]]:
+    def i_th_place(self, year: int) -> list[dict[str, int]] | str:
         """ Ranking (which country, continent, or region ranked the ith place for the number of
         (gold/silver/bronze/total) medals in the given year?)
 
@@ -169,6 +169,9 @@ class Graph:
         - to count medals, iterate through indi and team dicts, use dict.i.total_medals to get [g, s, b]
         - add g, s, b values to this function's dicts
         """
+        if year not in [year.item for year in self._vertices]:
+            return 'Invalid input for year'
+        
         gold = {}
         silver = {}
         bronze = {}
