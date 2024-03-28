@@ -107,7 +107,7 @@ class Graph:
         if item not in self._vertices:
             self._vertices[item] = _SportVertex(item, kind)
 
-    def add_edge(self, item1: Any, item2: Any, sport: Sport) -> None:
+    def add_edge(self, item1: Any, item2: Any, sport: Sport = None) -> None:
         """Add an edge between the two vertices with the given items in this graph.
 
         Raise a ValueError if item1 or item2 do not appear as vertices in this graph.
@@ -200,10 +200,17 @@ class Graph:
 
         return [gold, silver, bronze]
 
-
 ##################################################################################
 # Our additional methods
 ##################################################################################
+    def get_edge(self, item1: Any, item2: Any) -> Sport:
+        """Return the Sport class of that edge if item1 and item2 are adjacent and are in the graph.
+        Raise ValueError otherwise."""
+        if item1 in self._vertices and item2 in self._vertices and self.adjacent(item1, item2):
+            v1 = self._vertices[item1]
+            v2 = self._vertices[item2]
+            return v1.neighbours[v2]
+
     def update_sport(self) -> None:
         """Update sport, as we want to add more sport data into the edge during load_graph."""
 
@@ -269,11 +276,11 @@ class Medal:
     num_s: int
     num_b: int
 
-    def __init__(self) -> None:
+    def __init__(self, g: int = 0, s: int = 0, b: int = 0) -> None:
         """Initialize."""
-        self.num_g = 0
-        self.num_s = 0
-        self._num_b = 0
+        self.num_g = g
+        self.num_s = s
+        self._num_b = b
 
     def add_medal(self, kind: str, num: int = 1) -> None:
         """Add a medal with the given kind. The default is 1 medal per time added."""
@@ -323,6 +330,17 @@ class Sport:
             self.team_sports[name] = medals
         elif kind == 'individual' and name not in self.individual_sports:
             self.individual_sports[name] = medals
+
+    def update_medal(self, name: str, kind_sport: str, kind_medal: str, num: int=1) -> None:
+        """Update number of medal into existing Medal.
+        Representation Invariants:
+            - name in {self.team_sports, self.individual_sports}
+            - kind_sport in {'team', 'individual'}
+        """
+        if kind_sport == 'team':
+            self.team_sports[name].add_medal(kind_medal, num)
+        else:
+            self.individual_sports[name].add_medal(kind_medal, num)
 
     def total_medal(self, kind: str = '') -> int:
         """Return the total number of medals for all sports, according to whether kind is team or individual.
@@ -377,10 +395,33 @@ def load_graph(olympic_games: str, countries: str, groups: dict[str, str]) -> Gr
             graph.add_vertex(country_dict[row[6]][1], 'region')
             graph.add_vertex(row[1], 'year')
             # We still need to find a way to
-            graph.add_edge(country_dict[row[6]][0], row[1], Sport())
-            group = find_group(groups, row[3])
+            # Have: edge - Sport class -> Sport - Medal class
 
-            graph.add_edge(row[0], country_dict[row[1]])
+            # Add edge for country and its corresponding region
+            graph.add_edge(country_dict[row[6]][0], country_dict[row[6]][1])
+
+            # Add new edge (empty Sport) if not already adjacent
+            if not graph.adjacent(country_dict[row[6]][0], row[1]):
+                graph.add_edge(country_dict[row[6]][0], row[1], Sport())
+
+            # Update Sport
+            sport_class = graph.get_edge()
+            group = find_group(groups, row[4])
+
+            # Check to access the sport name if available, or create new key if not.
+            if row[4] not in sport_class.team_sports and row[4] not in sport_class.individual_sports:
+                # Create new medal
+                if row[9] == 'Gold':
+                    new_medal = Medal(g=1)
+                elif row[9] == 'Silver':
+                    new_medal = Medal(s=1)
+                else:
+                    new_medal = Medal(b=1)
+                sport_class.add_sport(row[4], group, new_medal)
+            else:
+                # Add new data to medal
+                sport_class.update_medal(row[4], group, row[9])
+
     return graph
 
 
