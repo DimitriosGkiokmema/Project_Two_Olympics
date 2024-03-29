@@ -6,7 +6,6 @@ Additionally, this file also deals with mouse and key inputs
 Reference for button: https://www.youtube.com/watch?v=4_9twnEduFA
 """
 import random
-
 import data
 import math
 import pygame

@@ -9,14 +9,12 @@ import pandas as pd  # remember to install the package pandas! (my version is 2.
 
 olympics = pd.read_csv("summer.csv")
 olympics = olympics.dropna()
-olympics = olympics.iloc[1:]  # I REMOVED THE HEADER FOR EASIER GRAPH LOAD
 olympics.to_csv('summer_modified.csv')
 
 
 country_codes = pd.read_csv("country_codes.csv")
 country_codes = country_codes[['Region Name_en (M49)', 'Country or Area_en (M49)', 'ISO-alpha3 Code (M49)']]
 country_codes = country_codes.dropna()
-country_codes = country_codes.iloc[1:]  # I REMOVED THE HEADER FOR EASIER GRAPH LOAD
 country_codes.to_csv('country_codes_modified.csv')
 
 
@@ -207,6 +205,42 @@ class Graph:
 
         return [gold, silver, bronze]
 
+    def compare_medals(self, country1: str, country2: str, year: int) -> str:
+        """Compare the number of Gold, Silver, and Bronze medals between two countries for a specific year.
+        Return a string summarizing the comparison of medals between the two countries.
+
+            country1 : The name of the first country.
+            country2 : The name of the second country.
+            year : The year for which to compare the medals.
+        """
+        try:
+            # Get the annual data for both countries
+            country1_data = self.annual_data_dict(country1, year)
+            country2_data = self.annual_data_dict(country2, year)
+
+            # Extract medal counts for each country
+            country1_gold = country1_data.get('total medals', 0)
+            country1_silver = country1_data.get('team medals', 0)
+            country1_bronze = country1_data.get('indiv medals', 0)
+
+            country2_gold = country2_data.get('total medals', 0)
+            country2_silver = country2_data.get('team medals', 0)
+            country2_bronze = country2_data.get('indiv medals', 0)
+
+            # Generate the comparison summary string
+            comparison_summary = f"Comparison of Medals in {year}:\n"
+            comparison_summary += f"{country1}:\n"
+            comparison_summary += f"Gold: {country1_gold}, Silver: {country1_silver}, Bronze: {country1_bronze}\n"
+            comparison_summary += f"{country2}:\n"
+            comparison_summary += f"Gold: {country2_gold}, Silver: {country2_silver}, Bronze: {country2_bronze}\n"
+
+            return comparison_summary
+        except ValueError as e:
+            return str(e)
+
+##################################################################################
+# Our additional methods
+##################################################################################
     def get_edge(self, item1: Any, item2: Any) -> Sport:
         """Return the Sport class of that edge if item1 and item2 are adjacent and are in the graph.
         Raise ValueError otherwise."""
@@ -335,7 +369,7 @@ class Sport:
         elif kind == 'individual' and name not in self.individual_sports:
             self.individual_sports[name] = medals
 
-    def update_medal(self, name: str, kind_sport: str, kind_medal: str, num: int=1) -> None:
+    def update_medal(self, name: str, kind_sport: str, kind_medal: str, num: int = 1) -> None:
         """Update number of medal into existing Medal.
         Representation Invariants:
             - name in {self.team_sports, self.individual_sports}
@@ -389,11 +423,13 @@ def load_graph(olympic_games: str, countries: str, groups: dict[str, str]) -> Gr
     country_dict = {}  # will be {isocode: (countryname, region)}
     with open(countries, 'r') as file:
         reader = csv.reader(file)
+        next(reader)  # skip the first header line
         for row in reader:
             country_dict[row[3]] = (row[2], row[1])
 
     with open(olympic_games, 'r') as file:
         reader = csv.reader(file)
+        next(reader)  # skip the first header line
         for row in reader:
             graph.add_vertex(country_dict[row[6]][0], 'country')
             graph.add_vertex(country_dict[row[6]][1], 'region')
