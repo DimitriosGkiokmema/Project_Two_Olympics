@@ -86,7 +86,7 @@ def single_plot():
     bananas = [2, 3, 5]
     oranges = [1, 3, 5]
     title = 'Random Graph'
-    bar = True
+    bar = False
     # if x == 0:
     #     x = YEARS
     names = ['apples', 'pears', 'oranges', 'bananas']
@@ -107,7 +107,7 @@ def single_plot():
         if bar:
             plt.bar(x=apples, height=pears)
         else:
-            plt.plot(YEARS, pears, label="My Line", color="blue", linewidth=2)
+            plt.plot(oranges, pears, label="My Line", color="blue", linewidth=2)
 
     # Add legend, axis labels, and title
     plt.ylabel('Medals', fontsize=14)

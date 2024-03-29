@@ -417,6 +417,18 @@ def load_graph(olympic_games: str, countries: str, groups: dict[str, str]) -> Gr
     The input for olympic_games is 'summer_modified.csv', and the input for countries is
     'country_codes_modified.csv'.
 
+    countries format: Region Name,Country or Area, Code
+    olympic_games format: Year,City,Sport,Discipline,Athlete,Country,Gender,Event,Medal
+
+    Graph: _vertices: dict[Any, _SportVertex]
+    _SportVertex:   item: Any
+                    kind: str
+                    neighbours: dict[_SportVertex, Sport]
+    Sport:  team_sports: dict[str, Medal]
+            individual_sports: dict[str, Medal]
+    Medal:  num_g: int
+            num_s: int
+            num_b: int
     """
     graph = Graph()
 
