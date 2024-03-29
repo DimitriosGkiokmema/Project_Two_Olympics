@@ -9,14 +9,12 @@ import pandas as pd  # remember to install the package pandas! (my version is 2.
 
 olympics = pd.read_csv("summer.csv")
 olympics = olympics.dropna()
-olympics = olympics.iloc[1:]  # I REMOVED THE HEADER FOR EASIER GRAPH LOAD
 olympics.to_csv('summer_modified.csv')
 
 
 country_codes = pd.read_csv("country_codes.csv")
 country_codes = country_codes[['Region Name_en (M49)', 'Country or Area_en (M49)', 'ISO-alpha3 Code (M49)']]
 country_codes = country_codes.dropna()
-country_codes = country_codes.iloc[1:]  # I REMOVED THE HEADER FOR EASIER GRAPH LOAD
 country_codes.to_csv('country_codes_modified.csv')
 
 
@@ -331,7 +329,7 @@ class Sport:
         elif kind == 'individual' and name not in self.individual_sports:
             self.individual_sports[name] = medals
 
-    def update_medal(self, name: str, kind_sport: str, kind_medal: str, num: int=1) -> None:
+    def update_medal(self, name: str, kind_sport: str, kind_medal: str, num: int = 1) -> None:
         """Update number of medal into existing Medal.
         Representation Invariants:
             - name in {self.team_sports, self.individual_sports}
@@ -385,11 +383,13 @@ def load_graph(olympic_games: str, countries: str, groups: dict[str, str]) -> Gr
     country_dict = {}  # will be {isocode: (countryname, region)}
     with open(countries, 'r') as file:
         reader = csv.reader(file)
+        next(reader)  # skip the first header line
         for row in reader:
             country_dict[row[3]] = (row[2], row[1])
 
     with open(olympic_games, 'r') as file:
         reader = csv.reader(file)
+        next(reader)  # skip the first header line
         for row in reader:
             graph.add_vertex(country_dict[row[6]][0], 'country')
             graph.add_vertex(country_dict[row[6]][1], 'region')
