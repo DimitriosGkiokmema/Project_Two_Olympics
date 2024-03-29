@@ -161,6 +161,10 @@ class Graph:
         else:
             return set(self._vertices.keys())
 
+    ##################################################################################
+    # Our additional methods
+    ##################################################################################
+
     def i_th_place(self, year: int) -> list[dict[str, int]] | str:
         """ Ranking (which country, continent, or region ranked the ith place for the number of
         (gold/silver/bronze/total) medals in the given year?)
@@ -173,7 +177,7 @@ class Graph:
         """
         if year not in [year.item for year in self._vertices]:
             return 'Invalid input for year'
-        
+
         gold = {}
         silver = {}
         bronze = {}
@@ -203,9 +207,6 @@ class Graph:
 
         return [gold, silver, bronze]
 
-##################################################################################
-# Our additional methods
-##################################################################################
     def get_edge(self, item1: Any, item2: Any) -> Sport:
         """Return the Sport class of that edge if item1 and item2 are adjacent and are in the graph.
         Raise ValueError otherwise."""
