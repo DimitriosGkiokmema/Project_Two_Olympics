@@ -77,51 +77,53 @@ class Button:
 ####################################################
 
 
-# def single_plot(names: list[str], title:str, bar: bool, style: str, y: list[list[int]], x: list[list[int]] = 0):
-def single_plot():
+def single_plot(names: list[str], title: str, bar: bool, style: str, y: list[list[int]], x: list[int] = 0):
+    # def single_plot():  # Used for quickly testing this function
     """ An instance of this class requires the graph name, y and (optionally) the x values. x and y MUST be lists
     This class will display a single or multiple graphs on the same window, depending on how many
 
     Instance Attributes:
         - names: a list containing the title of each graph
-        - style: the type of graph, either 'line' or 'bar'
+        - title: the title to display at the top of the window
+        - bar: the type of graph, True if a bar graph, False if a line graph
+        - style: many or single lined graph
         - y: a list of y coordinates
         - x: a list of x coordinates. If nothing is entered for it, the x coordinates are every num 1940-2020
 
     Representation Invariants:
-        - style in ['single line', 'many lines']
+        - len(names) > 0
+        - style in ['single', 'many']
         - bar == True or bar == False
         - len(y) == len(x) or x == 0
         - if a value is given for x cords, then y must have the same number of values
     """
-    style = 'single line'
-    apples = [1, 2, 3]
-    pears = [2, 3, 7]
-    bananas = [2, 3, 5]
-    oranges = [1, 3, 5]
-    title = 'Random Graph'
-    bar = False
-    # if x == 0:
-    #     x = YEARS
-    names = ['apples', 'pears', 'oranges', 'bananas']
-    y = [apples, pears, oranges, bananas]
+    # Below is used for testing
+    # style = 'single'
+    # apples = [1, 2, 3]
+    # pears = [2, 3, 7]
+    # bananas = [2, 3, 5]
+    # oranges = [1, 3, 5]
+    # title = 'Random Graph'
+    # bar = False
+    if x == 0:
+        x = YEARS
 
     # Keep
     line_explanation = {names[i]: y[i] for i in range(len(names))}
 
-    if style == 'many lines':  # Single graph with one or multiple lines in it
+    if style == 'many':  # Single graph with one or multiple lines in it
         # Single graph, multiple lines
-        df = pd.DataFrame(line_explanation)
+        df = pd.DataFrame(line_explanation)  # Shows a small table on the graph of what each line means
 
         # Plot individual lines
         for i in line_explanation:
-            plt.plot(pears, df[i], label=i, linewidth=4, color=generate_random_colour())
+            plt.plot(x, df[i], label=i, linewidth=4, color=generate_random_colour())
 
-    elif style == 'single line':
+    elif style == 'single':
         if bar:
-            plt.bar(x=apples, height=pears)
+            plt.bar(x=x, height=y[0])
         else:
-            plt.plot(oranges, pears, label="My Line", color="blue", linewidth=2)
+            plt.plot(x, y[0], label="My Line", color="blue", linewidth=2)
 
     # Add legend, axis labels, and title
     plt.ylabel('Medals', fontsize=14)
@@ -131,50 +133,36 @@ def single_plot():
     plt.show()
 
 
-#########################################
-# Below function still under construction
-#########################################
-
-
-def multiple_plots(names: list[str], title: str, bar: bool, style: str, y: list[list[int]], x: list[list[int]] = 0):
+def two_plots(names: list[str], title: str, bar: bool, style: str, y: list[list[int]], x: list[list[int]] = 0):
     """ An instance of this class requires the graph name, y and (optionally) the x values. x and y MUST be lists
-    This class will display a single or multiple graphs on the same window, depending on how many
+    This class will display one or two graphs on the same window, depending on how many are needed
 
     Instance Attributes:
         - names: a list containing the title of each graph
-        - style: the type of graph, either 'line' or 'bar'
-        - y: a list (or nested list) of y coordinates
-        - x: a list (or nested list) of x coordinates. If nothing is entered for it, the x coordinates are 1940-2020
+        - title: the title to display at the top of the window
+        - bar: the type of graph, True if a bar graph, False if a line graph
+        - style: many or single lined graph
+        - y: a list of y coordinates
+        - x: a list of x coordinates. If nothing is entered for it, the x coordinates are every num 1940-2020
 
     Representation Invariants:
         - len(names) > 0
-        - style in ['many graphs', 'single line', 'bar']
-        - len(names) == len(y) or all(len(names) == len(sub_y) for sub_y in y)
-        - if a value is given for x cords, then x must have the same length as names
+        - style in ['many', 'single']
+        - len(y) == len(x) or x == 0
+        - if a value is given for x cords, then y must have the same number of values
     """
     if x == 0:
         x = YEARS
-    style = random.choice(['many graphs', 'single or many line'])
-    names = ['Rank', 'Performance', 'Host Effect', 'Team vs Indi']
-    side_length = int(math.sqrt(len(names)))
 
-    apples = [1, 2, 3]
-    pears = [2, 3, 7]
-    bananas = [2, 3, 5]
-    oranges = [x // 3 for x in range(1940, 2021)]
+    if style == 'many':  # Two graphs all with one line
+        fig, axs = plt.subplots(1, 2)
 
-    if style == 'many graphs':  # Multiple graphs all with one line
-        fig, axs = plt.subplots(side_length, side_length)
-        name_i = 0
-        for i in range(side_length):
-            for j in range(side_length):
-                colour = random.choice(['blue', 'red', 'pink', 'green', 'purple', 'gray', 'cyan', 'olive'])
-                axs[i, j].plot(YEARS, oranges, f'tab:{colour}')
-                axs[i, j].set_title(names[name_i])  # Sets graph title
-                axs[i, j].set_xlabel('Years')  # Sets x-axis title
-                axs[i, j].set_ylabel('Medals')  # Sets y-axis title
-                name_i += 1
-    elif style == 'single or many line':  # Single graph with one or multiple lines in it
+        for i in range(2):
+            axs[i].plot(x, y[i], f'tab:{generate_random_colour()}')
+            axs[i].set_title(names[i])  # Sets graph title
+            axs[i].set_xlabel('Years')  # Sets x-axis title
+            axs[i].set_ylabel('Medals')  # Sets y-axis title
+    elif style == 'single':  # Single graph with one or multiple lines in it
         # Single graph, multiple lines
         df = pd.DataFrame({'apples': apples, 'pears': pears, 'oranges': apples, 'bananas': bananas})
 
@@ -203,6 +191,17 @@ def generate_random_colour() -> tuple[float, float, float]:
     return rgb[0], rgb[1], rgb[2]
 
 ####################################################
+# Changes screen background and displays text
+####################################################
+
+def display_info(button_name: str) -> None:
+    """ This function is only ever called when a button is clicked.
+    The name of the button is given in the function header adn depending on what it is,
+    this function changes the screen display accordingly, shows a graph, and prints
+    text on the screen (if required)
+    """
+
+####################################################
 # Game loop
 ####################################################
 
@@ -218,48 +217,32 @@ host_effect = Button((0, 255, 0), 100, 410, 'Host Effect')
 team_vs_indi = Button((0, 255, 0), 600, 410, 'Team vs Individual Sports')
 performance = Button((0, 255, 0), 100, 530, 'Performance')
 countries = Button((0, 255, 0), 600, 530, 'Country Statistics')
-sports = Button((0, 255, 0), 350, 650, 'Sport Statistics')
+sports = Button((0, 255, 0), 100, 650, 'Sport Statistics')
+visualize = Button((0, 255, 0), 600, 650, 'Visualize Graph')
 
 # Store buttons in a list
 buttons_main = [annual_medals, given_area, gsb, rankings, annual_data, historical, host_effect, team_vs_indi]
-buttons_main.extend([performance, countries, sports])
+buttons_main.extend([performance, countries, sports, visualize])
 
 
 def redraw_window():
     """Redraw window"""
     window.fill(background_colour)
 
-    for button in buttons_main:
-        button.draw((0, 0, 0))
-
-
-def alter_str(txt: str):
-    txt = txt.split()
-    final = ['']
-    str = ''
-
-    for word in txt:
-        if len(word) + len(final[-1]) < 14:
-            final[-1] += word + ' '
-        else:
-            final.append(word)
-
-    for i in final:
-        str += i + '\n'
-
-    return str
+    for curr_button in buttons_main:
+        curr_button.draw((0, 0, 0))
 
 
 show_graph = False
 run = True
 while run:
-
     for event in pygame.event.get():
         pos = pygame.mouse.get_pos()
         if event.type == pygame.QUIT:
             pygame.quit()
         for button in buttons_main:
             if event.type == pygame.MOUSEBUTTONDOWN and button.is_over(pos):
+                display_info(button.text)
                 show_graph = True
             if event.type == pygame.MOUSEMOTION:
                 if button.is_over(pos):
