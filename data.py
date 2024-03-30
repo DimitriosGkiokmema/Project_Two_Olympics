@@ -30,6 +30,45 @@ olympics.loc[olympics['Country'] == 'POR', 'Country'] = 'PRT'
 olympics.loc[olympics['Country'] == 'URU', 'Country'] = 'URY'
 olympics.loc[olympics['Country'] == 'HAI', 'Country'] = 'HTI'
 olympics.loc[olympics['Country'] == 'PHI', 'Country'] = 'PHL'
+olympics.loc[olympics['Country'] == 'CHI', 'Country'] = 'CHL'
+olympics.loc[olympics['Country'] == 'LAT', 'Country'] = 'LVA'
+olympics.loc[olympics['Country'] == 'SRI', 'Country'] = 'LKA'
+olympics.loc[olympics['Country'] == 'PUR', 'Country'] = 'PRI'
+olympics.loc[olympics['Country'] == 'IRI', 'Country'] = 'IRN'
+olympics.loc[olympics['Country'] == 'TRI', 'Country'] = 'TTO'
+olympics.loc[olympics['Country'] == 'BUL', 'Country'] = 'BGR'
+olympics.loc[olympics['Country'] == 'LIB', 'Country'] = 'LBN'
+olympics.loc[olympics['Country'] == 'BAH', 'Country'] = 'BHS'
+olympics.loc[olympics['Country'] == 'SIN', 'Country'] = 'SGP'
+olympics.loc[olympics['Country'] == 'NGR', 'Country'] = 'NGA'
+olympics.loc[olympics['Country'] == 'MGL', 'Country'] = 'MNG'
+olympics.loc[olympics['Country'] == 'NIG', 'Country'] = 'NER'
+olympics.loc[olympics['Country'] == 'BER', 'Country'] = 'BMU'
+olympics.loc[olympics['Country'] == 'TAN', 'Country'] = 'TZA'
+olympics.loc[olympics['Country'] == 'ZIM', 'Country'] = 'ZWE'
+olympics.loc[olympics['Country'] == 'ZAM', 'Country'] = 'ZMB'
+olympics.loc[olympics['Country'] == 'ALG', 'Country'] = 'DZA'
+olympics.loc[olympics['Country'] == 'CRC', 'Country'] = 'CRI'
+olympics.loc[olympics['Country'] == 'INA', 'Country'] = 'IDN'
+olympics.loc[olympics['Country'] == 'ISV', 'Country'] = 'VGB'
+olympics.loc[olympics['Country'] == 'EUN', 'Country'] = 'URS'  # Actually 2 different team but still in Soviet
+olympics.loc[olympics['Country'] == 'MAS', 'Country'] = 'MYS'
+olympics.loc[olympics['Country'] == 'CRO', 'Country'] = 'HRV'
+olympics.loc[olympics['Country'] == 'SLO', 'Country'] = 'SVK'
+olympics.loc[olympics['Country'] == 'TGA', 'Country'] = 'TON'
+olympics.loc[olympics['Country'] == 'BAR', 'Country'] = 'BRB'
+olympics.loc[olympics['Country'] == 'KSA', 'Country'] = 'SAU'
+olympics.loc[olympics['Country'] == 'KUW', 'Country'] = 'KWT'
+olympics.loc[olympics['Country'] == 'VIE', 'Country'] = 'VNM'
+olympics.loc[olympics['Country'] == 'PAR', 'Country'] = 'PRY'
+olympics.loc[olympics['Country'] == 'UAE', 'Country'] = 'ARE'
+olympics.loc[olympics['Country'] == 'SUD', 'Country'] = 'SDN'
+olympics.loc[olympics['Country'] == 'MRI', 'Country'] = 'MUS'
+olympics.loc[olympics['Country'] == 'TOG', 'Country'] = 'TGO'
+olympics.loc[olympics['Country'] == 'GUA', 'Country'] = 'GTM'
+olympics.loc[olympics['Country'] == 'GRN', 'Country'] = 'GRD'
+olympics.loc[olympics['Country'] == 'BOT', 'Country'] = 'BWA'
+
 # Convert back to a new csv file
 olympics.to_csv('summer_modified.csv')
 
@@ -44,6 +83,16 @@ country_codes.loc[len(country_codes.index)] = ['Oceania', 'Australasia', 'ANZ']
 country_codes.loc[len(country_codes.index)] = ['Europe', 'Russian Empire', 'RU1']
 country_codes.loc[len(country_codes.index)] = ['Europe', 'Czechoslovakia', 'TCH']
 country_codes.loc[len(country_codes.index)] = ['Europe', 'Yugoslavia', 'YUG']
+country_codes.loc[len(country_codes.index)] = ['Europe', 'Soviet Union', 'URS']
+country_codes.loc[len(country_codes.index)] = ['Europe', 'United Team of Germany', 'EUA']
+country_codes.loc[len(country_codes.index)] = ['Americas', 'British West Indies', 'BWI']
+country_codes.loc[130] = ['Asia', 'Chinese Taipei', 'TPE']
+country_codes.loc[len(country_codes.index)] = ['Europe', 'East Germany', 'GDR']
+country_codes.loc[len(country_codes.index)] = ['Europe', 'West Germany', 'FRG']
+country_codes.loc[len(country_codes.index)] = ['Europe', 'Netherlands Antilles', 'AHO']
+country_codes.loc[len(country_codes.index)] = ['World', 'Independent Olympic Participants', 'IOP']
+country_codes.loc[len(country_codes.index)] = ['Europe', 'Serbia and Montenegro', 'SCG']
+
 # Convert back to a new csv file
 country_codes.to_csv('country_codes_modified.csv')
 
@@ -463,13 +512,13 @@ def load_graph(olympic_games: str, countries: str, groups: dict[str, str]) -> Gr
     graph = Graph()
 
     country_dict = {}  # will be {isocode: (countryname, region)}
-    with open(countries, 'r') as file:
+    with open(countries, 'r', encoding='utf-8') as file:
         reader = csv.reader(file)
         next(reader)  # skip the first header line
         for row in reader:
             country_dict[row[3]] = (row[2], row[1])
 
-    with open(olympic_games, 'r') as file:
+    with open(olympic_games, 'r', encoding='utf-8') as file:
         reader = csv.reader(file)
         next(reader)  # skip the first header line
         for row in reader:

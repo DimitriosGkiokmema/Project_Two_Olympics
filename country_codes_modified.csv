@@ -129,7 +129,7 @@
 127,Asia,Turkmenistan,TKM
 128,Asia,Uzbekistan,UZB
 129,Asia,China,CHN
-130,Asia,China,CHN
+130,Asia,Chinese Taipei,TPE
 131,Asia,"China, Hong Kong Special Administrative Region",HKG
 132,Asia,"China, Macao Special Administrative Region",MAC
 133,Asia,Democratic People's Republic of Korea,PRK
@@ -255,3 +255,11 @@
 253,Europe,Russian Empire,RU1
 254,Europe,Czechoslovakia,TCH
 255,Europe,Yugoslavia,YUG
+256,Europe,Soviet Union,URS
+257,Europe,United Team of Germany,EUA
+258,Americas,British West Indies,BWI
+259,Europe,East Germany,GDR
+260,Europe,West Germany,FRG
+261,Europe,Netherlands Antilles,AHO
+262,World,Independent Olympic Participants,IOP
+263,Europe,Serbia and Montenegro,SCG
