@@ -19,13 +19,32 @@ olympics.loc[olympics['Discipline'] == 'Synchronized S.', 'Discipline'] = 'Synch
 olympics.loc[olympics['Discipline'] == 'Water polo', 'Discipline'] = 'Water Polo'
 olympics.loc[olympics['Discipline'] == 'Wrestling Free.', 'Discipline'] = 'Wrestling Freestyle'
 olympics.loc[olympics['Discipline'] == 'Water Motorspor', 'Discipline'] = 'Water Motorsport'
-# Convert back to the csv file
+# Rename countries to be consistent with country_codes
+olympics.loc[olympics['Country'] == 'GRE', 'Country'] = 'GRC'
+olympics.loc[olympics['Country'] == 'GER', 'Country'] = 'DEU'
+olympics.loc[olympics['Country'] == 'DEN', 'Country'] = 'DNK'
+olympics.loc[olympics['Country'] == 'SUI', 'Country'] = 'CHE'
+olympics.loc[olympics['Country'] == 'NED', 'Country'] = 'NLD'
+olympics.loc[olympics['Country'] == 'RSA', 'Country'] = 'ZAF'
+olympics.loc[olympics['Country'] == 'POR', 'Country'] = 'PRT'
+olympics.loc[olympics['Country'] == 'URU', 'Country'] = 'URY'
+olympics.loc[olympics['Country'] == 'HAI', 'Country'] = 'HTI'
+olympics.loc[olympics['Country'] == 'PHI', 'Country'] = 'PHL'
+# Convert back to a new csv file
 olympics.to_csv('summer_modified.csv')
 
 
 country_codes = pd.read_csv("country_codes.csv")
 country_codes = country_codes[['Region Name_en (M49)', 'Country or Area_en (M49)', 'ISO-alpha3 Code (M49)']]
 country_codes = country_codes.dropna()
+country_codes.reset_index(inplace=True, drop=True)
+country_codes.loc[len(country_codes.index)] = ['World', 'International Olympic Committee Mixed teams', 'ZZX']
+country_codes.loc[len(country_codes.index)] = ['Europe', 'Bohemia', 'BOH']
+country_codes.loc[len(country_codes.index)] = ['Oceania', 'Australasia', 'ANZ']
+country_codes.loc[len(country_codes.index)] = ['Europe', 'Russian Empire', 'RU1']
+country_codes.loc[len(country_codes.index)] = ['Europe', 'Czechoslovakia', 'TCH']
+country_codes.loc[len(country_codes.index)] = ['Europe', 'Yugoslavia', 'YUG']
+# Convert back to a new csv file
 country_codes.to_csv('country_codes_modified.csv')
 
 
@@ -329,7 +348,7 @@ class Medal:
         """Initialize."""
         self.num_g = g
         self.num_s = s
-        self._num_b = b
+        self.num_b = b
 
     def add_medal(self, kind: str, num: int = 1) -> None:
         """Add a medal with the given kind. The default is 1 medal per time added."""
@@ -468,7 +487,7 @@ def load_graph(olympic_games: str, countries: str, groups: dict[str, str]) -> Gr
                 graph.add_edge(country_dict[row[6]][0], row[1], Sport())
 
             # Update Sport
-            sport_class = graph.get_edge()
+            sport_class = graph.get_edge(country_dict[row[6]][0], row[1])  # get edge with that country and that year
             group = find_group(groups, row[4])
 
             # Check to access the sport name if available, or create new key if not.
