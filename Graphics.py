@@ -52,6 +52,7 @@ class Button:
         self.text = text
 
     def draw(self, outline=None):
+        """Draw the button on the screen"""
         # Call this method to draw the button on the screen
         if outline:
             pygame.draw.rect(window, outline, (self.x - 2, self.y - 2, self.width + 4, self.height + 4), 0)
@@ -135,7 +136,7 @@ def single_plot():
 #########################################
 
 
-def multiple_plots(names: list[str], title:str, bar: bool, style: str, y: list[list[int]], x: list[list[int]] = 0):
+def multiple_plots(names: list[str], title: str, bar: bool, style: str, y: list[list[int]], x: list[list[int]] = 0):
     """ An instance of this class requires the graph name, y and (optionally) the x values. x and y MUST be lists
     This class will display a single or multiple graphs on the same window, depending on how many
 
@@ -225,6 +226,7 @@ buttons_main.extend([performance, countries, sports])
 
 
 def redraw_window():
+    """Redraw window"""
     window.fill(background_colour)
 
     for button in buttons_main:
