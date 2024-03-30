@@ -20,7 +20,7 @@ background_colour = (125, 235, 255)
 
 window = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('CSC111 Project 2: The Analysis of Summer Olympics Through External Effects')
-# graph = data.load_graph('summer_modified.csv', 'country_codes_modified.csv')
+graph = data.load_graph('summer_modified.csv', 'country_codes_modified.csv')
 YEARS = [x for x in range(1940, 2021)]
 
 ####################################################

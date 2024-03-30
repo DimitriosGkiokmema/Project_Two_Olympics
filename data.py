@@ -11,11 +11,14 @@ olympics = pd.read_csv("summer.csv")
 olympics = olympics.dropna()
 # Renamed some sports to have consistent names
 olympics.loc[olympics['Discipline'] == 'Beach volley.', 'Discipline'] = 'Beach Volleyball'
+olympics.loc[olympics['Discipline'] == 'BMX', 'Discipline'] = 'Cycling BMX'
 olympics.loc[olympics['Discipline'] == 'Modern Pentath.', 'Discipline'] = 'Modern Pentathlon'
+olympics.loc[olympics['Discipline'] == 'Artistic G.', 'Discipline'] = 'Gymnastics Artistic'
 olympics.loc[olympics['Discipline'] == 'Rhythmic G.', 'Discipline'] = 'Gymnastics Rhythmic'
 olympics.loc[olympics['Discipline'] == 'Synchronized S.', 'Discipline'] = 'Synchronized Swimming'
 olympics.loc[olympics['Discipline'] == 'Water polo', 'Discipline'] = 'Water Polo'
 olympics.loc[olympics['Discipline'] == 'Wrestling Free.', 'Discipline'] = 'Wrestling Freestyle'
+olympics.loc[olympics['Discipline'] == 'Water Motorspor', 'Discipline'] = 'Water Motorsport'
 # Convert back to the csv file
 olympics.to_csv('summer_modified.csv')
 
@@ -488,10 +491,23 @@ def load_graph(olympic_games: str, countries: str, groups: dict[str, str]) -> Gr
 def find_group(groups: dict[str, str], sport: str) -> str:
     """Return the group (team or individual) that the sport belongs to.
     Note: the parameter groups has the form of {sportname: kind}, in which kind is either 'team' or 'individual'
+    Note: 0 means 'individual', and 1 means 'team'!!
     Representation Invariants:
         - sport in groups
     """
-    return groups[sport]
+    if groups[sport] == 0:
+        return 'individual'
+    else:
+        return 'team'
 
 
-group = {}
+group = {'Archery': 0, 'Athletics': 0, 'Badminton': 0, 'Baseball': 1, 'Basketball': 1, 'Basque Pelota': 1,
+         'Beach Volleyball': 1, 'Boxing': 0, 'Canoe / Kayak F': 0, 'Canoe / Kayak S': 0, 'Canoe Slalom': 0,
+         'Canoe Sprint': 1, 'Cricket': 1, 'Croquet': 0, 'Cycling BMX': 0, 'Cycling Road': 0, 'Cycling Track': 0,
+         'Diving': 0, 'Dressage': 0, 'Eventing': 0, 'Fencing': 0, 'Figure skating': 0, 'Football': 1, 'Golf': 0,
+         'Gymnastics Artistic': 0, 'Gymnastics Rhythmic': 1, 'Handball': 1, 'Hockey': 1, 'Ice Hockey': 1,
+         'Jeu de Paume': 0, 'Judo': 0, 'Jumping': 0, 'Lacrosse': 1, 'Marathon swimming': 0, 'Modern Pentathlon': 0,
+         'Mountain Bike': 1, 'Polo': 1, 'Rackets': 0, 'Roque': 0, 'Rowing': 1, 'Rugby': 1, 'Sailing': 1, 'Shooting': 0,
+         'Softball': 1, 'Swimming': 0, 'Synchronized Swimming': 1, 'Table Tennis': 0, 'Taekwondo': 0, 'Tennis': 0,
+         'Trampoline': 0, 'Triathlon': 0, 'Tug of War': 1, 'Vaulting': 0, 'Volleyball': 1, 'Water Motorsport': 1,
+         'Water Polo': 1, 'Weightlifting': 0, 'Wrestling Freestyle': 0, 'Wrestling Gre-R': 0}
