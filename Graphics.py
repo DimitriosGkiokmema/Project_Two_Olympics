@@ -103,15 +103,19 @@ def single_plot(names: list[str], title: str, bar: bool, style: str, y: list[lis
     # pears = [2, 3, 7]
     # bananas = [2, 3, 5]
     # oranges = [1, 3, 5]
+    # y = [apples, pears, bananas, oranges]
+    # names = ['apples', 'pears', 'bananas', 'oranges']
     # title = 'Random Graph'
     # bar = False
-    if x == 0:
-        x = YEARS
+    # x = bananas
 
-    # Keep
+    # if x == 0:
+    #     x = YEARS
+
+    # Keep this line
     line_explanation = {names[i]: y[i] for i in range(len(names))}
 
-    if style == 'many':  # Single graph with one or multiple lines in it
+    if style == 'many':  # Graph with one or multiple lines in it
         # Single graph, multiple lines
         df = pd.DataFrame(line_explanation)  # Shows a small table on the graph of what each line means
 
@@ -133,7 +137,7 @@ def single_plot(names: list[str], title: str, bar: bool, style: str, y: list[lis
     plt.show()
 
 
-def two_plots(names: list[str], title: str, bar: bool, style: str, y: list[list[int]], x: list[list[int]] = 0):
+def two_plots(names: list[str], title: str, bar: bool, s: str, y1: list[list[int]], y2: list[list[int]], x: list = 0):
     """ An instance of this class requires the graph name, y and (optionally) the x values. x and y MUST be lists
     This class will display one or two graphs on the same window, depending on how many are needed
 
@@ -141,42 +145,60 @@ def two_plots(names: list[str], title: str, bar: bool, style: str, y: list[list[
         - names: a list containing the title of each graph
         - title: the title to display at the top of the window
         - bar: the type of graph, True if a bar graph, False if a line graph
-        - style: many or single lined graph
+        - s: many or single lined graph. Same as style variable from above function
         - y: a list of y coordinates
         - x: a list of x coordinates. If nothing is entered for it, the x coordinates are every num 1940-2020
 
     Representation Invariants:
         - len(names) > 0
-        - style in ['many', 'single']
+        - s in ['many', 'single']
         - len(y) == len(x) or x == 0
         - if a value is given for x cords, then y must have the same number of values
     """
     if x == 0:
         x = YEARS
 
-    if style == 'many':  # Two graphs all with one line
+    # Keep this line
+    line_explanation = {names[i]: y1[i] for i in range(len(names))}
+
+    for y in y2:
+        line_explanation[names[y2.index(y) + len(line_explanation)]] = y
+
+    if s == 'single' and not bar:  # Two graphs with one line
         fig, axs = plt.subplots(1, 2)
 
-        for i in range(2):
-            axs[i].plot(x, y[i], f'tab:{generate_random_colour()}')
+        for y in [y1, y2]:
+            i = [y1, y2].index(y)
+            if not bar:
+                axs[i].plot(x, y, color=generate_random_colour())
+            else:
+                axs[i].bar(x=x, height=y, color=generate_random_colour())
+
             axs[i].set_title(names[i])  # Sets graph title
             axs[i].set_xlabel('Years')  # Sets x-axis title
             axs[i].set_ylabel('Medals')  # Sets y-axis title
-    elif style == 'single':  # Single graph with one or multiple lines in it
-        # Single graph, multiple lines
-        df = pd.DataFrame({'apples': apples, 'pears': pears, 'oranges': apples, 'bananas': bananas})
+    elif s == 'many':  # Two graphs with  multiple lines
+        fig, axs = plt.subplots(1, 2)
+        df = pd.DataFrame(line_explanation)
 
-        # Plot individual lines
-        plt.plot(df['apples'], label='apples', color='red')
-        plt.plot(df['apples'], label='oranges', color='orange', linewidth=4)
-        plt.plot(df['bananas'], label='bananas', color='yellow', linestyle='dashed')
+        for y in [y1, y2]:
+            i = [y1, y2].index(y)
 
-        # Add legend, axis labels, and title
-        plt.legend()
-        plt.ylabel('Amount', fontsize=14)
-        plt.xlabel('Fruits', fontsize=14)
-        plt.title('Fruit Sales', fontsize=16)
+            for line in y:
+                name_i = y.index(line)
 
+                if line not in y1:
+                    name_i += len(y1)
+
+                axs[i].plot(df[line], label=names[name_i], color='red', linestyle='dashed')
+
+            axs[i].set_title(names[i])
+            axs[i].set_xlabel('Years')
+            axs[i].set_ylabel('Medals')
+            axs[i].legend()
+
+    plt.title(title, fontsize=16)
+    plt.grid(True)
     plt.show()
 
 
@@ -193,6 +215,8 @@ def generate_random_colour() -> tuple[float, float, float]:
 ####################################################
 # Changes screen background and displays text
 ####################################################
+# Under Construction
+
 
 def display_info(button_name: str) -> None:
     """ This function is only ever called when a button is clicked.
@@ -200,6 +224,7 @@ def display_info(button_name: str) -> None:
     this function changes the screen display accordingly, shows a graph, and prints
     text on the screen (if required)
     """
+    # single_plot()
 
 ####################################################
 # Game loop
@@ -243,7 +268,7 @@ while run:
         for button in buttons_main:
             if event.type == pygame.MOUSEBUTTONDOWN and button.is_over(pos):
                 display_info(button.text)
-                show_graph = True
+                # show_graph = True
             if event.type == pygame.MOUSEMOTION:
                 if button.is_over(pos):
                     button.colour = (255, 0, 0)
@@ -251,9 +276,8 @@ while run:
                     button.colour = (0, 255, 0)
 
     # Draws the graph
-    if show_graph:
-        show_graph = False
-        single_plot()
+    # if show_graph:
+    #     show_graph = False
 
     # updates the visuals
     redraw_window()
