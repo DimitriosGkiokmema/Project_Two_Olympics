@@ -9,6 +9,14 @@ import pandas as pd  # remember to install the package pandas! (my version is 2.
 
 olympics = pd.read_csv("summer.csv")
 olympics = olympics.dropna()
+# Renamed some sports to have consistent names
+olympics.loc[olympics['Discipline'] == 'Beach volley.', 'Discipline'] = 'Beach Volleyball'
+olympics.loc[olympics['Discipline'] == 'Modern Pentath.', 'Discipline'] = 'Modern Pentathlon'
+olympics.loc[olympics['Discipline'] == 'Rhythmic G.', 'Discipline'] = 'Gymnastics Rhythmic'
+olympics.loc[olympics['Discipline'] == 'Synchronized S.', 'Discipline'] = 'Synchronized Swimming'
+olympics.loc[olympics['Discipline'] == 'Water polo', 'Discipline'] = 'Water Polo'
+olympics.loc[olympics['Discipline'] == 'Wrestling Free.', 'Discipline'] = 'Wrestling Freestyle'
+# Convert back to the csv file
 olympics.to_csv('summer_modified.csv')
 
 
@@ -472,3 +480,6 @@ def find_group(groups: dict[str, str], sport: str) -> str:
         - sport in groups
     """
     return groups[sport]
+
+
+group = {}
