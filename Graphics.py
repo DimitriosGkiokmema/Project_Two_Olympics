@@ -34,7 +34,7 @@ group = {'Archery': 0, 'Athletics': 0, 'Badminton': 0, 'Baseball': 1, 'Basketbal
 
 graph = data.load_graph('summer_modified.csv', 'country_codes_modified.csv', group)
 
-YEARS = [x for x in range(1940, 2021)]
+YEARS = [x for x in range(1940, 2013)]
 
 ####################################################
 # Buttons

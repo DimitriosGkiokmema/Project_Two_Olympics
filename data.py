@@ -136,6 +136,7 @@ class _SportVertex(_Vertex):
     Instance Attributes:
         - item: The data stored in this vertex, representing a year, country, or region.
         - kind: The type of this vertex: 'year', 'country', or 'region'.
+        - host: if this vertex is a year, this is the country that held the Olympics at that year. '' if not year
         - neighbours: The vertices that are adjacent to this vertex, and their corresponding
             edge weights.
 
@@ -146,9 +147,10 @@ class _SportVertex(_Vertex):
     """
     item: Any
     kind: str
+    host: str
     neighbours: dict[_SportVertex, Sport]
 
-    def __init__(self, item: Any, kind: str) -> None:
+    def __init__(self, item: Any, kind: str, host: str) -> None:
         """Initialize a new vertex with the given item and kind.
 
         This vertex is initialized with no neighbours.
@@ -157,6 +159,7 @@ class _SportVertex(_Vertex):
             - kind in {'year', 'country', 'region'}
         """
         super().__init__(item, kind)
+        self.host = host
         self.neighbours = {}
 
 
@@ -173,7 +176,7 @@ class Graph:
         """Initialize an empty graph (no vertices or edges)."""
         self._vertices = {}
 
-    def add_vertex(self, item: Any, kind: str) -> None:
+    def add_vertex(self, item: Any, kind: str, host: str) -> None:
         """Add a vertex with the given item and kind to this graph.
 
         The new vertex is not adjacent to any other vertices.
@@ -183,7 +186,7 @@ class Graph:
             - kind in {'year', 'country', 'region'}
         """
         if item not in self._vertices:
-            self._vertices[item] = _SportVertex(item, kind)
+            self._vertices[item] = _SportVertex(item, kind, host)
 
     def add_edge(self, item1: Any, item2: Any, sport: Sport = None) -> None:
         """Add an edge between the two vertices with the given items in this graph.
@@ -308,6 +311,28 @@ class Graph:
             bronze[country.item] = b
 
         return [gold, silver, bronze]
+
+    def host_wins(self, country) -> list[dict[Any, int]] | str:
+        """ This function returns a dict in the format [year_hosted, num of wins, {year_played: num of wins}]
+        If the inputted country never held the Olympics, a message stating this is returned
+        """
+        is_host = False
+        host_medals = {}
+        played_medals = {}
+
+        for year in self._vertices:
+            if self._vertices[year].kind == 'year' and self._vertices[year].host == country:
+                is_host = True
+                host_medals[year] = self._vertices[year].neighbours[country].total_medal()
+
+        if is_host:
+            for year in self._vertices[country].neighbours:
+                if self._vertices[year].kind == 'year' and self._vertices[year].host != country:
+                    played_medals[year.item] = year.neighbours[country].total_medal()
+
+            return [host_medals, played_medals]
+        else:
+            return 'The given country has never hosted the Olympics!'
 
     def compare_medals(self, country1: str, country2: str, year: int) -> str:
         """Compare the number of Gold, Silver, and Bronze medals between two countries for a specific year.
@@ -527,6 +552,7 @@ def load_graph(olympic_games: str, countries: str, groups: dict[str, str]) -> Gr
     Graph: _vertices: dict[Any, _SportVertex]
     _SportVertex:   item: Any
                     kind: str
+                    host: str
                     neighbours: dict[_SportVertex, Sport]
     Sport:  team_sports: dict[str, Medal]
             individual_sports: dict[str, Medal]
@@ -547,9 +573,9 @@ def load_graph(olympic_games: str, countries: str, groups: dict[str, str]) -> Gr
         reader = csv.reader(file)
         next(reader)  # skip the first header line
         for row in reader:
-            graph.add_vertex(country_dict[row[6]][0], 'country')
-            graph.add_vertex(country_dict[row[6]][1], 'region')
-            graph.add_vertex(row[1], 'year')
+            graph.add_vertex(country_dict[row[6]][0], 'country', '')
+            graph.add_vertex(country_dict[row[6]][1], 'region', '')
+            graph.add_vertex(row[1], 'year', row[6][0])
             # We still need to find a way to
             # Have: edge - Sport class -> Sport - Medal class
 
