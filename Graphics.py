@@ -156,41 +156,41 @@ def two_plots(names: list[str], title: str, bar: bool, s: str, y1: list[list[int
         - if a value is given for x cords, then y must have the same number of values
     """
     if x == 0:
-        x = YEARS
-
-    # Keep this line
-    line_explanation = {names[i]: y1[i] for i in range(len(names))}
-
-    for y in y2:
-        line_explanation[names[y2.index(y) + len(line_explanation)]] = y
+        x1 = YEARS
+        x2 = YEARS
+    else:
+        x1 = x[0]
+        x2 = x[1]
 
     if s == 'single' and not bar:  # Two graphs with one line
         fig, axs = plt.subplots(1, 2)
 
-        for y in [y1, y2]:
-            i = [y1, y2].index(y)
-            if not bar:
-                axs[i].plot(x, y, color=generate_random_colour())
-            else:
-                axs[i].bar(x=x, height=y, color=generate_random_colour())
+        if not bar:
+            axs[0].plot(x1, y1, color=generate_random_colour())
+            axs[1].plot(x2, y2, color=generate_random_colour())
+        else:
+            axs[0].bar(x=x1, height=y1, color=generate_random_colour())
+            axs[1].bar(x=x2, height=y2, color=generate_random_colour())
 
-            axs[i].set_title(names[i])  # Sets graph title
-            axs[i].set_xlabel('Years')  # Sets x-axis title
-            axs[i].set_ylabel('Medals')  # Sets y-axis title
+        # Putting details on first graph
+        axs[0].set_title(names[0])  # Sets graph title
+        axs[0].set_xlabel('Years')  # Sets x-axis title
+        axs[0].set_ylabel('Medals')  # Sets y-axis title
+
+        # Putting details on second graph
+        axs[1].set_title(names[1])  # Sets graph title
+        axs[1].set_xlabel('Years')  # Sets x-axis title
+        axs[1].set_ylabel('Medals')  # Sets y-axis title
     elif s == 'many':  # Two graphs with  multiple lines
         fig, axs = plt.subplots(1, 2)
-        df = pd.DataFrame(line_explanation)
+        x = [x1, x2]
+        y = [y1, y2]
 
-        for y in [y1, y2]:
-            i = [y1, y2].index(y)
-
-            for line in y:
-                name_i = y.index(line)
-
-                if line not in y1:
-                    name_i += len(y1)
-
-                axs[i].plot(df[line], label=names[name_i], color='red', linestyle='dashed')
+        for i in range(2):
+            if bar:
+                axs[i].bar(x=x[i], height=y[i], color=generate_random_colour())
+            else:
+                axs[i].plot(x[i], y[i], label=names[i], color=generate_random_colour())
 
             axs[i].set_title(names[i])
             axs[i].set_xlabel('Years')
@@ -225,6 +225,23 @@ def display_info(button_name: str) -> None:
     text on the screen (if required)
     """
     # single_plot()
+    # if button_name == 'Annual Medals':
+    # elif button_name == 'Given Area':
+    # elif button_name == 'Gold, Silver, and Bronze':
+    # elif button_name == 'Rank':
+    # elif button_name == 'Annual Data':
+    # elif button_name == 'Impact of Historical Events':
+    # elif button_name == 'Host Effect':
+    #     x = graph.host_wins()
+    #     x1 = [year for year in x[0]]
+    #     x2 = [year for year in x[1]]
+    #
+    #
+    # elif button_name == 'Team vs Individual Sports':
+    # elif button_name == 'Performance':
+    # elif button_name == 'Country Statistics':
+    # elif button_name == 'Sport Statistics':
+    # elif button_name == 'Visualize Graph':
 
 ####################################################
 # Game loop
