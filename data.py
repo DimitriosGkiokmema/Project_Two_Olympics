@@ -471,6 +471,55 @@ class Medal:
         Each bronze medal worths 1 point."""
         return 3 * self.num_g + 2 * self.num_s + self.num_b
 
+    def medal_number_in_year(self, input_year: int) -> int:
+        """
+        Computes the number of medals in the given year (= input_year).
+        Whenever the input_year is not in self, raise ValueError.
+        """
+        # Raises ValueError if the input_year is not in the Graph.
+        if input_year not in [year.item for year in self._vertices]:
+            raise ValueError
+        else:
+
+            # Follows an accumulator pattern.
+            medals_so_far = 0
+            for country in self._vertices[input_year].neighbours:
+                sport = self._vertices[input_year].neighbours[country]
+
+                # Counts separatedly the number of medal achieved in team_sport and individual_sport.
+                for team_sport in sport.team_sports:
+                    medals_so_far += sport.team_sports[team_sport].num_g + sport.team_sports[team_sport].num_s + \
+                                     sport.team_sports[team_sport].num_b
+                for individual_sport in sport.team_sports:
+                    medals_so_far += sport.team_sports[individual_sport].num_g + sport.team_sports[
+                        individual_sport].num_s + sport.team_sports[individual_sport].num_b
+
+        return medals_so_far
+
+    def medal_number_location(self, input_location: str) -> int:
+        """
+        Computes the number of medals in the input_location overtime.
+        Whenever the input_location is not in self, raise ValueError.
+        """
+        # Raises ValueError if the input_location is not in the Graph.
+        if input_location not in [location.item for location in self._vertices]:
+            raise ValueError
+        else:
+
+            # Follows an accumulator pattern.
+            medals_so_far = 0
+            for year in self._vertices[input_location].neighbours:
+                sport = self._vertices[year].neighbours[year]
+
+                # Counts separatedly the number of medal achieved in team_sport and individual_sport.
+                for team_sport in sport.team_sports:
+                    medals_so_far += sport.team_sports[team_sport].num_g + sport.team_sports[team_sport].num_s + \
+                                     sport.team_sports[team_sport].num_b
+                for individual_sport in sport.team_sports:
+                    medals_so_far += sport.team_sports[individual_sport].num_g + sport.team_sports[
+                        individual_sport].num_s + sport.team_sports[individual_sport].num_b
+        return medals_so_far
+
 
 class Sport:
     """A class storing the sports that a country partook as the key, and the medals they got at that sport in
