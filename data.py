@@ -242,7 +242,7 @@ class Graph:
         If kind != '', only return the items of the given vertex kind.
 
         Preconditions:
-            - kind in {'year', 'country'}
+            - kind in {'year', 'country', 'region'}
         """
         if kind != '':
             return {v.item for v in self._vertices.values() if v.kind == kind}
@@ -457,6 +457,166 @@ class Graph:
         else:
             raise ValueError
 
+    def medal_number_in_year(self, input_year: int) -> int:
+        """
+        Computes the number of medals in the given year (= input_year).
+        """
+        # Raises ValueError if the input_year is not in the Graph.
+        if input_year not in [year.item for year in self._vertices]:
+            return 0  # AMY CHANGED THIS
+        else:
+
+            # Follows an accumulator pattern.
+            medals_so_far = 0
+            for country in self._vertices[input_year].neighbours:
+                sport = self._vertices[input_year].neighbours[country]
+
+                # Counts separatedly the number of medal achieved in team_sport and individual_sport.
+                for team_sport in sport.team_sports:
+                    medals_so_far += sport.team_sports[team_sport].num_g + sport.team_sports[team_sport].num_s + \
+                                     sport.team_sports[team_sport].num_b
+                for individual_sport in sport.team_sports:
+                    medals_so_far += sport.team_sports[individual_sport].num_g + sport.team_sports[
+                        individual_sport].num_s + sport.team_sports[individual_sport].num_b
+
+            return medals_so_far
+
+    def medal_number_location(self, input_location: str) -> int:
+        """
+        Computes the number of medals in the input_location overtime.
+        Whenever the input_location is not in self, raise ValueError.
+        """
+        # Raises ValueError if the input_location is not in the Graph.
+        if input_location not in [location.item for location in self._vertices]:
+            raise ValueError
+        else:
+
+            # Follows an accumulator pattern.
+            medals_so_far = 0
+            for year in self._vertices[input_location].neighbours:
+                sport = self._vertices[year].neighbours[year]
+
+                # Counts separatedly the number of medal achieved in team_sport and individual_sport.
+                for team_sport in sport.team_sports:
+                    medals_so_far += sport.team_sports[team_sport].num_g + sport.team_sports[team_sport].num_s + \
+                                     sport.team_sports[team_sport].num_b
+                for individual_sport in sport.team_sports:
+                    medals_so_far += sport.team_sports[individual_sport].num_g + sport.team_sports[
+                        individual_sport].num_s + sport.team_sports[individual_sport].num_b
+        return medals_so_far
+
+############################################################################################
+# About historical events
+###########################################################################################
+
+    def participation_in_year(self, input_year: int) -> int:
+        """Return the number of countries participated in the Summer Olympic in a given year.
+        In other words, count the number of countries that the input_year vertex """
+        if input_year not in self._vertices:  # the key, as the load_graph, is str
+            return 0
+        else:
+            v_year = self._vertices[input_year]
+            count = 0
+            for vertex in v_year.neighbours:
+                if vertex.kind == 'country':
+                    count += 1
+
+            return count
+
+    def medal_all_years(self, start_year: int, end_year: int) -> list:
+        """Return the total number of medals for each year from start_year to end_year, INCLUSIVE"""
+        selected_years = []
+        for y in range(start_year, end_year + 1):
+            selected_years.append(self.medal_number_in_year(y))
+
+        return selected_years
+
+    def participation_all_years(self, start_year: int, end_year: int) -> list:
+        """Return the total number of countries participated in each year from start_year to end_year, INCLUSIVE"""
+        selected_years = []
+        for y in range(start_year, end_year + 1):
+            selected_years.append(self.participation_in_year(y))
+
+        return selected_years
+
+    def medal_overall_average(self) -> float | int:
+        """Return the overall average number of medals for all years between the first recorded year and the last
+        recorded year. Rounded to the second decimal place.
+        Notice: Still need to count the year with no medals. For example our data has two years: 2013, and 2015 with
+        the number of medals respectively are 20,10. Although the vertice 2014 isn't shown in the graph, it is still
+        between the start and end years, so we still need to count the year 2014, to make the average to be
+        (20 + 0 + 10) / 3, not (20 + 10) / 2.
+        """
+        all_years = self.get_all_vertices('year')
+        min_year, max_year = min({year.item for year in all_years}), max({year.item for year in all_years})
+        total = sum(self.medal_all_years(min_year, max_year))
+        return round(total / (max_year - min_year + 1), 2)
+
+    def medal_period_average(self, start_year: int, end_year: int) -> float | int:
+        """Return the period average number of medals from start_year to end_year, INCLUSIVE. Rounded to the
+        second decimal place.
+        Representation Invariants:
+            - start_year and end_year must be among [min_year, max_year] recorded in the dataset.
+        """
+        total = sum(self.medal_all_years(start_year, end_year))
+        return round(total / (end_year - start_year + 1), 2)
+
+    def participation_overall_average(self) -> float | int:
+        """Return the overall average number of participants for all years between the first recorded year and the
+        last recorded year. Rounded to the second decimal place.
+        Similar notice as medal_overall_average.
+        """
+        all_years = self.get_all_vertices('year')
+        min_year, max_year = min({year.item for year in all_years}), max({year.item for year in all_years})
+        total = sum(self.participation_all_years(min_year, max_year))
+        return round(total / (max_year - min_year + 1), 2)
+
+    def participation_period_average(self, start_year: int, end_year: int) -> float | int:
+        """Return the period average number of participants from start_year to end_year, INCLUSIVE. Rounded to the
+        second decimal place.
+        Representation Invariants:
+            - start_year and end_year must be among [min_year, max_year] recorded in the dataset."""
+        total = sum(self.participation_all_years(start_year, end_year))
+        return round(total / (end_year - start_year + 1), 2)
+
+#######################################################
+    def wins_one(self, year: int, country: str) -> tuple:
+        """Return the total scores, calculated from the weighted number of medals achieved by a country in year, in the
+        category of team sports and individual sports, respectively.
+        """
+        if self.adjacent(year, country):
+            v_country = self._vertices[country]
+            v_year = self._vertices[year]
+            sport_data = v_country.neighbours[v_year]
+
+            # Calculate team sports first
+            team_so_far = 0
+            for medal in sport_data.team_sports.values():
+                team_so_far += medal.weighted_score()
+            # Then calculate individual sports
+            indiv_so_far = 0
+            for medal in sport_data.individual_sports.values():
+                indiv_so_far += medal.weighted_score()
+
+            return team_so_far, indiv_so_far
+        else:
+            return 0, 0
+
+    def wins_multiple(self, country: str) -> tuple[list, list]:
+        """Return the total scores, calculated from the weighted number of medals achieved by a country throughout the
+        recorded period, in the category of team sports and individual sports, respectively. The first list in the
+        returned tuple will be for team, and the other one is for individual.
+        """
+        team = []
+        indiv = []
+        all_years = self.get_all_vertices('year')
+        min_year, max_year = min({year.item for year in all_years}), max({year.item for year in all_years})
+        for year in range(min_year, max_year + 1):  # Since we want the max_year inclusive
+            one = self.wins_one(year, country)
+            team.append(one[0])
+            indiv.append(one[1])
+        return team, indiv
+
 
 class Medal:
     """A place to store number of medals for a given edge (which country - in which year - on which sport).
@@ -599,22 +759,24 @@ def load_graph(olympic_games: str, countries: str, groups: dict[str, str]) -> Gr
         reader = csv.reader(file)
         next(reader)  # skip the first header line
         for row in reader:
+            yr = int(row[1])
             graph.add_vertex(country_dict[row[6]][0], 'country', '')
             graph.add_vertex(country_dict[row[6]][1], 'region', '')
             graph.add_vertex(row[1], 'year', city_to_country[row[2]])
             # We still need to find a way to
+            graph.add_vertex(yr, 'year', row[6][0])
             # Have: edge - Sport class -> Sport - Medal class
 
             # Add edge for country and its corresponding region
             graph.add_edge(country_dict[row[6]][0], country_dict[row[6]][1])
 
             # Add new edge (empty Sport) if not already adjacent
-            if not graph.adjacent(country_dict[row[6]][0], row[1]):
-                graph.add_edge(country_dict[row[6]][0], row[1], Sport())
+            if not graph.adjacent(country_dict[row[6]][0], yr):
+                graph.add_edge(country_dict[row[6]][0], yr, Sport())
 
             # Update Sport
-            sport_class = graph.get_edge(country_dict[row[6]][0], row[1])  # get edge with that country and that year
-            group = find_group(groups, row[4])
+            sport_class = graph.get_edge(country_dict[row[6]][0], yr)  # get edge with that country and that year
+            grp = find_group(groups, row[4])
 
             # Check to access the sport name if available, or create new key if not.
             if row[4] not in sport_class.team_sports and row[4] not in sport_class.individual_sports:
@@ -625,10 +787,10 @@ def load_graph(olympic_games: str, countries: str, groups: dict[str, str]) -> Gr
                     new_medal = Medal(s=1)
                 else:
                     new_medal = Medal(b=1)
-                sport_class.add_sport(row[4], group, new_medal)
+                sport_class.add_sport(row[4], grp, new_medal)
             else:
                 # Add new data to medal
-                sport_class.update_medal(row[4], group, row[9])
+                sport_class.update_medal(row[4], grp, row[9])
 
     return graph
 
