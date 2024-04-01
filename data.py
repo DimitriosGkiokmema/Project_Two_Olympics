@@ -434,7 +434,6 @@ class Graph:
     def medal_number_in_year(self, input_year: int) -> int:
         """
         Computes the number of medals in the given year (= input_year).
-        Whenever the input_year is not in self, raise ValueError.
         """
         # Raises ValueError if the input_year is not in the Graph.
         if input_year not in [year.item for year in self._vertices]:
@@ -479,6 +478,10 @@ class Graph:
                     medals_so_far += sport.team_sports[individual_sport].num_g + sport.team_sports[
                         individual_sport].num_s + sport.team_sports[individual_sport].num_b
         return medals_so_far
+
+############################################################################################
+# About historical events
+###########################################################################################
 
     def participation_in_year(self, input_year: int) -> int:
         """Return the number of countries participated in the Summer Olympic in a given year.
@@ -549,6 +552,44 @@ class Graph:
             - start_year and end_year must be among [min_year, max_year] recorded in the dataset."""
         total = sum(self.participation_all_years(start_year, end_year))
         return round(total / (end_year - start_year + 1), 2)
+
+#######################################################
+    def wins_one(self, year: int, country: str) -> tuple:
+        """Return the total scores, calculated from the weighted number of medals achieved by a country in year, in the
+        category of team sports and individual sports, respectively.
+        """
+        if self.adjacent(year, country):
+            v_country = self._vertices[country]
+            v_year = self._vertices[year]
+            sport_data = v_country.neighbours[v_year]
+
+            # Calculate team sports first
+            team_so_far = 0
+            for medal in sport_data.team_sports.values():
+                team_so_far += medal.weighted_score()
+            # Then calculate individual sports
+            indiv_so_far = 0
+            for medal in sport_data.individual_sports.values():
+                indiv_so_far += medal.weighted_score()
+
+            return team_so_far, indiv_so_far
+        else:
+            return 0, 0
+
+    def wins_multiple(self, country: str) -> tuple[list, list]:
+        """Return the total scores, calculated from the weighted number of medals achieved by a country throughout the
+        recorded period, in the category of team sports and individual sports, respectively. The first list in the
+        returned tuple will be for team, and the other one is for individual.
+        """
+        team = []
+        indiv = []
+        all_years = self.get_all_vertices('year')
+        min_year, max_year = min({year.item for year in all_years}), max({year.item for year in all_years})
+        for year in range(min_year, max_year + 1):  # Since we want the max_year inclusive
+            one = self.wins_one(year, country)
+            team.append(one[0])
+            indiv.append(one[1])
+        return team, indiv
 
 
 class Medal:
