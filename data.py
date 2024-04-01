@@ -483,10 +483,10 @@ class Graph:
     def participation_in_year(self, input_year: int) -> int:
         """Return the number of countries participated in the Summer Olympic in a given year.
         In other words, count the number of countries that the input_year vertex """
-        if str(input_year) not in self._vertices:  # the key, as the load_graph, is str
+        if input_year not in self._vertices:  # the key, as the load_graph, is str
             return 0
         else:
-            v_year = self._vertices[str(input_year)]
+            v_year = self._vertices[input_year]
             count = 0
             for vertex in v_year.neighbours:
                 if vertex.kind == 'country':
@@ -511,18 +511,21 @@ class Graph:
         return selected_years
 
     def medal_overall_average(self) -> float | int:
-        """Return the overall average of number of medals for all recorded years. Rounded to the second decimal point.
-        Notice: Still need to count the year with no medals. For example our data has 2013, 2014, 2015 with
-        the number of medals respectively are 20, 0, 10. Although the vertice 2014 isn't shown in the graph, we still
-        need to count the year 2014, to make the average to be (20 + 0 + 10) / 3, not (20 + 10) / 2.
-        Moreover, another scenario is that when we want to compute the average for 2012, 2013, 2014, and 2015 but there
-        is no medal data for 2012. In this case we will ignore 2012 and just start counting from 2013, since it is the
-        first year in the data that had medal observed."""
+        """Return the overall average number of medals for all recorded years. Rounded to the second decimal place.
+        Notice: Still need to count the year with no medals. For example our data has two years: 2013, and 2015 with
+        the number of medals respectively are 20,10. Although the vertice 2014 isn't shown in the graph, it is still
+        between the start and end years, so we still need to count the year 2014, to make the average to be
+        (20 + 0 + 10) / 3, not (20 + 10) / 2.
+        """
         all_years = self.get_all_vertices('year')
-        min_year, max_year = min({year.item for year in all_years}), max({year.item for year in all_year})
+        min_year, max_year = min({year.item for year in all_years}), max({year.item for year in all_years})
+        total = sum(self.medal_all_years(min_year, max_year))
+        return round(total / (max_year - min_year + 1), 2)
 
-
-
+    def medal_period_average(self, start_year: int, end_year: int) -> float | int:
+        """Return the priod average number of medals from start_year to end_year, INCLUSIVE. Rounded to the
+        second decimal place.
+        """
 class Medal:
     """A place to store number of medals for a given edge (which country - in which year - on which sport).
     Instance Attributes:
@@ -664,21 +667,21 @@ def load_graph(olympic_games: str, countries: str, groups: dict[str, str]) -> Gr
         reader = csv.reader(file)
         next(reader)  # skip the first header line
         for row in reader:
+            yr = int(row[1])
             graph.add_vertex(country_dict[row[6]][0], 'country', '')
             graph.add_vertex(country_dict[row[6]][1], 'region', '')
-            graph.add_vertex(row[1], 'year', row[6][0])
-            # We still need to find a way to
+            graph.add_vertex(yr, 'year', row[6][0])
             # Have: edge - Sport class -> Sport - Medal class
 
             # Add edge for country and its corresponding region
             graph.add_edge(country_dict[row[6]][0], country_dict[row[6]][1])
 
             # Add new edge (empty Sport) if not already adjacent
-            if not graph.adjacent(country_dict[row[6]][0], row[1]):
-                graph.add_edge(country_dict[row[6]][0], row[1], Sport())
+            if not graph.adjacent(country_dict[row[6]][0], yr):
+                graph.add_edge(country_dict[row[6]][0], yr, Sport())
 
             # Update Sport
-            sport_class = graph.get_edge(country_dict[row[6]][0], row[1])  # get edge with that country and that year
+            sport_class = graph.get_edge(country_dict[row[6]][0], yr)  # get edge with that country and that year
             grp = find_group(groups, row[4])
 
             # Check to access the sport name if available, or create new key if not.
