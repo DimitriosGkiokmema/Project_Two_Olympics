@@ -331,8 +331,9 @@ class Graph:
             #     print(self._vertices[year].item, " - ", self._vertices[year].host)
             if self._vertices[year].kind == 'year' and self._vertices[year].host.lower() == country.lower():
                 is_host = True
-                # print(country, ' hosted on ', self._vertices[year].item)
+                print(country, ' hosted on ', self._vertices[year].item)
 
+                print(self._vertices[year].neighbours)
                 for participant in self._vertices[year].neighbours:
                     if participant.item.lower() == country.lower():
                         medals = self._vertices[year].neighbours[participant].total_medal()

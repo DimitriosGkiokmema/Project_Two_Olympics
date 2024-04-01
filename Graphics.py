@@ -232,18 +232,18 @@ def display_info(button_name: str) -> None:
     # elif button_name == 'Annual Data':
     # elif button_name == 'Impact of Historical Events':
     if button_name == 'Host Effect':
-        x = graph.host_wins('Greece')  # [{year_hosted, num of wins}, {year_played: num of wins}]
-        if not isinstance(x, str):
-            x1 = [year for year in x[0]]
-            x2 = [year for year in x[1]]
-            y1 = [x[0][win] for win in x[0]]
-            y2 = [x[1][win] for win in x[1]]
-            print(y1)
+        cords = graph.host_wins('Greece')  # [{year_hosted, num of wins}, {year_played: num of wins}]
+        print(cords)
+        if not isinstance(cords, str):
+            x1 = [year for year in cords[0]]
+            x2 = [year for year in cords[1]]
+            y1 = [cords[0][win] for win in cords[0]]
+            y2 = [cords[1][win] for win in cords[1]]
             title = 'Host Country Effect'
             names = ['Wins Hosted by Country', 'Wins When Country Participated']
             two_plots(names, title, False, 'single', [y1], [y2], [x1, x2])
         else:
-            print(x)
+            print(cords)
 
     # elif button_name == 'Team vs Individual Sports':
     # elif button_name == 'Performance':
@@ -293,16 +293,11 @@ while run:
         for button in buttons_main:
             if event.type == pygame.MOUSEBUTTONDOWN and button.is_over(pos):
                 display_info(button.text)
-                # show_graph = True
             if event.type == pygame.MOUSEMOTION:
                 if button.is_over(pos):
                     button.colour = (255, 0, 0)
                 else:
                     button.colour = (0, 255, 0)
-
-    # Draws the graph
-    # if show_graph:
-    #     show_graph = False
 
     # updates the visuals
     redraw_window()
