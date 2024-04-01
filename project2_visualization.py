@@ -56,7 +56,11 @@ def setup_graph(graph: data.Graph,
         y1, y2 = pos[edge[0]][1], pos[edge[1]][1]
         y_edges += [y1, y2, None]
         if weighted:
-            weight_positions.append(((x1 + x2) / 2, (y1 + y2) / 2, weights[(edge[0], edge[1])].total_scores()))
+            e = weights[(edge[0], edge[1])]
+            if e is None:
+                weight_positions.append(((x1 + x2) / 2, (y1 + y2) / 2, ''))
+            else:
+                weight_positions.append(((x1 + x2) / 2, (y1 + y2) / 2, e.total_scores()))
 
     trace3 = Scatter(x=x_edges,
                      y=y_edges,
