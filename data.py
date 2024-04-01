@@ -511,7 +511,8 @@ class Graph:
         return selected_years
 
     def medal_overall_average(self) -> float | int:
-        """Return the overall average number of medals for all recorded years. Rounded to the second decimal place.
+        """Return the overall average number of medals for all years between the first recorded year and the last
+        recorded year. Rounded to the second decimal place.
         Notice: Still need to count the year with no medals. For example our data has two years: 2013, and 2015 with
         the number of medals respectively are 20,10. Although the vertice 2014 isn't shown in the graph, it is still
         between the start and end years, so we still need to count the year 2014, to make the average to be
@@ -523,12 +524,30 @@ class Graph:
         return round(total / (max_year - min_year + 1), 2)
 
     def medal_period_average(self, start_year: int, end_year: int) -> float | int:
-        """Return the priod average number of medals from start_year to end_year, INCLUSIVE. Rounded to the
+        """Return the period average number of medals from start_year to end_year, INCLUSIVE. Rounded to the
         second decimal place.
         Representation Invariants:
             - start_year and end_year must be among [min_year, max_year] recorded in the dataset.
         """
         total = sum(self.medal_all_years(start_year, end_year))
+        return round(total / (end_year - start_year + 1), 2)
+
+    def participation_overall_average(self) -> float | int:
+        """Return the overall average number of participants for all years between the first recorded year and the
+        last recorded year. Rounded to the second decimal place.
+        Similar notice as medal_overall_average.
+        """
+        all_years = self.get_all_vertices('year')
+        min_year, max_year = min({year.item for year in all_years}), max({year.item for year in all_years})
+        total = sum(self.participation_all_years(min_year, max_year))
+        return round(total / (max_year - min_year + 1), 2)
+
+    def participation_period_average(self, start_year: int, end_year: int) -> float | int:
+        """Return the period average number of participants from start_year to end_year, INCLUSIVE. Rounded to the
+        second decimal place.
+        Representation Invariants:
+            - start_year and end_year must be among [min_year, max_year] recorded in the dataset."""
+        total = sum(self.participation_all_years(start_year, end_year))
         return round(total / (end_year - start_year + 1), 2)
 
 
