@@ -2,8 +2,8 @@
 TODO
 """
 from __future__ import annotations
-
 import csv
+import geonamescache
 import networkx as nx
 from typing import Any
 import pandas as pd  # remember to install the package pandas! (my version is 2.2.1)
@@ -96,6 +96,13 @@ country_codes.loc[len(country_codes.index)] = ['Europe', 'Serbia and Montenegro'
 
 # Convert back to a new csv file
 country_codes.to_csv('country_codes_modified.csv')
+cities = ['Athens', 'Paris', 'St Louis', 'London', 'Stockholm', 'Antwerp', 'Amsterdam', 'Beijing']
+cities.extend(['Los Angeles', 'Berlin', 'Helsinki', 'Melbourne / Stockholm', 'Rome', 'Tokyo', 'Mexico'])
+cities.extend(['Munich', 'Montreal', 'Moscow', 'Seoul', 'Barcelona', 'Atlanta', 'Sydney'])
+counties = ['Greece', 'France', 'United States of America', 'England', 'Sweden', 'Belgium', 'Netherlands', 'China']
+counties.extend(['United States of America', 'Germany', 'Finland', 'Australia / Germany', 'Italy', 'Japan', 'Mexico'])
+counties.extend(['Germany', 'Canada', 'Russia', 'South Korea', 'Spain', 'United States of America', 'Australia'])
+city_to_country = {cities[i]: counties[i] for i in range(len(cities))}
 
 
 class _Vertex:
@@ -312,27 +319,46 @@ class Graph:
 
         return [gold, silver, bronze]
 
-    def host_wins(self, country) -> list[dict[Any, int]] | str:
-        """ This function returns a dict in the format [year_hosted, num of wins, {year_played: num of wins}]
+    def host_wins(self, country: str) -> list[dict[Any, int]] | str:
+        """ This function returns a dict in the format [{year_hosted, num of wins}, {year_played: num of wins}]
         If the inputted country never held the Olympics, a message stating this is returned
         """
         is_host = False
         host_medals = {}
-        played_medals = {}
 
         for year in self._vertices:
-            if self._vertices[year].kind == 'year' and self._vertices[year].host == country:
+            # if self._vertices[year].kind == 'year':
+            #     print(self._vertices[year].item, " - ", self._vertices[year].host)
+            if self._vertices[year].kind == 'year' and self._vertices[year].host.lower() == country.lower():
                 is_host = True
-                host_medals[year] = self._vertices[year].neighbours[country].total_medal()
+                # print(country, ' hosted on ', self._vertices[year].item)
+
+                for participant in self._vertices[year].neighbours:
+                    if participant.item.lower() == country.lower():
+                        medals = self._vertices[year].neighbours[participant].total_medal()
+                        host_medals[int(self._vertices[year].item)] = medals
 
         if is_host:
-            for year in self._vertices[country].neighbours:
-                if self._vertices[year].kind == 'year' and self._vertices[year].host != country:
-                    played_medals[year.item] = year.neighbours[country].total_medal()
-
-            return [host_medals, played_medals]
+            return [host_medals, self.host_wins_helper(country)]
         else:
             return 'The given country has never hosted the Olympics!'
+
+    def host_wins_helper(self, country: str) -> dict[Any, int]:
+        """ Searches the Graph for the years the given country participated in the Olympics and returns
+        the medals awarded to the country at each year it participated (but not hosted!)
+        """
+        played_medals = {}
+
+        for year in self._vertices[country].neighbours:
+            if self._vertices[year.item].kind == 'year' and self._vertices[year.item].host.lower() != country.lower():
+                played_medals[int(year.item)] = 0
+
+                for participant in year.neighbours:
+                    if participant.item.lower() == country.lower():
+                        medals = year.neighbours[participant].total_medal()
+                        played_medals[int(year.item)] = medals
+
+        return played_medals
 
     def compare_medals(self, country1: str, country2: str, year: int) -> str:
         """Compare the number of Gold, Silver, and Bronze medals between two countries for a specific year.
@@ -516,8 +542,8 @@ class Sport:
             - kind in {'', 'team', 'individual'}
         """
         if kind == '':
-            total_team_medals = sum([medal.total_medal for medal in self.team_sports.values()])
-            total_indi_medals = sum([medal.total_medal for medal in self.individual_sports.values()])
+            total_team_medals = sum([medal.total_medal() for medal in self.team_sports.values()])
+            total_indi_medals = sum([medal.total_medal() for medal in self.individual_sports.values()])
             return total_team_medals + total_indi_medals
         elif kind == 'team':
             return sum([medal.total_medal for medal in self.team_sports.values()])
@@ -575,7 +601,7 @@ def load_graph(olympic_games: str, countries: str, groups: dict[str, str]) -> Gr
         for row in reader:
             graph.add_vertex(country_dict[row[6]][0], 'country', '')
             graph.add_vertex(country_dict[row[6]][1], 'region', '')
-            graph.add_vertex(row[1], 'year', row[6][0])
+            graph.add_vertex(row[1], 'year', city_to_country[row[2]])
             # We still need to find a way to
             # Have: edge - Sport class -> Sport - Medal class
 

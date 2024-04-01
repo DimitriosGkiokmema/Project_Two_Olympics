@@ -162,15 +162,15 @@ def two_plots(names: list[str], title: str, bar: bool, s: str, y1: list[list[int
         x1 = x[0]
         x2 = x[1]
 
-    if s == 'single' and not bar:  # Two graphs with one line
+    if s == 'single':  # Two graphs with one line
         fig, axs = plt.subplots(1, 2)
 
-        if not bar:
-            axs[0].plot(x1, y1, color=generate_random_colour())
-            axs[1].plot(x2, y2, color=generate_random_colour())
+        if not bar and len(x1) > 1:
+            axs[0].plot(x1, y1[0], color=generate_random_colour())
+            axs[1].plot(x2, y2[0], color=generate_random_colour())
         else:
-            axs[0].bar(x=x1, height=y1, color=generate_random_colour())
-            axs[1].bar(x=x2, height=y2, color=generate_random_colour())
+            axs[0].bar(x=x1, height=y1[0], color=generate_random_colour())
+            axs[1].bar(x=x2, height=y2[0], color=generate_random_colour())
 
         # Putting details on first graph
         axs[0].set_title(names[0])  # Sets graph title
@@ -187,7 +187,7 @@ def two_plots(names: list[str], title: str, bar: bool, s: str, y1: list[list[int
         y = [y1, y2]
 
         for i in range(2):
-            if bar:
+            if bar or len(x1) == 1:
                 axs[i].bar(x=x[i], height=y[i], color=generate_random_colour())
             else:
                 axs[i].plot(x[i], y[i], label=names[i], color=generate_random_colour())
@@ -231,12 +231,20 @@ def display_info(button_name: str) -> None:
     # elif button_name == 'Rank':
     # elif button_name == 'Annual Data':
     # elif button_name == 'Impact of Historical Events':
-    # elif button_name == 'Host Effect':
-    #     x = graph.host_wins()
-    #     x1 = [year for year in x[0]]
-    #     x2 = [year for year in x[1]]
-    #
-    #
+    if button_name == 'Host Effect':
+        x = graph.host_wins('Greece')  # [{year_hosted, num of wins}, {year_played: num of wins}]
+        if not isinstance(x, str):
+            x1 = [year for year in x[0]]
+            x2 = [year for year in x[1]]
+            y1 = [x[0][win] for win in x[0]]
+            y2 = [x[1][win] for win in x[1]]
+            print(y1)
+            title = 'Host Country Effect'
+            names = ['Wins Hosted by Country', 'Wins When Country Participated']
+            two_plots(names, title, False, 'single', [y1], [y2], [x1, x2])
+        else:
+            print(x)
+
     # elif button_name == 'Team vs Individual Sports':
     # elif button_name == 'Performance':
     # elif button_name == 'Country Statistics':
