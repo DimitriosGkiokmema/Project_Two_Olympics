@@ -351,7 +351,7 @@ class Graph:
         for key in self._vertices:
             vertex = self._vertices[key]
             if vertex.kind == 'country':
-                counties.append(vertex.item)
+                countries.append(vertex.item)
         country_wise_performance = {}
         for country in countries:
             years_participated = []
