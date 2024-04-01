@@ -6,6 +6,8 @@ Additionally, this file also deals with mouse and key inputs
 Reference for button: https://www.youtube.com/watch?v=4_9twnEduFA
 """
 import random
+import sys
+
 import data
 import math
 import pygame
@@ -16,7 +18,10 @@ pygame.init()
 
 screen_width = 1200
 screen_height = 750
-background_colour = (125, 235, 255)
+# background_colour = (125, 235, 255)
+background_colour =  pygame.image.load('Olympics Wallpaper.jpg')
+background_colour = pygame.transform.scale(background_colour, (screen_width, screen_height))
+
 
 window = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('CSC111 Project 2: The Analysis of Summer Olympics Through External Effects')
@@ -43,8 +48,8 @@ YEARS = [x for x in range(1940, 2013)]
 
 class Button:
     """ template for the buttons"""
-    def __init__(self, colour, x, y, text=''):
-        self.colour = colour
+    def __init__(self, x, y, text=''):
+        self.colour = (208, 206, 206)
         self.x = x
         self.y = y
         self.width = 450
@@ -77,7 +82,7 @@ class Button:
 ####################################################
 
 
-def single_plot(names: list[str], title: str, bar: bool, style: str, y: list[list[int]], x: list[int] = 0):
+def single_plot(names: list[str], title: str, bar: bool, style: str, y: list[list[int]], x: list[int]):
     # def single_plot():  # Used for quickly testing this function
     """ An instance of this class requires the graph name, y and (optionally) the x values. x and y MUST be lists
     This class will display a single or multiple graphs on the same window, depending on how many
@@ -137,14 +142,14 @@ def single_plot(names: list[str], title: str, bar: bool, style: str, y: list[lis
     plt.show()
 
 
-def two_plots(names: list[str], title: str, bar: bool, s: str, y1: list[list[int]], y2: list[list[int]], x: list = 0):
+def two_plots(names: list[str], title: str, bar: list, s: str, y1: list[int], y2: list[int], x: list = 0):
     """ An instance of this class requires the graph name, y and (optionally) the x values. x and y MUST be lists
     This class will display one or two graphs on the same window, depending on how many are needed
 
     Instance Attributes:
         - names: a list containing the title of each graph
         - title: the title to display at the top of the window
-        - bar: the type of graph, True if a bar graph, False if a line graph
+        - bar: a list of bools representing the type of graph, True if a bar graph, False if a line graph
         - s: many or single lined graph. Same as style variable from above function
         - y: a list of y coordinates
         - x: a list of x coordinates. If nothing is entered for it, the x coordinates are every num 1940-2020
@@ -155,22 +160,21 @@ def two_plots(names: list[str], title: str, bar: bool, s: str, y1: list[list[int
         - len(y) == len(x) or x == 0
         - if a value is given for x cords, then y must have the same number of values
     """
-    if x == 0:
-        x1 = YEARS
-        x2 = YEARS
-    else:
-        x1 = x[0]
-        x2 = x[1]
+    x1 = x[0]
+    x2 = x[1]
 
     if s == 'single':  # Two graphs with one line
         fig, axs = plt.subplots(1, 2)
 
-        if not bar and len(x1) > 1:
-            axs[0].plot(x1, y1[0], color=generate_random_colour())
-            axs[1].plot(x2, y2[0], color=generate_random_colour())
+        if not bar[0]:
+            axs[0].plot(x1, y1, color=generate_random_colour())
         else:
-            axs[0].bar(x=x1, height=y1[0], color=generate_random_colour())
-            axs[1].bar(x=x2, height=y2[0], color=generate_random_colour())
+            axs[0].bar(x=x1, height=y1, color=generate_random_colour())
+
+        if not bar[1]:
+            axs[1].plot(x2, y2, color=generate_random_colour())
+        else:
+            axs[1].bar(x=x2, height=y2, color=generate_random_colour())
 
         # Putting details on first graph
         axs[0].set_title(names[0])  # Sets graph title
@@ -183,21 +187,23 @@ def two_plots(names: list[str], title: str, bar: bool, s: str, y1: list[list[int
         axs[1].set_ylabel('Medals')  # Sets y-axis title
     elif s == 'many':  # Two graphs with  multiple lines
         fig, axs = plt.subplots(1, 2)
-        x = [x1, x2]
-        y = [y1, y2]
+
+        if bar[0]:
+            axs[0].bar(x=x1, height=y1, color=generate_random_colour())
+        else:
+            axs[0].plot(x1, y1, label=names[0], color=generate_random_colour())
+
+        if bar[1]:
+            axs[1].bar(x=x2, height=y2, color=generate_random_colour())
+        else:
+            axs[1].plot(x2, y2, label=names[1], color=generate_random_colour())
 
         for i in range(2):
-            if bar or len(x1) == 1:
-                axs[i].bar(x=x[i], height=y[i], color=generate_random_colour())
-            else:
-                axs[i].plot(x[i], y[i], label=names[i], color=generate_random_colour())
-
             axs[i].set_title(names[i])
             axs[i].set_xlabel('Years')
             axs[i].set_ylabel('Medals')
             axs[i].legend()
 
-    plt.title(title, fontsize=16)
     plt.grid(True)
     plt.show()
 
@@ -213,7 +219,7 @@ def generate_random_colour() -> tuple[float, float, float]:
     return rgb[0], rgb[1], rgb[2]
 
 ####################################################
-# Changes screen background and displays text
+# Shows graphs and displays text
 ####################################################
 # Under Construction
 
@@ -232,16 +238,19 @@ def display_info(button_name: str) -> None:
     # elif button_name == 'Annual Data':
     # elif button_name == 'Impact of Historical Events':
     if button_name == 'Host Effect':
-        cords = graph.host_wins('Greece')  # [{year_hosted, num of wins}, {year_played: num of wins}]
-        print(cords)
+        question = 'Enter a country to see its Host Effect: '
+        country = get_user_response(question).title()
+        cords = graph.host_wins(country)  # [{year_hosted, num of wins}, {year_played: num of wins}]
+
         if not isinstance(cords, str):
+            print(cords)
             x1 = [year for year in cords[0]]
             x2 = [year for year in cords[1]]
             y1 = [cords[0][win] for win in cords[0]]
             y2 = [cords[1][win] for win in cords[1]]
             title = 'Host Country Effect'
             names = ['Wins Hosted by Country', 'Wins When Country Participated']
-            two_plots(names, title, False, 'single', [y1], [y2], [x1, x2])
+            two_plots(names, title, [True, False], 'single', y1, y2, [x1, x2])
         else:
             print(cords)
 
@@ -251,24 +260,88 @@ def display_info(button_name: str) -> None:
     # elif button_name == 'Sport Statistics':
     # elif button_name == 'Visualize Graph':
 
+
+def get_user_response(question: str) -> str:
+    """ Displays a new window that asks for user input, then returns that input"""
+    # Set up the colors
+    black = (0, 0, 0)
+    gray = (255, 255, 255)
+
+    # Set up the font
+    font = pygame.font.Font(None, 32)
+
+    # Set up the input box
+    input_box = pygame.Rect(screen_width // 2 - 100, screen_height // 2, 140, 32)
+    color_inactive = pygame.Color('lightskyblue3')
+    color_active = pygame.Color('dodgerblue2')
+    color = color_inactive
+    active = False
+    text = ''
+    response = ''
+
+    # Set up the question
+    question = font.render(question, True, black)
+    question_rect = question.get_rect(center=(screen_width // 2, screen_height // 2 - 50))
+
+    # Main loop
+    done = False
+    while not done:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                # If the user clicked on the input_box rect.
+                if input_box.collidepoint(event.pos):
+                    # Toggle the active flag.
+                    active = not active
+                else:
+                    active = False
+                # Change the color of the input box.
+                color = color_active if active else color_inactive
+            if event.type == pygame.KEYDOWN:
+                if active:
+                    if event.key == pygame.K_RETURN:
+                        response = text
+                        text = ''
+                        done = True
+                    elif event.key == pygame.K_BACKSPACE:
+                        text = text[:-1]
+                    else:
+                        text += event.unicode
+
+        # Render the input box
+        txt_surface = font.render(text, True, color)
+        width = max(200, txt_surface.get_width() + 10)
+        input_box.w = width
+
+        # Blit everything to the screen
+        window.fill(gray)
+        pygame.draw.rect(window, color, input_box, 2)
+        window.blit(question, question_rect)
+        window.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
+        pygame.display.flip()
+
+    redraw_window()
+    return response
+
 ####################################################
 # Game loop
 ####################################################
 
 
 # Create buttons
-annual_medals = Button((0, 255, 0), 100, 50, 'Annual Medals')
-given_area = Button((0, 255, 0), 600, 50, 'Given Area')
-gsb = Button((0, 255, 0), 100, 170, 'Gold, Silver, and Bronze')
-rankings = Button((0, 255, 0), 600, 170, 'Rank')
-annual_data = Button((0, 255, 0), 100, 290, 'Annual Data')
-historical = Button((0, 255, 0), 600, 290, 'Impact of Historical Events')
-host_effect = Button((0, 255, 0), 100, 410, 'Host Effect')
-team_vs_indi = Button((0, 255, 0), 600, 410, 'Team vs Individual Sports')
-performance = Button((0, 255, 0), 100, 530, 'Performance')
-countries = Button((0, 255, 0), 600, 530, 'Country Statistics')
-sports = Button((0, 255, 0), 100, 650, 'Sport Statistics')
-visualize = Button((0, 255, 0), 600, 650, 'Visualize Graph')
+annual_medals = Button(100, 50, 'Annual Medals')
+given_area = Button(600, 50, 'Given Area')
+gsb = Button(100, 170, 'Gold, Silver, and Bronze')
+rankings = Button(600, 170, 'Rank')
+annual_data = Button(100, 290, 'Annual Data')
+historical = Button(600, 290, 'Impact of Historical Events')
+host_effect = Button(100, 410, 'Host Effect')
+team_vs_indi = Button(600, 410, 'Team vs Individual Sports')
+performance = Button(100, 530, 'Performance')
+countries = Button(600, 530, 'Country Statistics')
+sports = Button(100, 650, 'Sport Statistics')
+visualize = Button(600, 650, 'Visualize Graph')
 
 # Store buttons in a list
 buttons_main = [annual_medals, given_area, gsb, rankings, annual_data, historical, host_effect, team_vs_indi]
@@ -277,7 +350,7 @@ buttons_main.extend([performance, countries, sports, visualize])
 
 def redraw_window():
     """Redraw window"""
-    window.fill(background_colour)
+    window.blit(background_colour, (0, 0))
 
     for curr_button in buttons_main:
         curr_button.draw((0, 0, 0))
@@ -297,7 +370,7 @@ while run:
                 if button.is_over(pos):
                     button.colour = (255, 0, 0)
                 else:
-                    button.colour = (0, 255, 0)
+                    button.colour = (208, 206, 206)
 
     # updates the visuals
     redraw_window()

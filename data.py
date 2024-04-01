@@ -3,7 +3,6 @@ TODO
 """
 from __future__ import annotations
 import csv
-import geonamescache
 import networkx as nx
 from typing import Any
 import pandas as pd  # remember to install the package pandas! (my version is 2.2.1)
@@ -327,16 +326,12 @@ class Graph:
         host_medals = {}
 
         for year in self._vertices:
-            # if self._vertices[year].kind == 'year':
-            #     print(self._vertices[year].item, " - ", self._vertices[year].host)
             if self._vertices[year].kind == 'year' and self._vertices[year].host.lower() == country.lower():
                 is_host = True
-                print(country, ' hosted on ', self._vertices[year].item)
 
-                print(self._vertices[year].neighbours)
-                for participant in self._vertices[year].neighbours:
-                    if participant.item.lower() == country.lower():
-                        medals = self._vertices[year].neighbours[participant].total_medal()
+                for participant in self._vertices[int(year)].neighbours:
+                    if participant.kind == 'country' and participant.item.lower() == country.lower():
+                        medals = self._vertices[int(year)].neighbours[participant].total_medal()
                         host_medals[int(self._vertices[year].item)] = medals
 
         if is_host:
@@ -350,7 +345,7 @@ class Graph:
         """
         played_medals = {}
 
-        for year in self._vertices[country].neighbours:
+        for year in self._vertices[country.title()].neighbours:
             if self._vertices[year.item].kind == 'year' and self._vertices[year.item].host.lower() != country.lower():
                 played_medals[int(year.item)] = 0
 
@@ -770,6 +765,7 @@ def load_graph(olympic_games: str, countries: str, groups: dict[str, str]) -> Gr
 
             # Add edge for country and its corresponding region
             graph.add_edge(country_dict[row[6]][0], country_dict[row[6]][1])
+            graph.add_edge(yr, country_dict[row[6]][1])
 
             # Add new edge (empty Sport) if not already adjacent
             if not graph.adjacent(country_dict[row[6]][0], yr):
