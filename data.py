@@ -2,106 +2,19 @@
 TODO
 """
 from __future__ import annotations
+from typing import Any
 import csv
 import networkx as nx
-from typing import Any
 import pandas as pd  # remember to install the package pandas! (my version is 2.2.1)
 
-olympics = pd.read_csv("summer.csv")
-olympics = olympics.dropna()
-# Renamed some sports to have consistent names
-olympics.loc[olympics['Discipline'] == 'Beach volley.', 'Discipline'] = 'Beach Volleyball'
-olympics.loc[olympics['Discipline'] == 'BMX', 'Discipline'] = 'Cycling BMX'
-olympics.loc[olympics['Discipline'] == 'Modern Pentath.', 'Discipline'] = 'Modern Pentathlon'
-olympics.loc[olympics['Discipline'] == 'Artistic G.', 'Discipline'] = 'Gymnastics Artistic'
-olympics.loc[olympics['Discipline'] == 'Rhythmic G.', 'Discipline'] = 'Gymnastics Rhythmic'
-olympics.loc[olympics['Discipline'] == 'Synchronized S.', 'Discipline'] = 'Synchronized Swimming'
-olympics.loc[olympics['Discipline'] == 'Water polo', 'Discipline'] = 'Water Polo'
-olympics.loc[olympics['Discipline'] == 'Wrestling Free.', 'Discipline'] = 'Wrestling Freestyle'
-olympics.loc[olympics['Discipline'] == 'Water Motorspor', 'Discipline'] = 'Water Motorsport'
-# Rename countries to be consistent with country_codes
-olympics.loc[olympics['Country'] == 'GRE', 'Country'] = 'GRC'
-olympics.loc[olympics['Country'] == 'GER', 'Country'] = 'DEU'
-olympics.loc[olympics['Country'] == 'DEN', 'Country'] = 'DNK'
-olympics.loc[olympics['Country'] == 'SUI', 'Country'] = 'CHE'
-olympics.loc[olympics['Country'] == 'NED', 'Country'] = 'NLD'
-olympics.loc[olympics['Country'] == 'RSA', 'Country'] = 'ZAF'
-olympics.loc[olympics['Country'] == 'POR', 'Country'] = 'PRT'
-olympics.loc[olympics['Country'] == 'URU', 'Country'] = 'URY'
-olympics.loc[olympics['Country'] == 'HAI', 'Country'] = 'HTI'
-olympics.loc[olympics['Country'] == 'PHI', 'Country'] = 'PHL'
-olympics.loc[olympics['Country'] == 'CHI', 'Country'] = 'CHL'
-olympics.loc[olympics['Country'] == 'LAT', 'Country'] = 'LVA'
-olympics.loc[olympics['Country'] == 'SRI', 'Country'] = 'LKA'
-olympics.loc[olympics['Country'] == 'PUR', 'Country'] = 'PRI'
-olympics.loc[olympics['Country'] == 'IRI', 'Country'] = 'IRN'
-olympics.loc[olympics['Country'] == 'TRI', 'Country'] = 'TTO'
-olympics.loc[olympics['Country'] == 'BUL', 'Country'] = 'BGR'
-olympics.loc[olympics['Country'] == 'LIB', 'Country'] = 'LBN'
-olympics.loc[olympics['Country'] == 'BAH', 'Country'] = 'BHS'
-olympics.loc[olympics['Country'] == 'SIN', 'Country'] = 'SGP'
-olympics.loc[olympics['Country'] == 'NGR', 'Country'] = 'NGA'
-olympics.loc[olympics['Country'] == 'MGL', 'Country'] = 'MNG'
-olympics.loc[olympics['Country'] == 'NIG', 'Country'] = 'NER'
-olympics.loc[olympics['Country'] == 'BER', 'Country'] = 'BMU'
-olympics.loc[olympics['Country'] == 'TAN', 'Country'] = 'TZA'
-olympics.loc[olympics['Country'] == 'ZIM', 'Country'] = 'ZWE'
-olympics.loc[olympics['Country'] == 'ZAM', 'Country'] = 'ZMB'
-olympics.loc[olympics['Country'] == 'ALG', 'Country'] = 'DZA'
-olympics.loc[olympics['Country'] == 'CRC', 'Country'] = 'CRI'
-olympics.loc[olympics['Country'] == 'INA', 'Country'] = 'IDN'
-olympics.loc[olympics['Country'] == 'ISV', 'Country'] = 'VGB'
-olympics.loc[olympics['Country'] == 'EUN', 'Country'] = 'URS'  # Actually 2 different team but still in Soviet
-olympics.loc[olympics['Country'] == 'MAS', 'Country'] = 'MYS'
-olympics.loc[olympics['Country'] == 'CRO', 'Country'] = 'HRV'
-olympics.loc[olympics['Country'] == 'SLO', 'Country'] = 'SVK'
-olympics.loc[olympics['Country'] == 'TGA', 'Country'] = 'TON'
-olympics.loc[olympics['Country'] == 'BAR', 'Country'] = 'BRB'
-olympics.loc[olympics['Country'] == 'KSA', 'Country'] = 'SAU'
-olympics.loc[olympics['Country'] == 'KUW', 'Country'] = 'KWT'
-olympics.loc[olympics['Country'] == 'VIE', 'Country'] = 'VNM'
-olympics.loc[olympics['Country'] == 'PAR', 'Country'] = 'PRY'
-olympics.loc[olympics['Country'] == 'UAE', 'Country'] = 'ARE'
-olympics.loc[olympics['Country'] == 'SUD', 'Country'] = 'SDN'
-olympics.loc[olympics['Country'] == 'MRI', 'Country'] = 'MUS'
-olympics.loc[olympics['Country'] == 'TOG', 'Country'] = 'TGO'
-olympics.loc[olympics['Country'] == 'GUA', 'Country'] = 'GTM'
-olympics.loc[olympics['Country'] == 'GRN', 'Country'] = 'GRD'
-olympics.loc[olympics['Country'] == 'BOT', 'Country'] = 'BWA'
 
-# Convert back to a new csv file
-olympics.to_csv('summer_modified.csv')
-
-
-country_codes = pd.read_csv("country_codes.csv")
-country_codes = country_codes[['Region Name_en (M49)', 'Country or Area_en (M49)', 'ISO-alpha3 Code (M49)']]
-country_codes = country_codes.dropna()
-country_codes.reset_index(inplace=True, drop=True)
-country_codes.loc[len(country_codes.index)] = ['World', 'International Olympic Committee Mixed teams', 'ZZX']
-country_codes.loc[len(country_codes.index)] = ['Europe', 'Bohemia', 'BOH']
-country_codes.loc[len(country_codes.index)] = ['Oceania', 'Australasia', 'ANZ']
-country_codes.loc[len(country_codes.index)] = ['Europe', 'Russian Empire', 'RU1']
-country_codes.loc[len(country_codes.index)] = ['Europe', 'Czechoslovakia', 'TCH']
-country_codes.loc[len(country_codes.index)] = ['Europe', 'Yugoslavia', 'YUG']
-country_codes.loc[len(country_codes.index)] = ['Europe', 'Soviet Union', 'URS']
-country_codes.loc[len(country_codes.index)] = ['Europe', 'United Team of Germany', 'EUA']
-country_codes.loc[len(country_codes.index)] = ['Americas', 'British West Indies', 'BWI']
-country_codes.loc[130] = ['Asia', 'Chinese Taipei', 'TPE']
-country_codes.loc[len(country_codes.index)] = ['Europe', 'East Germany', 'GDR']
-country_codes.loc[len(country_codes.index)] = ['Europe', 'West Germany', 'FRG']
-country_codes.loc[len(country_codes.index)] = ['Europe', 'Netherlands Antilles', 'AHO']
-country_codes.loc[len(country_codes.index)] = ['World', 'Independent Olympic Participants', 'IOP']
-country_codes.loc[len(country_codes.index)] = ['Europe', 'Serbia and Montenegro', 'SCG']
-
-# Convert back to a new csv file
-country_codes.to_csv('country_codes_modified.csv')
-cities = ['Athens', 'Paris', 'St Louis', 'London', 'Stockholm', 'Antwerp', 'Amsterdam', 'Beijing']
-cities.extend(['Los Angeles', 'Berlin', 'Helsinki', 'Melbourne / Stockholm', 'Rome', 'Tokyo', 'Mexico'])
-cities.extend(['Munich', 'Montreal', 'Moscow', 'Seoul', 'Barcelona', 'Atlanta', 'Sydney'])
-counties = ['Greece', 'France', 'United States of America', 'England', 'Sweden', 'Belgium', 'Netherlands', 'China']
-counties.extend(['United States of America', 'Germany', 'Finland', 'Australia / Germany', 'Italy', 'Japan', 'Mexico'])
-counties.extend(['Germany', 'Canada', 'Russia', 'South Korea', 'Spain', 'United States of America', 'Australia'])
-city_to_country = {cities[i]: counties[i] for i in range(len(cities))}
+CITIES = ['Athens', 'Paris', 'St Louis', 'London', 'Stockholm', 'Antwerp', 'Amsterdam', 'Beijing','Los Angeles',
+          'Berlin', 'Helsinki', 'Melbourne / Stockholm', 'Rome', 'Tokyo', 'Mexico', 'Munich', 'Montreal', 'Moscow',
+          'Seoul', 'Barcelona', 'Atlanta', 'Sydney']
+COUNTIES = ['Greece', 'France', 'United States of America', 'England', 'Sweden', 'Belgium', 'Netherlands', 'China',
+            'United States of America', 'Germany', 'Finland', 'Australia / Germany', 'Italy', 'Japan', 'Mexico',
+            'Germany', 'Canada', 'Russia', 'South Korea', 'Spain', 'United States of America', 'Australia']
+CITY_TO_COUNTRY = {CITIES[i]: COUNTIES[i] for i in range(len(CITIES))}
 
 
 class _Vertex:
@@ -286,7 +199,7 @@ class Graph:
         - to count medals, iterate through indi and team dicts, use dict.i.total_medals to get [g, s, b]
         - add g, s, b values to this function's dicts
         """
-        if year not in [year.item for year in self._vertices]:
+        if year not in self._vertices:
             return 'Invalid input for year'
 
         gold = {}
@@ -399,6 +312,8 @@ class Graph:
             v1 = self._vertices[item1]
             v2 = self._vertices[item2]
             return v1.neighbours[v2]
+        else:
+            raise ValueError
 
     def update_sport(self) -> None:
         """Update sport, as we want to add more sport data into the edge during load_graph."""
@@ -426,7 +341,7 @@ class Graph:
                       f"{sport_data.total_medal('team')} medals on team sports and the other "
                       f"{sport_data.total_medal('individual')} on individuals.")
         else:
-            print(f"Something went wrong. Please check your input and try again.")
+            print('Something went wrong. Please check your input and try again.')
 
     def performance(self) -> dict:
         """Returns the average of change of medals weight starting from the start year of participation to the last
@@ -497,11 +412,10 @@ class Graph:
 
                 # Counts separatedly the number of medal achieved in team_sport and individual_sport.
                 for team_sport in sport.team_sports:
-                    medals_so_far += sport.team_sports[team_sport].num_g + sport.team_sports[team_sport].num_s + \
-                                     sport.team_sports[team_sport].num_b
+                    medals_so_far += sport.team_sports[team_sport].total_medal()
+
                 for individual_sport in sport.team_sports:
-                    medals_so_far += sport.team_sports[individual_sport].num_g + sport.team_sports[
-                        individual_sport].num_s + sport.team_sports[individual_sport].num_b
+                    medals_so_far += sport.team_sports[individual_sport].total_medal()
 
             return medals_so_far
 
@@ -522,11 +436,9 @@ class Graph:
 
                 # Counts separatedly the number of medal achieved in team_sport and individual_sport.
                 for team_sport in sport.team_sports:
-                    medals_so_far += sport.team_sports[team_sport].num_g + sport.team_sports[team_sport].num_s + \
-                                     sport.team_sports[team_sport].num_b
+                    medals_so_far += sport.team_sports[team_sport].total_medal()
                 for individual_sport in sport.team_sports:
-                    medals_so_far += sport.team_sports[individual_sport].num_g + sport.team_sports[
-                        individual_sport].num_s + sport.team_sports[individual_sport].num_b
+                    medals_so_far += sport.team_sports[individual_sport].total_medal()
         return medals_so_far
 
 ############################################################################################
@@ -647,9 +559,9 @@ class Graph:
         team = []
         indiv = []
         all_years = self.get_all_vertices('year')
-        min_year, max_year = min({year.item for year in all_years}), max({year.item for year in all_years})
-        for year in range(min_year, max_year + 1):  # Since we want the max_year inclusive
-            one = self.wins_one(year, country)
+        min_year, max_year = min({yr.item for yr in all_years}), max({yr.item for yr in all_years})
+        for i in range(min_year, max_year + 1):  # Since we want the max_year inclusive
+            one = self.wins_one(i, country)
             team.append(one[0])
             indiv.append(one[1])
         return team, indiv
@@ -819,7 +731,7 @@ def load_graph(olympic_games: str, countries: str, groups: dict[str, str]) -> Gr
             yr = int(row[1])
             graph.add_vertex(country_dict[row[6]][0], 'country', '')
             graph.add_vertex(country_dict[row[6]][1], 'region', '')
-            graph.add_vertex(yr, 'year', city_to_country[row[2]])
+            graph.add_vertex(yr, 'year', CITY_TO_COUNTRY[row[2]])
             # We still need to find a way to
             # Have: edge - Sport class -> Sport - Medal class
 
@@ -865,13 +777,110 @@ def find_group(groups: dict[str, str], sport: str) -> str:
         return 'team'
 
 
-group = {'Archery': 0, 'Athletics': 0, 'Badminton': 0, 'Baseball': 1, 'Basketball': 1, 'Basque Pelota': 1,
-         'Beach Volleyball': 1, 'Boxing': 0, 'Canoe / Kayak F': 0, 'Canoe / Kayak S': 0, 'Canoe Slalom': 0,
-         'Canoe Sprint': 1, 'Cricket': 1, 'Croquet': 0, 'Cycling BMX': 0, 'Cycling Road': 0, 'Cycling Track': 0,
-         'Diving': 0, 'Dressage': 0, 'Eventing': 0, 'Fencing': 0, 'Figure skating': 0, 'Football': 1, 'Golf': 0,
-         'Gymnastics Artistic': 0, 'Gymnastics Rhythmic': 1, 'Handball': 1, 'Hockey': 1, 'Ice Hockey': 1,
-         'Jeu de Paume': 0, 'Judo': 0, 'Jumping': 0, 'Lacrosse': 1, 'Marathon swimming': 0, 'Modern Pentathlon': 0,
-         'Mountain Bike': 1, 'Polo': 1, 'Rackets': 0, 'Roque': 0, 'Rowing': 1, 'Rugby': 1, 'Sailing': 1, 'Shooting': 0,
-         'Softball': 1, 'Swimming': 0, 'Synchronized Swimming': 1, 'Table Tennis': 0, 'Taekwondo': 0, 'Tennis': 0,
-         'Trampoline': 0, 'Triathlon': 0, 'Tug of War': 1, 'Vaulting': 0, 'Volleyball': 1, 'Water Motorsport': 1,
-         'Water Polo': 1, 'Weightlifting': 0, 'Wrestling Freestyle': 0, 'Wrestling Gre-R': 0}
+if __name__ == '__main__':
+    olympics = pd.read_csv("summer.csv")
+    olympics = olympics.dropna()
+    # Renamed some sports to have consistent names
+    olympics.loc[olympics['Discipline'] == 'Beach volley.', 'Discipline'] = 'Beach Volleyball'
+    olympics.loc[olympics['Discipline'] == 'BMX', 'Discipline'] = 'Cycling BMX'
+    olympics.loc[olympics['Discipline'] == 'Modern Pentath.', 'Discipline'] = 'Modern Pentathlon'
+    olympics.loc[olympics['Discipline'] == 'Artistic G.', 'Discipline'] = 'Gymnastics Artistic'
+    olympics.loc[olympics['Discipline'] == 'Rhythmic G.', 'Discipline'] = 'Gymnastics Rhythmic'
+    olympics.loc[olympics['Discipline'] == 'Synchronized S.', 'Discipline'] = 'Synchronized Swimming'
+    olympics.loc[olympics['Discipline'] == 'Water polo', 'Discipline'] = 'Water Polo'
+    olympics.loc[olympics['Discipline'] == 'Wrestling Free.', 'Discipline'] = 'Wrestling Freestyle'
+    olympics.loc[olympics['Discipline'] == 'Water Motorspor', 'Discipline'] = 'Water Motorsport'
+    # Rename countries to be consistent with country_codes
+    olympics.loc[olympics['Country'] == 'GRE', 'Country'] = 'GRC'
+    olympics.loc[olympics['Country'] == 'GER', 'Country'] = 'DEU'
+    olympics.loc[olympics['Country'] == 'DEN', 'Country'] = 'DNK'
+    olympics.loc[olympics['Country'] == 'SUI', 'Country'] = 'CHE'
+    olympics.loc[olympics['Country'] == 'NED', 'Country'] = 'NLD'
+    olympics.loc[olympics['Country'] == 'RSA', 'Country'] = 'ZAF'
+    olympics.loc[olympics['Country'] == 'POR', 'Country'] = 'PRT'
+    olympics.loc[olympics['Country'] == 'URU', 'Country'] = 'URY'
+    olympics.loc[olympics['Country'] == 'HAI', 'Country'] = 'HTI'
+    olympics.loc[olympics['Country'] == 'PHI', 'Country'] = 'PHL'
+    olympics.loc[olympics['Country'] == 'CHI', 'Country'] = 'CHL'
+    olympics.loc[olympics['Country'] == 'LAT', 'Country'] = 'LVA'
+    olympics.loc[olympics['Country'] == 'SRI', 'Country'] = 'LKA'
+    olympics.loc[olympics['Country'] == 'PUR', 'Country'] = 'PRI'
+    olympics.loc[olympics['Country'] == 'IRI', 'Country'] = 'IRN'
+    olympics.loc[olympics['Country'] == 'TRI', 'Country'] = 'TTO'
+    olympics.loc[olympics['Country'] == 'BUL', 'Country'] = 'BGR'
+    olympics.loc[olympics['Country'] == 'LIB', 'Country'] = 'LBN'
+    olympics.loc[olympics['Country'] == 'BAH', 'Country'] = 'BHS'
+    olympics.loc[olympics['Country'] == 'SIN', 'Country'] = 'SGP'
+    olympics.loc[olympics['Country'] == 'NGR', 'Country'] = 'NGA'
+    olympics.loc[olympics['Country'] == 'MGL', 'Country'] = 'MNG'
+    olympics.loc[olympics['Country'] == 'NIG', 'Country'] = 'NER'
+    olympics.loc[olympics['Country'] == 'BER', 'Country'] = 'BMU'
+    olympics.loc[olympics['Country'] == 'TAN', 'Country'] = 'TZA'
+    olympics.loc[olympics['Country'] == 'ZIM', 'Country'] = 'ZWE'
+    olympics.loc[olympics['Country'] == 'ZAM', 'Country'] = 'ZMB'
+    olympics.loc[olympics['Country'] == 'ALG', 'Country'] = 'DZA'
+    olympics.loc[olympics['Country'] == 'CRC', 'Country'] = 'CRI'
+    olympics.loc[olympics['Country'] == 'INA', 'Country'] = 'IDN'
+    olympics.loc[olympics['Country'] == 'ISV', 'Country'] = 'VGB'
+    olympics.loc[olympics['Country'] == 'EUN', 'Country'] = 'URS'  # Actually 2 different team but still in Soviet
+    olympics.loc[olympics['Country'] == 'MAS', 'Country'] = 'MYS'
+    olympics.loc[olympics['Country'] == 'CRO', 'Country'] = 'HRV'
+    olympics.loc[olympics['Country'] == 'SLO', 'Country'] = 'SVK'
+    olympics.loc[olympics['Country'] == 'TGA', 'Country'] = 'TON'
+    olympics.loc[olympics['Country'] == 'BAR', 'Country'] = 'BRB'
+    olympics.loc[olympics['Country'] == 'KSA', 'Country'] = 'SAU'
+    olympics.loc[olympics['Country'] == 'KUW', 'Country'] = 'KWT'
+    olympics.loc[olympics['Country'] == 'VIE', 'Country'] = 'VNM'
+    olympics.loc[olympics['Country'] == 'PAR', 'Country'] = 'PRY'
+    olympics.loc[olympics['Country'] == 'UAE', 'Country'] = 'ARE'
+    olympics.loc[olympics['Country'] == 'SUD', 'Country'] = 'SDN'
+    olympics.loc[olympics['Country'] == 'MRI', 'Country'] = 'MUS'
+    olympics.loc[olympics['Country'] == 'TOG', 'Country'] = 'TGO'
+    olympics.loc[olympics['Country'] == 'GUA', 'Country'] = 'GTM'
+    olympics.loc[olympics['Country'] == 'GRN', 'Country'] = 'GRD'
+    olympics.loc[olympics['Country'] == 'BOT', 'Country'] = 'BWA'
+
+    # Convert back to a new csv file
+    olympics.to_csv('summer_modified.csv')
+
+    country_codes = pd.read_csv("country_codes.csv")
+    country_codes = country_codes[['Region Name_en (M49)', 'Country or Area_en (M49)', 'ISO-alpha3 Code (M49)']]
+    country_codes = country_codes.dropna()
+    country_codes.reset_index(inplace=True, drop=True)
+    country_codes.loc[len(country_codes.index)] = ['World', 'International Olympic Committee Mixed teams', 'ZZX']
+    country_codes.loc[len(country_codes.index)] = ['Europe', 'Bohemia', 'BOH']
+    country_codes.loc[len(country_codes.index)] = ['Oceania', 'Australasia', 'ANZ']
+    country_codes.loc[len(country_codes.index)] = ['Europe', 'Russian Empire', 'RU1']
+    country_codes.loc[len(country_codes.index)] = ['Europe', 'Czechoslovakia', 'TCH']
+    country_codes.loc[len(country_codes.index)] = ['Europe', 'Yugoslavia', 'YUG']
+    country_codes.loc[len(country_codes.index)] = ['Europe', 'Soviet Union', 'URS']
+    country_codes.loc[len(country_codes.index)] = ['Europe', 'United Team of Germany', 'EUA']
+    country_codes.loc[len(country_codes.index)] = ['Americas', 'British West Indies', 'BWI']
+    country_codes.loc[130] = ['Asia', 'Chinese Taipei', 'TPE']
+    country_codes.loc[len(country_codes.index)] = ['Europe', 'East Germany', 'GDR']
+    country_codes.loc[len(country_codes.index)] = ['Europe', 'West Germany', 'FRG']
+    country_codes.loc[len(country_codes.index)] = ['Europe', 'Netherlands Antilles', 'AHO']
+    country_codes.loc[len(country_codes.index)] = ['World', 'Independent Olympic Participants', 'IOP']
+    country_codes.loc[len(country_codes.index)] = ['Europe', 'Serbia and Montenegro', 'SCG']
+    # Convert back to a new csv file
+    country_codes.to_csv('country_codes_modified.csv')
+
+    group = {'Archery': 0, 'Athletics': 0, 'Badminton': 0, 'Baseball': 1, 'Basketball': 1, 'Basque Pelota': 1,
+             'Beach Volleyball': 1, 'Boxing': 0, 'Canoe / Kayak F': 0, 'Canoe / Kayak S': 0, 'Canoe Slalom': 0,
+             'Canoe Sprint': 1, 'Cricket': 1, 'Croquet': 0, 'Cycling BMX': 0, 'Cycling Road': 0, 'Cycling Track': 0,
+             'Diving': 0, 'Dressage': 0, 'Eventing': 0, 'Fencing': 0, 'Figure skating': 0, 'Football': 1, 'Golf': 0,
+             'Gymnastics Artistic': 0, 'Gymnastics Rhythmic': 1, 'Handball': 1, 'Hockey': 1, 'Ice Hockey': 1,
+             'Jeu de Paume': 0, 'Judo': 0, 'Jumping': 0, 'Lacrosse': 1, 'Marathon swimming': 0, 'Modern Pentathlon': 0,
+             'Mountain Bike': 1, 'Polo': 1, 'Rackets': 0, 'Roque': 0, 'Rowing': 1, 'Rugby': 1, 'Sailing': 1,
+             'Shooting': 0,
+             'Softball': 1, 'Swimming': 0, 'Synchronized Swimming': 1, 'Table Tennis': 0, 'Taekwondo': 0, 'Tennis': 0,
+             'Trampoline': 0, 'Triathlon': 0, 'Tug of War': 1, 'Vaulting': 0, 'Volleyball': 1, 'Water Motorsport': 1,
+             'Water Polo': 1, 'Weightlifting': 0, 'Wrestling Freestyle': 0, 'Wrestling Gre-R': 0}
+
+    import python_ta
+
+    python_ta.check_all(config={
+        'extra-imports': ['csv', 'networkx', 'pandas'],  # the names (strs) of imported modules
+        'allowed-io': ['print', 'open', 'input'],     # the names (strs) of functions that call print/open/input
+        'max-line-length': 120
+    })
