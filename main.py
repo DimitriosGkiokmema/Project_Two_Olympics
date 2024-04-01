@@ -19,7 +19,7 @@ pygame.init()
 screen_width = 1200
 screen_height = 750
 # background_colour = (125, 235, 255)
-background_colour =  pygame.image.load('Olympics Wallpaper.jpg')
+background_colour = pygame.image.load('Olympics Wallpaper.jpg')
 background_colour = pygame.transform.scale(background_colour, (screen_width, screen_height))
 
 

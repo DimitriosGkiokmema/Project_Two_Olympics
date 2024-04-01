@@ -90,3 +90,8 @@ country_codes.loc[len(country_codes.index)] = ['Europe', 'Serbia and Montenegro'
 
 # Convert back to a new csv file
 country_codes.to_csv('country_codes_modified.csv')
+
+small_olympics = pd.read_csv("summer_modified.csv")
+small_olympics = small_olympics.iloc[0:50,]
+small_olympics = small_olympics.drop(['Unnamed: 0'], axis=1)
+small_olympics.to_csv("summer_small.csv")

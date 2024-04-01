@@ -269,7 +269,7 @@ class Graph:
                     graph_nx.add_node(u.item, kind=u.kind)
 
                 if u.item in graph_nx.nodes:
-                    graph_nx.add_edge(v.item, u.item)
+                    graph_nx.add_edge(v.item, u.item, sport=v.neighbours[u])
 
             if graph_nx.number_of_nodes() >= max_vertices:
                 break
@@ -558,7 +558,7 @@ class Graph:
         return round(total / (end_year - start_year + 1), 2)
 
     def sport_flow(self, start_year: int, end_year: int) -> dict[int, int]:
-        """Return the total number of sports for each year from start_year to end_year, INCLUSIVE. 
+        """Return the total number of sports for each year from start_year to end_year, INCLUSIVE.
         If there is a year that is not included in self, it will be represented with sports number 0."""
         years_flow = {}
         for y in range(start_year, end_year + 1):
@@ -715,9 +715,22 @@ class Sport:
             total_indi_medals = sum([medal.total_medal() for medal in self.individual_sports.values()])
             return total_team_medals + total_indi_medals
         elif kind == 'team':
-            return sum([medal.total_medal for medal in self.team_sports.values()])
+            return sum([medal.total_medal() for medal in self.team_sports.values()])
         else:  # kind == 'individual'
-            return sum([medal.total_medal for medal in self.individual_sports.values()])
+            return sum([medal.total_medal() for medal in self.individual_sports.values()])
+
+    def total_scores(self, kind: str = '') -> int:
+        """Return the total number of weighted medals for all sports, according to whether kind is team of individual.
+        If kind is left lanked, return towal weighted scores of medals for both groups.
+        """
+        if kind == '':
+            total_team_scores = sum([medal.weighted_score() for medal in self.team_sports.values()])
+            total_indi_scores = sum([medal.weighted_score() for medal in self.individual_sports.values()])
+            return total_indi_scores + total_team_scores
+        elif kind == 'team':
+            return sum([medal.weighted_score() for medal in self.team_sports.values()])
+        else:
+            return sum([medal.weighted_score() for medal in self.individual_sports.values()])
 
     def total_num_sport(self, kind: str = '') -> int:
         """Return the total number of sports according to the kind (either team or individual).
@@ -771,9 +784,8 @@ def load_graph(olympic_games: str, countries: str, groups: dict[str, str]) -> Gr
             yr = int(row[1])
             graph.add_vertex(country_dict[row[6]][0], 'country', '')
             graph.add_vertex(country_dict[row[6]][1], 'region', '')
-            graph.add_vertex(row[1], 'year', city_to_country[row[2]])
+            graph.add_vertex(yr, 'year', city_to_country[row[2]])
             # We still need to find a way to
-            graph.add_vertex(yr, 'year', row[6][0])
             # Have: edge - Sport class -> Sport - Medal class
 
             # Add edge for country and its corresponding region
