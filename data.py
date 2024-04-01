@@ -557,6 +557,19 @@ class Graph:
         total = sum(self.medal_all_years(start_year, end_year))
         return round(total / (end_year - start_year + 1), 2)
 
+    def sport_flow(self, start_year: int, end_year: int) -> dict[int, int]:
+        """Return the total number of sports for each year from start_year to end_year, INCLUSIVE. 
+        If there is a year that is not included in self, it will be represented with sports number 0."""
+        years_flow = {}
+        for y in range(start_year, end_year + 1):
+            sport_number = 0
+            if y in self._vertices:
+                for country in self._vertices[y].neighbours:
+                    sport_number += len(self._vertices[y].neighbours[country].team_sports) + len(
+                        self._vertices[y].neighbours[country].team_sports)
+            years_flow[y] = sport_number
+        return years_flow
+
     def participation_overall_average(self) -> float | int:
         """Return the overall average number of participants for all years between the first recorded year and the
         last recorded year. Rounded to the second decimal place.
