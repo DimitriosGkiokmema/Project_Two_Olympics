@@ -525,7 +525,13 @@ class Graph:
     def medal_period_average(self, start_year: int, end_year: int) -> float | int:
         """Return the priod average number of medals from start_year to end_year, INCLUSIVE. Rounded to the
         second decimal place.
+        Representation Invariants:
+            - start_year and end_year must be among [min_year, max_year] recorded in the dataset.
         """
+        total = sum(self.medal_all_years(start_year, end_year))
+        return round(total / (end_year - start_year + 1), 2)
+
+
 class Medal:
     """A place to store number of medals for a given edge (which country - in which year - on which sport).
     Instance Attributes:
