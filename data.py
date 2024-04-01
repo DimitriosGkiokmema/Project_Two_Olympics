@@ -428,6 +428,34 @@ class Graph:
         else:
             print(f"Something went wrong. Please check your input and try again.")
 
+    def performance(self) -> dict:
+        """Returns the average of change of medals weight starting from the start year of participation to the last
+         year of participation for all the countries in a dictionary.
+        """
+        countries = []
+        for key in self._vertices:
+            vertex = self._vertices[key]
+            if vertex.kind == 'country':
+                counties.append(vertex.item)
+        country_wise_performance = {}
+        for country in countries:
+            years_participated = []
+            sum_of_change = 0
+            v_country = self._vertices[country]
+            for vertice in v_country.neighbours:
+                if vertice.kind == 'year':
+                    years_participated.append(vertice.item)
+            years_participated.sort()
+            prev_medals_weight = 0
+            for year in years_participated:
+                v_year = self._vertices[year]
+                sport_data = v_country.neighbours[v_year]
+                curr_weight = sport_data.total_medals_weight()
+                sum_of_change += (curr_weight - prev_medals_weight)
+                prev_medals_weight = curr_weight
+            country_wise_performance[country] = sum_of_change / len(years_participated)
+        return country_wise_performance
+
     def annual_data_dict(self, country: str, year: int) -> Any:
         """Return the annual data of a country in a specific year, dimilar to annual_data_sentence, but presented as
         a dictionary for further code usage.
@@ -703,6 +731,13 @@ class Sport:
             self.team_sports[name].add_medal(kind_medal, num)
         else:
             self.individual_sports[name].add_medal(kind_medal, num)
+
+    def total_medals_weight(self) -> int:
+        """Returns the total weighted values for the given sport class's each medal."""
+
+        total_team_medals_weight = sum([medal.weighted_score() for medal in self.team_sports.values()])
+        total_indi_medals_weight = sum([medal.weighted_score() for medal in self.individual_sports.values()])
+        return total_team_medals_weight + total_indi_medals_weight
 
     def total_medal(self, kind: str = '') -> int:
         """Return the total number of medals for all sports, according to whether kind is team or individual.
