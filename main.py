@@ -24,7 +24,6 @@ back_button_image = pygame.transform.scale(back_button_image, (50, 50))
 background_image = pygame.image.load('Olympics Wallpaper.jpg')
 background_image = pygame.transform.scale(background_image, (screen_width, screen_height))
 
-
 window = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('CSC111 Project 2: The Analysis of Summer Olympics Through External Effects')
 

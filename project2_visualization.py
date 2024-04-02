@@ -1,3 +1,6 @@
+"""
+The visualization of a graph, similar to exercise 4.
+"""
 import networkx as nx
 from plotly.graph_objs import Scatter, Figure
 import data
@@ -12,17 +15,20 @@ COLOUR_SCHEME = [
 
 LINE_COLOUR = 'rgb(210,210,210)'
 VERTEX_BORDER_COLOUR = 'rgb(50, 50, 50)'
-BOOK_COLOUR = 'rgb(89, 205, 105)'
-USER_COLOUR = 'rgb(105, 89, 205)'
+YEAR_COLOUR = 'rgb(89, 205, 105)'
+COUNTRY_COLOUR = 'rgb(105, 89, 205)'
+REGION_COLOUR = 'rgb(205, 149, 89)'
 
 
 def setup_graph(graph: data.Graph,
                 layout: str = 'spring_layout',
-                max_vertices: int = 5000) -> list:
+                max_vertices: int = 5000,
+                weighted: bool = False) -> list:
     """Use plotly and networkx to setup the visuals for the given graph.
 
     Optional arguments:
-        - weighted: True when weight data should be visualized
+        - weighted: True when weight data should be visualized. Weight in this case is the Sport class in the edge
+        between a country and a year it participated.
     """
 
     graph_nx = graph.to_networkx(max_vertices)
@@ -33,18 +39,28 @@ def setup_graph(graph: data.Graph,
     y_values = [pos[k][1] for k in graph_nx.nodes]
     labels = list(graph_nx.nodes)
 
+    if weighted:
+        weights = nx.get_edge_attributes(graph_nx, 'sport')
+
     kinds = [graph_nx.nodes[k]['kind'] for k in graph_nx.nodes]
 
-    colours = [BOOK_COLOUR if kind == 'book' else USER_COLOUR for kind in kinds]
+    colours = [YEAR_COLOUR if k == 'year' else (COUNTRY_COLOUR if k == 'country'else REGION_COLOUR) for k in kinds]
 
     x_edges = []
     y_edges = []
+    weight_positions = []
 
     for edge in graph_nx.edges:
         x1, x2 = pos[edge[0]][0], pos[edge[1]][0]
         x_edges += [x1, x2, None]
         y1, y2 = pos[edge[0]][1], pos[edge[1]][1]
         y_edges += [y1, y2, None]
+        if weighted:
+            e = weights[(edge[0], edge[1])]
+            if e is None:
+                weight_positions.append(((x1 + x2) / 2, (y1 + y2) / 2, ''))
+            else:
+                weight_positions.append(((x1 + x2) / 2, (y1 + y2) / 2, e.total_scores()))
 
     trace3 = Scatter(x=x_edges,
                      y=y_edges,
@@ -69,7 +85,10 @@ def setup_graph(graph: data.Graph,
 
     data = [trace3, trace4]
 
-    return data
+    if weighted:
+        return [weight_positions, data]
+    else:
+        return data
 
 
 def visualize_graph(graph: data.Graph,
@@ -86,6 +105,23 @@ def visualize_graph(graph: data.Graph,
     """
 
     draw_graph(setup_graph(graph, layout, max_vertices), output_file)
+
+
+def visualize_weighted_graph(graph: data.Graph,
+                             layout: str = 'spring_layout',
+                             max_vertices: int = 5000,
+                             output_file: str = '') -> None:
+    """Use plotly and networkx to visualize the given weighted graph.
+
+    Optional arguments:
+        - layout: which graph layout algorithm to use
+        - max_vertices: the maximum number of vertices that can appear in the graph
+        - output_file: a filename to save the plotly image to (rather than displaying
+            in your web browser)
+    """
+
+    weight_positions, data = setup_graph(graph, layout, max_vertices, True)
+    draw_graph(data, output_file, weight_positions)
 
 
 def draw_graph(data: list, output_file: str = '', weight_positions=None) -> None:
