@@ -1,4 +1,6 @@
-"""CSC111 Project 2: The Analysis of Summer Olympics Through External Effects (1896 - 2012)"""
+"""CSC111 Project 2: The Analysis of Summer Olympics Through External Effects (1896 - 2012)
+AMY IS MAKING IT TO BECOME A NEW MAIN.PY SO THAT THE FUNCTIONS WILL BE HIDDEN AND THE USER CAN HAVE BETTER EXPERIENCES?
+"""
 import data
 import pygame
 from main import Button, display_info, redraw_window
