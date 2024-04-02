@@ -326,12 +326,12 @@ class Graph:
         host_medals = {}
 
         for year in self._vertices:
-            if self._vertices[year].kind == 'year' and self._vertices[year].host.lower() == country.lower():
+            if self._vertices[year].kind == 'year' and self._vertices[year].host == country:
                 is_host = True
 
-                for participant in self._vertices[int(year)].neighbours:
-                    if participant.kind == 'country' and participant.item.lower() == country.lower():
-                        medals = self._vertices[int(year)].neighbours[participant].total_medal()
+                for participant in self._vertices[year].neighbours:
+                    if participant.kind == 'country' and participant.item == country:
+                        medals = self._vertices[year].neighbours[participant].total_medal()
                         host_medals[int(self._vertices[year].item)] = medals
 
         if is_host:
@@ -346,7 +346,7 @@ class Graph:
         played_medals = {}
 
         for year in self._vertices[country.title()].neighbours:
-            if self._vertices[year.item].kind == 'year' and self._vertices[year.item].host.lower() != country.lower():
+            if self._vertices[year.item].kind == 'year':
                 played_medals[int(year.item)] = 0
 
                 for participant in year.neighbours:
@@ -558,7 +558,7 @@ class Graph:
         return round(total / (end_year - start_year + 1), 2)
 
     def sport_flow(self, start_year: int, end_year: int) -> dict[int, int]:
-        """Return the total number of sports for each year from start_year to end_year, INCLUSIVE. 
+        """Return the total number of sports for each year from start_year to end_year, INCLUSIVE.
         If there is a year that is not included in self, it will be represented with sports number 0."""
         years_flow = {}
         for y in range(start_year, end_year + 1):
@@ -715,9 +715,9 @@ class Sport:
             total_indi_medals = sum([medal.total_medal() for medal in self.individual_sports.values()])
             return total_team_medals + total_indi_medals
         elif kind == 'team':
-            return sum([medal.total_medal for medal in self.team_sports.values()])
+            return sum([medal.total_medal() for medal in self.team_sports.values()])
         else:  # kind == 'individual'
-            return sum([medal.total_medal for medal in self.individual_sports.values()])
+            return sum([medal.total_medal() for medal in self.individual_sports.values()])
 
     def total_num_sport(self, kind: str = '') -> int:
         """Return the total number of sports according to the kind (either team or individual).
@@ -771,9 +771,8 @@ def load_graph(olympic_games: str, countries: str, groups: dict[str, str]) -> Gr
             yr = int(row[1])
             graph.add_vertex(country_dict[row[6]][0], 'country', '')
             graph.add_vertex(country_dict[row[6]][1], 'region', '')
-            graph.add_vertex(row[1], 'year', city_to_country[row[2]])
+            graph.add_vertex(int(row[1]), 'year', city_to_country[row[2]])
             # We still need to find a way to
-            graph.add_vertex(yr, 'year', row[6][0])
             # Have: edge - Sport class -> Sport - Medal class
 
             # Add edge for country and its corresponding region

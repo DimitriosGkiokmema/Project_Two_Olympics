@@ -18,9 +18,11 @@ pygame.init()
 
 screen_width = 1200
 screen_height = 750
-# background_colour = (125, 235, 255)
-background_colour =  pygame.image.load('Olympics Wallpaper.jpg')
-background_colour = pygame.transform.scale(background_colour, (screen_width, screen_height))
+# background_image = (125, 235, 255)
+back_button_image = pygame.image.load('back_button.png')
+back_button_image = pygame.transform.scale(back_button_image, (50, 50))
+background_image = pygame.image.load('Olympics Wallpaper.jpg')
+background_image = pygame.transform.scale(background_image, (screen_width, screen_height))
 
 
 window = pygame.display.set_mode((screen_width, screen_height))
@@ -48,13 +50,19 @@ YEARS = [x for x in range(1940, 2013)]
 
 class Button:
     """ template for the buttons"""
-    def __init__(self, x, y, text=''):
+    def __init__(self, x, y, text='', image=None):
         self.colour = (208, 206, 206)
         self.x = x
         self.y = y
-        self.width = 450
-        self.height = 80
         self.text = text
+        self.image = image
+
+        if image == back_button_image:
+            self.width = 50
+            self.height = 50
+        else:
+            self.width = 450
+            self.height = 80
 
     def draw(self, outline=None):
         """Draw the button on the screen"""
@@ -68,6 +76,8 @@ class Button:
             text = font.render(self.text, 1, (0, 0, 0))
             window.blit(text, (self.x + (self.width / 2 - text.get_width() / 2), self.y + (self.height / 2 -
                                                                                         text.get_height() / 2)))
+        else:
+            window.blit(self.image, (self.x, self.y))
 
     def is_over(self, position):
         # Pos is the mouse position or a tuple of (x,y) coordinates
@@ -230,29 +240,41 @@ def display_info(button_name: str) -> None:
     this function changes the screen display accordingly, shows a graph, and prints
     text on the screen (if required)
     """
-    # single_plot()
     # if button_name == 'Annual Medals':
+    #     cords = graph
     # elif button_name == 'Given Area':
-    # elif button_name == 'Gold, Silver, and Bronze':
+    if button_name == 'Gold, Silver, and Bronze':
+        question1 = 'Enter the first country you want to compare: '
+        question2 = 'Enter a country you want to compare the first to: '
+        # question3 = 'Enter the year the two countries participated in the Olympics'
+        # country1 = get_user_response(question1)
+        # country2 = get_user_response(question2)
+        # year = get_user_response(question3)
+        # output = graph.compare_medals(country1, country2, int(year))
+        #
+        # if len(output) > 1:
+        #     display_text(output)
+        display_text(graph.compare_medals('Greece', 'France', 1896))
+
     # elif button_name == 'Rank':
     # elif button_name == 'Annual Data':
     # elif button_name == 'Impact of Historical Events':
     if button_name == 'Host Effect':
         question = 'Enter a country to see its Host Effect: '
-        country = get_user_response(question).title()
+        country = get_user_response(question)
         cords = graph.host_wins(country)  # [{year_hosted, num of wins}, {year_played: num of wins}]
 
         if not isinstance(cords, str):
-            print(cords)
+            # print(cords)
             x1 = [year for year in cords[0]]
             x2 = [year for year in cords[1]]
             y1 = [cords[0][win] for win in cords[0]]
             y2 = [cords[1][win] for win in cords[1]]
             title = 'Host Country Effect'
-            names = ['Wins Hosted by Country', 'Wins When Country Participated']
+            names = ['Medals Won When Hosted by Country', 'Total Medals Won']
             two_plots(names, title, [True, False], 'single', y1, y2, [x1, x2])
         else:
-            print(cords)
+            display_text(cords)
 
     # elif button_name == 'Team vs Individual Sports':
     # elif button_name == 'Performance':
@@ -261,11 +283,57 @@ def display_info(button_name: str) -> None:
     # elif button_name == 'Visualize Graph':
 
 
+def display_text(txt: str) -> None:
+    """ Text is given and this function displays it on the pygame window"""
+    # Create a font object
+    font = pygame.font.Font('freesansbold.ttf', 32)
+    text_colour = (255, 255, 0)
+    background_colour = (0, 0, 128)
+    window.fill((255, 255, 255))
+
+    # Split the input text into separate lines
+    lines = txt.split('\n')
+
+    # Create a list to store text surfaces
+    text_surfaces = []
+
+    # Render each line of text
+    for line in lines:
+        text_surface = font.render(line, True, text_colour, background_colour)
+        text_surfaces.append(text_surface)
+
+    # Calculate total height of all text surfaces
+    total_height = sum(surface.get_height() for surface in text_surfaces)
+
+    # Position text surfaces vertically
+    y_position = (screen_height - total_height) // 2
+    for surface in text_surfaces:
+        text_rect = surface.get_rect(center=(screen_width // 2, y_position))
+        window.blit(surface, text_rect)
+        y_position += surface.get_height()
+
+    back_button = buttons_main[len(buttons_main) - 1]
+
+    show_txt = True
+    while show_txt:
+        back_button.draw((0, 0, 0))
+        position = pygame.mouse.get_pos()
+        for action in pygame.event.get():
+            if action.type == pygame.QUIT:
+                show_txt = False
+                pygame.quit()
+            if action.type == pygame.MOUSEBUTTONDOWN and back_button.is_over(position):
+                show_txt = False
+        pygame.display.update()
+
+    redraw_window()
+
+
 def get_user_response(question: str) -> str:
     """ Displays a new window that asks for user input, then returns that input"""
     # Set up the colors
     black = (0, 0, 0)
-    gray = (255, 255, 255)
+    gray = (208, 206, 206)
 
     # Set up the font
     font = pygame.font.Font(None, 32)
@@ -322,7 +390,7 @@ def get_user_response(question: str) -> str:
         pygame.display.flip()
 
     redraw_window()
-    return response
+    return response.title()
 
 ####################################################
 # Game loop
@@ -342,21 +410,21 @@ performance = Button(100, 530, 'Performance')
 countries = Button(600, 530, 'Country Statistics')
 sports = Button(100, 650, 'Sport Statistics')
 visualize = Button(600, 650, 'Visualize Graph')
+back = Button(screen_width - 55, 5, image=back_button_image)
 
 # Store buttons in a list
 buttons_main = [annual_medals, given_area, gsb, rankings, annual_data, historical, host_effect, team_vs_indi]
-buttons_main.extend([performance, countries, sports, visualize])
+buttons_main.extend([performance, countries, sports, visualize, back])
 
 
 def redraw_window():
     """Redraw window"""
-    window.blit(background_colour, (0, 0))
+    window.blit(background_image, (0, 0))
 
-    for curr_button in buttons_main:
+    for curr_button in buttons_main[:len(buttons_main) - 1]:
         curr_button.draw((0, 0, 0))
 
 
-show_graph = False
 run = True
 while run:
     for event in pygame.event.get():
