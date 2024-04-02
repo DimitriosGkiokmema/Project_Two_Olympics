@@ -347,11 +347,7 @@ class Graph:
         """Returns the average of change of medals weight starting from the start year of participation to the last
          year of participation for all the countries in a dictionary.
         """
-        countries = []
-        for key in self._vertices:
-            vertex = self._vertices[key]
-            if vertex.kind == 'country':
-                countries.append(vertex.item)
+        countries = [c.item for c in self.get_all_vertices('country')]
         country_wise_performance = {}
         for country in countries:
             years_participated = []
