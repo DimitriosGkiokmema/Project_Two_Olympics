@@ -239,12 +239,12 @@ class Graph:
         host_medals = {}
 
         for year in self._vertices:
-            if self._vertices[year].kind == 'year' and self._vertices[year].host.lower() == country.lower():
+            if self._vertices[year].kind == 'year' and self._vertices[year].host == country:
                 is_host = True
 
-                for participant in self._vertices[int(year)].neighbours:
-                    if participant.kind == 'country' and participant.item.lower() == country.lower():
-                        medals = self._vertices[int(year)].neighbours[participant].total_medal()
+                for participant in self._vertices[year].neighbours:
+                    if participant.kind == 'country' and participant.item == country:
+                        medals = self._vertices[year].neighbours[participant].total_medal()
                         host_medals[int(self._vertices[year].item)] = medals
 
         if is_host:
@@ -259,7 +259,7 @@ class Graph:
         played_medals = {}
 
         for year in self._vertices[country.title()].neighbours:
-            if self._vertices[year.item].kind == 'year' and self._vertices[year.item].host.lower() != country.lower():
+            if self._vertices[year.item].kind == 'year':
                 played_medals[int(year.item)] = 0
 
                 for participant in year.neighbours:
