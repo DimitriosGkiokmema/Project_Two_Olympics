@@ -360,11 +360,11 @@ class Graph:
                 sport_data = v_country.neighbours[v_year]  # type Sport
 
                 return (f"In {year}, {country} participated and had medals on {sport_data.total_num_sport()} sports,\n"
-                      f"including {sport_data.total_num_sport('team')} team sports and "
-                      f"{sport_data.total_num_sport('individual')} sports. \n In terms of the number of medals, \n"
-                      f"{country} in that year has achieved the total of \n{sport_data.total_medal()} medals, with \n"
-                      f"{sport_data.total_medal('team')} medals on team sports and the other "
-                      f"{sport_data.total_medal('individual')} on individuals.")
+                        f"including {sport_data.total_num_sport('team')} team sports and "
+                        f"{sport_data.total_num_sport('individual')} sports. \n In terms of the number of medals, \n"
+                        f"{country} in that year has achieved the total of \n{sport_data.total_medal()} medals, with \n"
+                        f"{sport_data.total_medal('team')} medals on team sports and the other "
+                        f"{sport_data.total_medal('individual')} on individuals.")
         else:
             return 'Something went wrong. Please check your input and try again.'
 
