@@ -2,7 +2,7 @@
 TODO
 """
 from __future__ import annotations
-from typing import Any
+from typing import Any, List, Tuple
 import csv
 import networkx as nx
 import pandas as pd  # remember to install the package pandas! (my version is 2.2.1)
@@ -189,7 +189,7 @@ class Graph:
 
         return graph_nx
 
-    def i_th_place(self, year: int) -> list[dict[str, int]] | str:
+    def i_th_place(self, i: int, year: int) -> list[tuple[Any, int]] | str:
         """ Ranking (which country, continent, or region ranked the ith place for the number of
         (gold/silver/bronze/total) medals in the given year?)
 
@@ -198,38 +198,63 @@ class Graph:
         - for each country, access its Sport and count its Medals
         - to count medals, iterate through indi and team dicts, use dict.i.total_medals to get [g, s, b]
         - add g, s, b values to this function's dicts
+
+        Graph: _vertices: dict[Any, _SportVertex]
+        _SportVertex:   item: Any
+                        kind: str
+                        host: str
+                        neighbours: dict[_SportVertex, Sport]
+        Sport:  team_sports: dict[str, Medal]
+                individual_sports: dict[str, Medal]
+        Medal:  num_g: int
+                num_s: int
+                num_b: int
         """
         if year not in self._vertices:
             return 'Invalid input for year'
 
-        gold = {}
-        silver = {}
-        bronze = {}
+        gold = []
+        silver = []
+        bronze = []
 
-        for country in self._vertices[year].neighbours:
-            sport = self._vertices[year].neighbours[country]
-            g, s, b = 0, 0, 0
+        for vertex in self._vertices[year].neighbours:
+            if self._vertices[year].neighbours[vertex] is not None:
+                medals = self.rank_helper(year, vertex)
 
-            # Records the number of total medals won in team sports
-            for team_sport in sport.team_sports:
-                medals = sport.team_sports[team_sport]
-                g += medals.num_g
-                s += medals.num_s
-                b += medals.num_b
+                # Records the number of medals in dicts
+                gold.append((vertex.item, medals[0]))
+                silver.append((vertex.item, medals[1]))
+                bronze.append((vertex.item, medals[2]))
 
-            # Records the number of total medals won in individual sports
-            for individual_sport in sport.team_sports:
-                medals = sport.team_sports[individual_sport]
-                g += medals.num_g
-                s += medals.num_s
-                b += medals.num_b
+        if i < len(gold):
+            insertion_sort(gold)
+            insertion_sort(silver)
+            insertion_sort(bronze)
+            return [gold[len(gold) - i], silver[len(silver) - i], bronze[len(bronze) - i]]
+        else:
+            num_participants = len(self._vertices[year].neighbours)
+            return f'Invalid rank; only {num_participants} countries participated in the {year} Olympic games'
 
-            # Records the number of medals in dicts
-            gold[country.item] = g
-            silver[country.item] = s
-            bronze[country.item] = b
+    def rank_helper(self, year: int, vertex: _SportVertex) -> list[int]:
+        """ This is a helper function for rank (above)
+        Given a Sport object, this function returns the total number of medals for that sport."""
+        g, s, b = 0, 0, 0
 
-        return [gold, silver, bronze]
+        # Records the number of total medals won in team sports
+        for team_sport in self._vertices[year].neighbours[vertex].team_sports:
+            medals = self._vertices[year].neighbours[vertex].team_sports[team_sport]
+            g += medals.num_g
+            s += medals.num_s
+            b += medals.num_b
+
+        # Records the number of total medals won in individual sports
+        for individual_sport in self._vertices[year].neighbours[vertex].individual_sports:
+            medals = self._vertices[year].neighbours[vertex].individual_sports[individual_sport]
+            g += medals.num_g
+            s += medals.num_s
+            b += medals.num_b
+
+        return [g, s, b]
 
     def host_wins(self, country: str) -> list[dict[Any, int]] | str:
         """ This function returns a dict in the format [{year_hosted, num of wins}, {year_played: num of wins}]
@@ -263,7 +288,7 @@ class Graph:
                 played_medals[int(year.item)] = 0
 
                 for participant in year.neighbours:
-                    if participant.item.lower() == country.lower():
+                    if participant.item == country:
                         medals = year.neighbours[participant].total_medal()
                         played_medals[int(year.item)] = medals
 
@@ -689,6 +714,20 @@ class Sport:
             return len(self.team_sports)
         else:
             return len(self.individual_sports)
+
+
+def insertion_sort(lst: list[tuple[str, int]]) -> None:
+    """ Helper for i_th_place function.
+    Takes in a list of format [(country, medals)] and sorts it in terms of medals
+    Note that this is a *mutating* function.
+    """
+    for i in range(0, len(lst)):
+        j = i
+        while not (j == 0 or lst[j - 1][1] <= lst[j][1]):
+            # Swap lst[j - 1] and lst[j]
+            lst[j - 1], lst[j] = lst[j], lst[j - 1]
+
+            j -= 1
 
 
 ####################################################################################################################

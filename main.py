@@ -245,17 +245,40 @@ def display_info(button_name: str) -> None:
     if button_name == 'Gold, Silver, and Bronze':
         question1 = 'Enter the first country you want to compare: '
         question2 = 'Enter a country you want to compare the first to: '
-        # question3 = 'Enter the year the two countries participated in the Olympics'
-        # country1 = get_user_response(question1)
-        # country2 = get_user_response(question2)
-        # year = get_user_response(question3)
-        # output = graph.compare_medals(country1, country2, int(year))
-        #
-        # if len(output) > 1:
-        #     display_text(output)
-        display_text(graph.compare_medals('Greece', 'France', 1896))
+        question3 = 'Enter the year the two countries participated in the Olympics'
+        country1 = get_user_response(question1)
+        country2 = get_user_response(question2)
+        year = int(get_user_response(question3))
+        output = graph.compare_medals(country1, country2, year)
 
-    # elif button_name == 'Rank':
+        if len(output) > 1:
+            nums = extract_integers(output)
+            names = [country1, country2]
+            title = 'Medal Comparisons'
+            y1 = [nums[0], nums[1], nums[2]]
+            y2 = [nums[3], nums[4], nums[5]]
+            x = [1, 2, 3]
+            ps = 'Click the back button to see graph(we know that its not ideal)'
+            display_text('Note that 1, 2 and 3 on the x-axis represent\ngold, silver, and bronze\n' + ps)
+            two_plots(names, title, [True, True], 'single', y1, y2, [x, x])
+        else:
+            display_text(f'In {year}, {country1} and {country2} never participated together!')
+    elif button_name == 'Rank':
+        year = int(get_user_response('Enter the year: '))
+        rank = int(get_user_response('Enter the desired rank: '))
+        output = graph.i_th_place(rank, year)
+        name = f'Country at ith place in {year}'
+
+        if 'Invalid' not in output:
+            y = [i[1] for i in output]
+            x = [1, 2, 3]
+            ps = 'Click the back button to see graph(we know that its not ideal)'
+            txt = f'{output[0][0]} in rank {rank} gold, {output[1][0]} in rank {rank} silver,'
+            txt += f'\n and {output[2][0]} in rank {rank} bronze\n'
+            display_text('Note that 1, 2 and 3 on the x-axis represent\n' + txt + ps)
+            single_plot([name], 'Ranking', True, 'single', [y], x)
+        else:
+            display_text(output)
     # elif button_name == 'Annual Data':
     # elif button_name == 'Impact of Historical Events':
     if button_name == 'Host Effect':
@@ -280,6 +303,31 @@ def display_info(button_name: str) -> None:
     # elif button_name == 'Country Statistics':
     # elif button_name == 'Sport Statistics':
     # elif button_name == 'Visualize Graph':
+
+
+def extract_integers(text: str) -> list[int]:
+    """Extracts all integers from the input text."""
+    # Initialize an empty list to store integers
+    result = []
+    current_number = ""
+
+    # Iterate through each character in the text
+    for char in text:
+        if char.isdigit():
+            # If the character is a digit, add it to the current number
+            current_number += char
+        elif current_number:
+            # If the character is not a digit and we have a current number,
+            # convert it to an integer and add it to the result list
+            result.append(int(current_number))
+            current_number = ""
+
+    # Add the last number (if any) to the result
+    if current_number:
+        result.append(int(current_number))
+
+    assert len(result[1:]) == 6
+    return result[1:]
 
 
 def display_text(txt: str) -> None:
@@ -424,6 +472,8 @@ def redraw_window():
         curr_button.draw((0, 0, 0))
 
 
+s = graph.i_th_place(1, 1896)
+print(s)
 run = True
 while run:
     for event in pygame.event.get():
