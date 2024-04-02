@@ -70,18 +70,13 @@ class Button:
             pygame.draw.rect(window, outline, (self.x - 2, self.y - 2, self.width + 4, self.height + 4), 0)
         pygame.draw.rect(window, self.colour, (self.x, self.y, self.width, self.height), 0)
 
-        # if self.text != '':
-#             font = pygame.font.SysFont('calibri', 40)
-#             text = font.render(self.text, 1, (0, 0, 0))
-# <<<<<<< HEAD
-#             window.blit(text, (self.x + (self.width / 2 - text.get_width() / 2), self.y +
-#                                (self.height / 2 - text.get_height() / 2)))
-# =======
-#             window.blit(text, (self.x + (self.width / 2 - text.get_width() / 2), self.y + (self.height / 2 -
-#                                                                                         text.get_height() / 2)))
-#         else:
-#             window.blit(self.image, (self.x, self.y))
-# >>>>>>> c42ffbb7656895f2e95baab957b7efc5653c4bac
+        if self.text != '':
+            font = pygame.font.SysFont('calibri', 40)
+            text = font.render(self.text, 1, (0, 0, 0))
+            window.blit(text, (self.x + (self.width / 2 - text.get_width() / 2), self.y +
+                               (self.height / 2 - text.get_height() / 2)))
+        else:
+            window.blit(self.image, (self.x, self.y))
 
     def is_over(self, position):
         """Is over"""
@@ -117,22 +112,6 @@ def single_plot(names: list[str], title: str, bar: bool, style: str, y: list[lis
         - len(y) == len(x) or x == 0
         - if a value is given for x cords, then y must have the same number of values
     """
-    # Below is used for testing
-    # style = 'single'
-    # apples = [1, 2, 3]
-    # pears = [2, 3, 7]
-    # bananas = [2, 3, 5]
-    # oranges = [1, 3, 5]
-    # y = [apples, pears, bananas, oranges]
-    # names = ['apples', 'pears', 'bananas', 'oranges']
-    # title = 'Random Graph'
-    # bar = False
-    # x = bananas
-
-    # if x == 0:
-    #     x = YEARS
-
-    # Keep this line
     line_explanation = {names[i]: y[i] for i in range(len(names))}
 
     if style == 'many':  # Graph with one or multiple lines in it
@@ -285,24 +264,28 @@ def display_info(button_name: str) -> None:
             single_plot([name], 'Ranking', True, 'single', [y], x)
         else:
             display_text(output)
-    # elif button_name == 'Annual Data':
+    elif button_name == 'Annual Data':
+        country = get_user_response('Enter the country you would like to see data for: ')
+        year = int(get_user_response('Enter the year: '))
+        output = graph.annual_data_sentence(country, year)
+        display_text(output)
     # elif button_name == 'Impact of Historical Events':
     if button_name == 'Host Effect':
         question = 'Enter a country to see its Host Effect: '
         country = get_user_response(question)
-        cords = graph.host_wins(country)  # [{year_hosted, num of wins}, {year_played: num of wins}]
+        output = graph.host_wins(country)  # [{year_hosted, num of wins}, {year_played: num of wins}]
 
-        if not isinstance(cords, str):
+        if not isinstance(output, str):
             # print(cords)
-            x1 = [year for year in cords[0]]
-            x2 = [year for year in cords[1]]
-            y1 = [cords[0][win] for win in cords[0]]
-            y2 = [cords[1][win] for win in cords[1]]
+            x1 = [year for year in output[0]]
+            x2 = [year for year in output[1]]
+            y1 = [output[0][win] for win in output[0]]
+            y2 = [output[1][win] for win in output[1]]
             title = 'Host Country Effect'
             names = ['Medals Won When Hosted by Country', 'Total Medals Won']
             two_plots(names, title, [True, False], 'single', y1, y2, [x1, x2])
         else:
-            display_text(cords)
+            display_text(output)
 
     # elif button_name == 'Team vs Individual Sports':
     # elif button_name == 'Performance':
@@ -478,8 +461,6 @@ def redraw_window():
         curr_button.draw((0, 0, 0))
 
 
-s = graph.i_th_place(1, 1896)
-print(s)
 run = True
 while run:
     for event in pygame.event.get():
