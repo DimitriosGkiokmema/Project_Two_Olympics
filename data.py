@@ -414,6 +414,8 @@ class Graph:
                         'total medals': sport_data.total_medal(),
                         'team medals': sport_data.total_medal('team'),
                         'indiv medals': sport_data.total_medal('individual')}
+            else:
+                return
         else:
             raise ValueError
 
@@ -483,7 +485,7 @@ class Graph:
     def medal_all_years(self, start_year: int, end_year: int) -> list:
         """Return the total number of medals for each year from start_year to end_year, INCLUSIVE"""
         selected_years = []
-        for y in range(start_year, end_year + 1):
+        for y in range(start_year, end_year + 1, 4):
             selected_years.append(self.medal_number_in_year(y))
 
         return selected_years
@@ -491,7 +493,7 @@ class Graph:
     def participation_all_years(self, start_year: int, end_year: int) -> list:
         """Return the total number of countries participated in each year from start_year to end_year, INCLUSIVE"""
         selected_years = []
-        for y in range(start_year, end_year + 1):
+        for y in range(start_year, end_year + 1, 4):  # Since Olympics happens every 4 years.
             selected_years.append(self.participation_in_year(y))
 
         return selected_years
@@ -522,7 +524,7 @@ class Graph:
         """Return the total number of sports for each year from start_year to end_year, INCLUSIVE.
         If there is a year that is not included in self, it will be represented with sports number 0."""
         years_flow = {}
-        for y in range(start_year, end_year + 1):
+        for y in range(start_year, end_year + 1, 4):
             sport_number = 0
             if y in self._vertices:
                 for country in self._vertices[y].neighbours:
@@ -581,7 +583,7 @@ class Graph:
         indiv = []
         all_years = self.get_all_vertices('year')
         min_year, max_year = min({yr.item for yr in all_years}), max({yr.item for yr in all_years})
-        for i in range(min_year, max_year + 1):  # Since we want the max_year inclusive
+        for i in range(min_year, max_year + 1, 4):  # Since we want the max_year inclusive
             one = self.wins_one(i, country)
             team.append(one[0])
             indiv.append(one[1])
@@ -813,6 +815,7 @@ def find_group(groups: dict[str, str], sport: str) -> str:
 
 
 if __name__ == '__main__':
+
     olympics = pd.read_csv("summer.csv")
     olympics = olympics.dropna()
     # Renamed some sports to have consistent names
