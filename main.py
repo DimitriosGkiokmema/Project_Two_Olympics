@@ -39,7 +39,7 @@ group = {'Archery': 0, 'Athletics': 0, 'Badminton': 0, 'Baseball': 1, 'Basketbal
 
 graph = data.load_graph('summer_modified.csv', 'country_codes_modified.csv', group)
 
-YEARS = [x for x in range(1940, 2013)]
+YEARS = [x for x in range(1896, 2013, 4)]  # EVERY 4 YEARS
 
 ####################################################
 # Buttons
@@ -66,10 +66,11 @@ class Button:
         if self.text != '':
             font = pygame.font.SysFont('calibri', 40)
             text = font.render(self.text, 1, (0, 0, 0))
-            window.blit(text, (self.x + (self.width / 2 - text.get_width() / 2), self.y + (self.height / 2 -
-                                                                                        text.get_height() / 2)))
+            window.blit(text, (self.x + (self.width / 2 - text.get_width() / 2), self.y +
+                               (self.height / 2 - text.get_height() / 2)))
 
     def is_over(self, position):
+        """Is over"""
         # Pos is the mouse position or a tuple of (x,y) coordinates
         if self.x < position[0] < self.x + self.width:
             if self.y < position[1] < self.y + self.height:
