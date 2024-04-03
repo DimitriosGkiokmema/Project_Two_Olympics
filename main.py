@@ -386,6 +386,7 @@ def display_info(button_name: str) -> None:
         display_text(text)
         horizontal_bar_graph('Performance of regions and countries', x_names, y)
     # elif button_name == 'Country Statistics':
+    #   participation_all_years
     # elif button_name == 'Sport Statistics':
     if button_name == 'Visualize Graph':
         vis.visualize_graph(graph)
