@@ -338,6 +338,13 @@ def display_info(button_name: str) -> None:
         names = ["Total Number of Medals", "Total Number of Participants"]
         two_plots(names, title, [False, False], 'single', y1, y2, [x1, x2])
     elif button_name == 'Host Effect':
+        # ps = 'Click the back button to proceed (we know that its not ideal)'
+        # display_text(ps)
+        # # HELP ME CONTINUE CONSTRUCTING IT
+        # question1 = 'Enter a start year (within known years): '
+        # start_year = get_user_response(question1)
+        # question2 = 'Enter an end year (within known years): '
+        # end_year = get_user_response(question2)
         question = 'Enter a country to see its Host Effect: '
         country = get_user_response(question)
         output = graph.host_wins(country)  # [{year_hosted, num of wins}, {year_played: num of wins}]
