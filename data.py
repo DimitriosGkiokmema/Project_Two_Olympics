@@ -518,8 +518,7 @@ class Graph:
         Computes the number of medals in the input_location overtime.
         Whenever the input_location is not in self, raise ValueError.
         """
-        # Raises ValueError if the input_location is not in the Graph.
-        if input_location not in [location for location in self._vertices]:
+        if input_location not in self._vertices:
             raise ValueError
         else:
 
@@ -662,7 +661,7 @@ class Graph:
 
 ##########################################
 # For Region: compute the total number of medals gained in each year (bar), as well as the percentage from the world's
-# total number of medal (line), displaying on the same graph. Do similar thing for the total weighted scores.
+# total number of medals (line), displayed on the same graph. Do a similar thing for the total weighted scores.
 ##########################################
     def medal_year_by_region(self, year: int, region: str) -> int:
         """Return the number of medals gained in the given region in that year. It means that we only choose countries
@@ -946,6 +945,9 @@ def load_graph(olympic_games: str, countries: str, groups: dict[str, str]) -> Gr
             # Add new edge (empty Sport) if not already adjacent
             if not graph.adjacent(country_dict[row[6]][0], yr):
                 graph.add_edge(country_dict[row[6]][0], yr, Sport())
+                
+            if not graph.adjacent(country_dict[row[6]][1], yr):
+                graph.add_edge(country_dict[row[6]][1], yr, Sport())
 
             # Update Sport
             sport_class = graph.get_edge(country_dict[row[6]][0], yr)  # get edge with that country and that year
