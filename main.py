@@ -278,15 +278,27 @@ def display_info(button_name: str) -> None:
         display_text(output)
     elif button_name == 'Given Area':
         question = 'Enter the region you want to see the number of medals awarded overtime: '
-        location = get_user_response(question)
-        medals = graph.medal_number_location(location)
+        region = get_user_response(question)
+        graph1 = graph.total_medal_by_region(region)  # either a tuple of 2 lists or none
+        graph2 = graph.weight_by_region(region)  # either a tuple of 2 lists or none
 
-        if medals == ValueError:
-            output = f'There were no medals ever awarded in {location}'
+        if graph1 is not None and graph2 is not None:
+            names = ['Medals in ' + region, 'Weighted scores in ' + region]
+            x = graph.years_during()  # list of years from the beginning to the end
+            y1_bar, y1_line = graph1[0], graph1[1]
+            y2_bar, y2_line = graph2[0], graph2[1]
+
+        # medals = graph.medal_number_location(location)
+        #
+        # if medals == ValueError:
+        #     output = f'There were no medals ever awarded in {location}'
+        # else:
+        #     output = f'In {location}, {medals} medals were awarded!'
+
+        # display_text(output)
         else:
-            output = f'In {location}, {medals} medals were awarded!'
+            display_text(f'Region not found. Please check your input.')
 
-        display_text(output)
     elif button_name == 'Gold, Silver, and Bronze':
         question1 = 'Enter the first country you want to compare: '
         question2 = 'Enter a country you want to compare the first to: '
