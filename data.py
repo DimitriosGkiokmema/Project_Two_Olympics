@@ -271,7 +271,7 @@ class Graph:
 
         return [g, s, b]
 
-    def host_wins(self, country: str) -> list[dict[Any, int]] | str:
+    def host_wins(self, country: str, b: int, e:int) -> list[dict[Any, int]] | str:
         """ This function returns a dict in the format [{year_hosted, num of wins}, {year_played: num of wins}]
         If the inputted country never held the Olympics, a message stating this is returned
         """
@@ -279,7 +279,7 @@ class Graph:
         host_medals = {}
 
         for year in self._vertices:
-            if self._vertices[year].kind == 'year' and self._vertices[year].host == country:
+            if self._vertices[year].kind == 'year' and self._vertices[year].host == country and b <= year <= e:
                 is_host = True
                 for participant in self._vertices[year].neighbours:
                     self.add_to_host_medals(year, country, participant, host_medals)
@@ -945,7 +945,7 @@ def load_graph(olympic_games: str, countries: str, groups: dict[str, str]) -> Gr
             # Add new edge (empty Sport) if not already adjacent
             if not graph.adjacent(country_dict[row[6]][0], yr):
                 graph.add_edge(country_dict[row[6]][0], yr, Sport())
-                
+
             if not graph.adjacent(country_dict[row[6]][1], yr):
                 graph.add_edge(country_dict[row[6]][1], yr, Sport())
 

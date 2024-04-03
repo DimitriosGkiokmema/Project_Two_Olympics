@@ -17,7 +17,6 @@ pygame.init()
 
 screen_width = 1200
 screen_height = 750
-# background_image = (125, 235, 255)
 back_button_image = pygame.image.load('back_button.png')
 back_button_image = pygame.transform.scale(back_button_image, (50, 50))
 background_image = pygame.image.load('Olympics Wallpaper.jpg')
@@ -339,16 +338,13 @@ def display_info(button_name: str) -> None:
         names = ["Total Number of Medals", "Total Number of Participants"]
         two_plots(names, title, [False, False], 'single', y1, y2, [x1, x2])
     elif button_name == 'Host Effect':
-        # ps = 'Click the back button to proceed (we know that its not ideal)'
-        # display_text(ps)
-        # # HELP ME CONTINUE CONSTRUCTING IT
-        # question1 = 'Enter a start year (within known years): '
-        # start_year = get_user_response(question1)
-        # question2 = 'Enter an end year (within known years): '
-        # end_year = get_user_response(question2)
+        question1 = 'Enter a start year (within known years): '
+        start = int(get_user_response(question1))
+        question2 = 'Enter an end year (within known years): '
+        end = int(get_user_response(question2))
         question = 'Enter a country to see its Host Effect: '
         country = get_user_response(question)
-        output = graph.host_wins(country)  # [{year_hosted, num of wins}, {year_played: num of wins}]
+        output = graph.host_wins(country, start, end)  # [{year_hosted, num of wins}, {year_played: num of wins}]
 
         if not isinstance(output, str):
             x1 = [year for year in output[0]]
@@ -386,10 +382,21 @@ def display_info(button_name: str) -> None:
                 '(Click the back arrow to see the graph)')
         display_text(text)
         horizontal_bar_graph('Performance of regions and countries', x_names, y)
-    # elif button_name == 'Country Statistics':
-    #   participation_all_years
-    # elif button_name == 'Sport Statistics':
-    #   sport_flow
+    elif button_name == 'Country Statistics':
+        start = int(get_user_response('Enter the starting year: '))
+        end = int(get_user_response('Enter the ending year: '))
+        y = graph.participation_all_years(start, end)
+        x = [year for year in range(start, end + 1, 4)]
+        title = 'Change in the Number of Participating Countries'
+        single_plot([''], title, False, 'single', [y], x)
+    elif button_name == 'Sport Statistics':
+        start = int(get_user_response('Enter the starting year: '))
+        end = int(get_user_response('Enter the ending year: '))
+        stats = graph.sport_flow(start, end)
+        x = [year for year in stats]
+        y = [stats[year] for year in stats]
+        title = 'Change in the Number of Sports Played'
+        single_plot([''], title, False, 'single', [y], x)
     if button_name == 'Visualize Graph':
         vis.visualize_graph(graph)
 
