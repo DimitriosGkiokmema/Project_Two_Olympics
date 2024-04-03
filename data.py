@@ -266,16 +266,22 @@ class Graph:
         for year in self._vertices:
             if self._vertices[year].kind == 'year' and self._vertices[year].host == country:
                 is_host = True
-
                 for participant in self._vertices[year].neighbours:
-                    if participant.kind == 'country' and participant.item == country:
-                        medals = self._vertices[year].neighbours[participant].total_medal()
-                        host_medals[int(self._vertices[year].item)] = medals
+                    self.add_to_host_medals(year, country, participant, host_medals)
 
         if is_host:
             return [host_medals, self.host_wins_helper(country)]
         else:
             return 'The given country has never hosted the Olympics!'
+
+    def add_to_host_medals(self, year: Any, country: str, participant: _SportVertex, host_medals: dict[int, int]):
+        """ This is a helper for the function above.
+        It calculates the total medals for a country at a specific year,
+        and assigns it to the host_medals by mutating host_medals
+        """
+        if participant.kind == 'country' and participant.item == country:
+            medals = self._vertices[year].neighbours[participant].total_medal()
+            host_medals[int(self._vertices[year].item)] = medals
 
     def host_wins_helper(self, country: str) -> dict[Any, int]:
         """ Searches the Graph for the years the given country participated in the Olympics and returns
@@ -288,11 +294,22 @@ class Graph:
                 played_medals[int(year.item)] = 0
 
                 for participant in year.neighbours:
-                    if participant.item == country:
-                        medals = year.neighbours[participant].total_medal()
-                        played_medals[int(year.item)] = medals
+                    # if participant.item == country:
+                    #     medals = year.neighbours[participant].total_medal()
+                    #     played_medals[int(year.item)] = medals
+                    self.add_to_played_medals(year, country, participant, played_medals)
+                # played_medals =
 
         return played_medals
+
+    def add_to_played_medals(self, year: Any, country: str, participant: _SportVertex, played_medals: dict[int, int]):
+        """ This is a helper for the function above.
+        It calculates the total medals for a country at a specific year,
+        and assigns it to the host_medals
+        """
+        if participant.item == country:
+            medals = year.neighbours[participant].total_medal()
+            played_medals[int(year.item)] = medals
 
     def compare_medals(self, country1: str, country2: str, year: int) -> str:
         """Compare the number of Gold, Silver, and Bronze medals between two countries for a specific year.
@@ -361,9 +378,9 @@ class Graph:
 
                 return (f"In {year}, {country} participated and had medals on {sport_data.total_num_sport()} sports,\n"
                       f"including {sport_data.total_num_sport('team')} team sports and "
-                      f"{sport_data.total_num_sport('individual')} sports. \n In terms of the number of medals, \n"
-                      f"{country} in that year has achieved the total of \n{sport_data.total_medal()} medals, with \n"
-                      f"{sport_data.total_medal('team')} medals on team sports and the other "
+                      f"{sport_data.total_num_sport('individual')} individual sports. \n In terms of the number of \n"
+                      f"medals, {country} in that year has achieved the total of {sport_data.total_medal()} medals,\n"
+                      f"with {sport_data.total_medal('team')} medals on team sports and the other "
                       f"{sport_data.total_medal('individual')} on individuals.")
         else:
             return 'Something went wrong. Please check your input and try again.'
@@ -372,7 +389,11 @@ class Graph:
         """Returns the average rate of change of medals weight starting from the start year of participation to the last
          year of participation for all the countries in a dictionary.
         """
-        countries = [c.item for c in self.get_all_vertices('country')]
+        countries = []
+        for key in self._vertices:
+            vertex = self._vertices[key]
+            if vertex.kind == 'country':
+                countries.append(vertex.item)
         country_wise_performance = {}
         for country in countries:
             years_participated = []

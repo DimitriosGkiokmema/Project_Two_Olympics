@@ -6,10 +6,8 @@ Additionally, this file also deals with mouse and key inputs
 Reference for button: https://www.youtube.com/watch?v=4_9twnEduFA
 """
 import random
-import sys
-
+import numpy as np
 import data
-import math
 import pygame
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -39,8 +37,6 @@ group = {'Archery': 0, 'Athletics': 0, 'Badminton': 0, 'Baseball': 1, 'Basketbal
          'Water Polo': 1, 'Weightlifting': 0, 'Wrestling Freestyle': 0, 'Wrestling Gre-R': 0}
 
 graph = data.load_graph('summer_modified.csv', 'country_codes_modified.csv', group)
-
-YEARS = [x for x in range(1896, 2013, 4)]  # EVERY 4 YEARS
 
 ####################################################
 # Buttons
@@ -202,6 +198,19 @@ def two_plots(names: list[str], title: str, bar: list, s: str, y1: list[int], y2
     plt.show()
 
 
+def two_plots_words():
+    x = np.array([0, 1, 2, 3])
+    y = np.array([20, 21, 22, 23])
+    my_xticks = ['John', 'Arnold', 'Mavis', 'Matt']
+
+    plt.xticks(x, my_xticks)
+    plt.bar(x, y)
+    plt.xlabel('Custom X-Axis Labels')
+    plt.ylabel('Y-Axis Values')
+    plt.title('Custom X-Axis Ticks Example')
+    plt.show()
+
+
 def generate_random_colour() -> tuple[float, float, float]:
     """ Generates a random tuple of rgb values which will be used for the line colours in the graphs
     """
@@ -242,7 +251,7 @@ def display_info(button_name: str) -> None:
             title = 'Medal Comparisons'
             y1 = [nums[0], nums[1], nums[2]]
             y2 = [nums[3], nums[4], nums[5]]
-            x = [1, 2, 3]
+            x = ['gold', 'silver', 'bronze']
             ps = 'Click the back button to see graph(we know that its not ideal)'
             display_text('Note that 1, 2 and 3 on the x-axis represent\ngold, silver, and bronze\n' + ps)
             two_plots(names, title, [True, True], 'single', y1, y2, [x, x])
@@ -276,7 +285,6 @@ def display_info(button_name: str) -> None:
         output = graph.host_wins(country)  # [{year_hosted, num of wins}, {year_played: num of wins}]
 
         if not isinstance(output, str):
-            # print(cords)
             x1 = [year for year in output[0]]
             x2 = [year for year in output[1]]
             y1 = [output[0][win] for win in output[0]]
@@ -461,6 +469,7 @@ def redraw_window():
         curr_button.draw((0, 0, 0))
 
 
+print('performance: ', graph.performance())
 run = True
 while run:
     for event in pygame.event.get():
