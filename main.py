@@ -11,6 +11,7 @@ import data
 import pygame
 import matplotlib.pyplot as plt
 import pandas as pd
+import project2_visualization as vis
 
 pygame.init()
 
@@ -198,18 +199,49 @@ def two_plots(names: list[str], title: str, bar: list, s: str, y1: list[int], y2
     plt.show()
 
 
-def two_plots_words():
-    x = np.array([0, 1, 2, 3])
-    y = np.array([20, 21, 22, 23])
-    my_xticks = ['John', 'Arnold', 'Mavis', 'Matt']
+def plot_word(names: list[str], bar: list[bool], x: list[list[int]], x_names: list[list[str]], y: list[list[int]]):
+    x1 = np.array(x[0])
+    y1 = np.array(y[0])
 
-    plt.xticks(x, my_xticks)
-    plt.bar(x, y)
-    plt.xlabel('Custom X-Axis Labels')
-    plt.ylabel('Y-Axis Values')
-    plt.title('Custom X-Axis Ticks Example')
+    if len(x) == 2:
+        fig, axs = plt.subplots(1, 2)
+
+        if bar[0]:
+            axs[0].bar(x=x1, height=y1, tick_label=x_names[0], color=generate_random_colour())
+        else:
+            axs[0].plot(x1, y1, tick_label=x_names[0], color=generate_random_colour())
+
+        x2 = np.array(x[1])
+        y2 = np.array(y[1])
+        if bar[1]:
+            axs[1].bar(x=x2, height=y2, tick_label=x_names[1], color=generate_random_colour())
+        else:
+            axs[1].plot(x2, y2, tick_label=x_names[1], color=generate_random_colour())
+
+        for i in range(len(x)):
+            axs[i].set_title(names[i])
+            axs[i].set_ylabel('Medals')
+    else:
+        plt.xticks(x[0], x_names[0])
+        plt.bar(x[0], y[0])
+        plt.title(names[0])
+        plt.ylabel('Medals')
+
     plt.show()
 
+
+def horizontal_bar_graph(name: str, x_names: list[str], y: list[int]) -> None:
+    """ Unlike the above graph functions, this function displays a vertical bar graph """
+    # Create a horizontal bar graph
+    plt.barh(x_names, y, color=generate_random_colour())
+
+    # Customize labels and title
+    plt.xlabel('Medals')
+    plt.ylabel('Regions')
+    plt.title(name)
+
+    # Show the plot
+    plt.show()
 
 def generate_random_colour() -> tuple[float, float, float]:
     """ Generates a random tuple of rgb values which will be used for the line colours in the graphs
@@ -233,10 +265,29 @@ def display_info(button_name: str) -> None:
     this function changes the screen display accordingly, shows a graph, and prints
     text on the screen (if required)
     """
-    # if button_name == 'Annual Medals':
-    #     cords = graph
-    # elif button_name == 'Given Area':
-    if button_name == 'Gold, Silver, and Bronze':
+    if button_name == 'Annual Medals':
+        question = 'Enter the year you want to see the number of medals awarded: '
+        year = int(get_user_response(question))
+        medals = graph.medal_number_in_year(year)
+
+        if medals == 0:
+            output = 'There were no medals awarded that year'
+        else:
+            output = f'In {year}, {medals} medals were awarded!'
+
+        display_text(output)
+    elif button_name == 'Given Area':
+        question = 'Enter the location you want to see the number of medals awarded overtime: '
+        location = get_user_response(question)
+        medals = graph.medal_number_location(location)
+
+        if medals == ValueError:
+            output = f'There were no medals ever awarded in {location}'
+        else:
+            output = f'In {location}, {medals} medals were awarded!'
+
+        display_text(output)
+    elif button_name == 'Gold, Silver, and Bronze':
         question1 = 'Enter the first country you want to compare: '
         question2 = 'Enter a country you want to compare the first to: '
         question3 = 'Enter the year the two countries participated in the Olympics'
@@ -247,14 +298,13 @@ def display_info(button_name: str) -> None:
 
         if len(output) > 1:
             nums = extract_integers(output)
-            names = [country1, country2]
-            title = 'Medal Comparisons'
+            names = [country1 + "'s Medals", country2 + "'s Medals"]
             y1 = [nums[0], nums[1], nums[2]]
             y2 = [nums[3], nums[4], nums[5]]
+            y = [y1, y2]
             x = ['gold', 'silver', 'bronze']
-            ps = 'Click the back button to see graph(we know that its not ideal)'
-            display_text('Note that 1, 2 and 3 on the x-axis represent\ngold, silver, and bronze\n' + ps)
-            two_plots(names, title, [True, True], 'single', y1, y2, [x, x])
+            bar = [True, True]
+            plot_word(names, bar, [[1, 2, 3], [1, 2, 3]], [x, x], y)
         else:
             display_text(f'In {year}, {country1} and {country2} never participated together!')
     elif button_name == 'Rank':
@@ -266,11 +316,8 @@ def display_info(button_name: str) -> None:
         if 'Invalid' not in output:
             y = [i[1] for i in output]
             x = [1, 2, 3]
-            ps = 'Click the back button to see graph (we know that its not ideal)'
-            txt = f'{output[0][0]} in rank {rank} gold, \n{output[1][0]} in rank {rank} silver,\n'
-            txt += f'and {output[2][0]} in rank {rank} bronze\n'
-            display_text('Note that 1, 2 and 3 on the x-axis represent\n' + txt + ps)
-            single_plot([name], 'Ranking', True, 'single', [y], x)
+            x_name = ['Gold', 'Silver', 'Bronze']
+            plot_word([name], [True], [x], [x_name], [y])
         else:
             display_text(output)
     elif button_name == 'Annual Data':
@@ -278,23 +325,19 @@ def display_info(button_name: str) -> None:
         year = int(get_user_response('Enter the year: '))
         output = graph.annual_data_sentence(country, year)
         display_text(output)
-
     elif button_name == 'Impact of Historical Events':
-        x1 = graph.years_during()
-        x2 = graph.years_during()
+        question1 = 'Enter a start year (within known years): '
+        start_year = int(get_user_response(question1))
+        question2 = 'Enter an end year (within known years): '
+        end_year = int(get_user_response(question2))
+        x1 = graph.years_during(start_year, end_year)
+        x2 = graph.years_during(start_year, end_year)
         y1 = graph.medal_all_years(x1[0], x1[-1])
         y2 = graph.participation_all_years(x2[0], x2[-1])
         title = "World's Medal and Participation over years"
         names = ["Total Number of Medals", "Total Number of Participants"]
         two_plots(names, title, [False, False], 'single', y1, y2, [x1, x2])
-        ps = 'Click the back button to proceed (we know that its not ideal)'
-        display_text(ps)
-        question1 = 'Enter a start year (within known years): '
-        start_year = get_user_response(question1)
-        question2 = 'Enter an end year (within known years): '
-        end_year = get_user_response(question2)
-
-    if button_name == 'Host Effect':
+    elif button_name == 'Host Effect':
         question = 'Enter a country to see its Host Effect: '
         country = get_user_response(question)
         output = graph.host_wins(country)  # [{year_hosted, num of wins}, {year_played: num of wins}]
@@ -309,7 +352,6 @@ def display_info(button_name: str) -> None:
             two_plots(names, title, [True, False], 'single', y1, y2, [x1, x2])
         else:
             display_text(output)
-
     elif button_name == 'Team vs Individual Sports':
         question = 'Enter a country to compare Team and Individual Sports scores: '
         country = get_user_response(question)
@@ -322,11 +364,24 @@ def display_info(button_name: str) -> None:
         title = 'Weighted Scores by Medals Awarded'
         names = ['Team Sports', 'Individual Sports']
         two_plots(names, title, [True, True], 'single', y1, y2, [x1, x2])
-
-    # elif button_name == 'Performance':
+    elif button_name == 'Performance':
+        perform = graph.performance()
+        print(perform)
+        x_names = []
+        y = []
+        for key in perform:
+            x_names.append(key)
+            y.append(perform[key])
+        text = ('There are a lot of regions / countries in this graph.\n'
+                'To view it more clearly, click the magnifying glass\n'
+                'symbol and draw a rectangle in the graph to zoom in.\n'
+                '(Click the back arrow to see the graph)')
+        display_text(text)
+        horizontal_bar_graph('Performance of regions and countries', x_names, y)
     # elif button_name == 'Country Statistics':
     # elif button_name == 'Sport Statistics':
-    # elif button_name == 'Visualize Graph':
+    if button_name == 'Visualize Graph':
+        vis.visualize_graph(graph)
 
 
 def extract_integers(text: str) -> list[int]:
@@ -496,7 +551,7 @@ def redraw_window():
         curr_button.draw((0, 0, 0))
 
 
-print('performance: ', graph.performance())
+# print('performance: ', graph.performance())
 run = True
 while run:
     for event in pygame.event.get():

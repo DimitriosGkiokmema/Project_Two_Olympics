@@ -372,7 +372,7 @@ class Graph:
         else:
             raise ValueError
 
-    def years_during(self) -> list[int]:
+    def years_during(self, start: int, end: int) -> list[int]:
         """Return a list of years that are expected to have Olympics games, from the first year (min year)
         to the end year (max year) recorded in this graph. That means we record the year from
         range(min_year, max_year + 1, 4).
@@ -381,12 +381,17 @@ class Graph:
         Representation Invariants:
             - There must be at least one 'year' vertex in this graph.
         """
-        all_years = self.get_all_vertices('year')
-        min_year, max_year = min(all_years), max(all_years)
+        # This is Amy's original code, I changed it to start and end at select years
+        # all_years = self.get_all_vertices('year')
+        # min_year, max_year = min(all_years), max(all_years)
         lst_year = []
-        for y in range(min_year, max_year, 4):
+        for y in range(start, end, 4):
             lst_year.append(y)
         return lst_year
+        # lst_year = []
+        # for y in range(start, end + 1, 4):
+        #     lst_year.append(y)
+        # return lst_year
 
     def annual_data_sentence(self, country: str, year: int) -> str:
         """Print out annual data based on user's input about a country name and a year.
@@ -486,7 +491,7 @@ class Graph:
 
             for country in countries:
                 sport = self.get_edge(input_year, country.item)
-                # Counts separatedly the number of medal achieved in team_sport and individual_sport.
+                # Counts separately the number of medal achieved in team_sport and individual_sport.
                 for team_sport in sport.team_sports:
                     medals_so_far += sport.team_sports[team_sport].total_medal()
 
