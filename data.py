@@ -649,7 +649,7 @@ class Graph:
 
 ##########################################
 # For Region: compute the total number of medals gained in each year (bar), as well as the percentage from the world's
-# total number of medal (line), displaying on the same graph. Do similar thing for the total weighted scores.
+# total number of medals (line), displayed on the same graph. Do a similar thing for the total weighted scores.
 ##########################################
     def medal_year_by_region(self, year: int, region: str) -> int:
         """Return the number of medals gained in the given region in that year. It means that we only choose countries
