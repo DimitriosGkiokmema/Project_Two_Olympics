@@ -652,7 +652,7 @@ class Graph:
         team = []
         indiv = []
         all_years = self.get_all_vertices('year')
-        min_year, max_year = min({yr.item for yr in all_years}), max({yr.item for yr in all_years})
+        min_year, max_year = min(all_years), max(all_years)
         for i in range(min_year, max_year + 1, 4):  # Since we want the max_year inclusive
             one = self.wins_one(i, country)
             team.append(one[0])
