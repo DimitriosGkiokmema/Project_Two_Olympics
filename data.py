@@ -8,7 +8,7 @@ import networkx as nx
 import pandas as pd  # remember to install the package pandas! (my version is 2.2.1)
 
 
-CITIES = ['Athens', 'Paris', 'St Louis', 'London', 'Stockholm', 'Antwerp', 'Amsterdam', 'Beijing','Los Angeles',
+CITIES = ['Athens', 'Paris', 'St Louis', 'London', 'Stockholm', 'Antwerp', 'Amsterdam', 'Beijing', 'Los Angeles',
           'Berlin', 'Helsinki', 'Melbourne / Stockholm', 'Rome', 'Tokyo', 'Mexico', 'Munich', 'Montreal', 'Moscow',
           'Seoul', 'Barcelona', 'Atlanta', 'Sydney']
 COUNTIES = ['Greece', 'France', 'United States of America', 'England', 'Sweden', 'Belgium', 'Netherlands', 'China',
@@ -372,7 +372,7 @@ class Graph:
         else:
             raise ValueError
 
-    def years_during(self, start: int, end: int) -> list[int]:
+    def years_during_selected(self, start: int, end: int) -> list[int]:  # AMY CHANGED THE NAME
         """Return a list of years that are expected to have Olympics games, from the first year (min year)
         to the end year (max year) recorded in this graph. That means we record the year from
         range(min_year, max_year + 1, 4).
@@ -392,6 +392,22 @@ class Graph:
         # for y in range(start, end + 1, 4):
         #     lst_year.append(y)
         # return lst_year
+
+    def years_during(self) -> list:
+        """Return a list of years that are expected to have Olympics games, from the first year (min year)
+        to the end year (max year) recorded in this graph. That means we record the year from
+        range(min_year, max_year + 1, 4).
+        Secial years when the Olympics was cancelled (1916, 1940, 1944) still count to this list.
+
+        Representation Invariants:
+            - There must be at least one 'year' vertex in this graph.
+        """
+        all_years = self.get_all_vertices('year')
+        min_year, max_year = min(all_years), max(all_years)
+        lst_year = []
+        for y in range(min_year, max_year + 1, 4):
+            lst_year.append(y)
+        return lst_year
 
     def annual_data_sentence(self, country: str, year: int) -> str:
         """Print out annual data based on user's input about a country name and a year.
@@ -547,6 +563,20 @@ class Graph:
             selected_years.append(self.medal_number_in_year(y))
 
         return selected_years
+
+    def weight_in_year(self, input_year: int) -> int:
+        """Return the weighted score of medals in the given year."""
+        if input_year not in self._vertices:
+            return 0
+        else:
+            v_year = self._vertices[input_year]
+            count = 0
+            countries = v_year.get_neighbours('country')
+            for country in countries:
+                sport = self.get_edge(input_year, country.item)
+                count += sport.total_scores()
+
+            return count
 
     def participation_all_years(self, start_year: int, end_year: int) -> list:
         """Return the total number of countries participated in each year from start_year to end_year, INCLUSIVE"""
@@ -735,11 +765,11 @@ class Graph:
                     weight.append(0)
                     percentage.append(0)
                 else:
-                    medal_this_region = self.weight_year_by_region(yr, region)
-                    medal_world = self.medal_number_in_year(yr)  # It must not be 0, since as soon as this year exists
+                    weight_this_region = self.weight_year_by_region(yr, region)
+                    weight_world = self.weight_in_year(yr)  # It must not be 0, since as soon as this year exists
                     # in this region, there is at least one country took part in that year.
-                    weight.append(medal_this_region)
-                    percentage.append(medal_this_region / medal_world)
+                    weight.append(weight_this_region)
+                    percentage.append(weight_this_region / weight_world)
 
             return weight, percentage
 
@@ -846,6 +876,8 @@ class Sport:
     def total_scores(self, kind: str = '') -> int:
         """Return the total number of weighted medals for all sports, according to whether kind is team of individual.
         If kind is left lanked, return towal weighted scores of medals for both groups.
+        Representation Invariants:
+            - kind in {'team', 'individual'}
         """
         if kind == '':
             total_team_scores = sum([medal.weighted_score() for medal in self.team_sports.values()])

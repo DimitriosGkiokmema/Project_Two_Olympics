@@ -243,6 +243,7 @@ def horizontal_bar_graph(name: str, x_names: list[str], y: list[int]) -> None:
     # Show the plot
     plt.show()
 
+
 def generate_random_colour() -> tuple[float, float, float]:
     """ Generates a random tuple of rgb values which will be used for the line colours in the graphs
     """
