@@ -506,7 +506,7 @@ class Graph:
         Whenever the input_location is not in self, raise ValueError.
         """
         # Raises ValueError if the input_location is not in the Graph.
-        if input_location not in [location.item for location in self._vertices]:
+        if input_location not in self._vertices:
             raise ValueError
         else:
 
