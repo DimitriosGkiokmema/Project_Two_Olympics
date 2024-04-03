@@ -8,7 +8,7 @@ import networkx as nx
 import pandas as pd  # remember to install the package pandas! (my version is 2.2.1)
 
 
-CITIES = ['Athens', 'Paris', 'St Louis', 'London', 'Stockholm', 'Antwerp', 'Amsterdam', 'Beijing','Los Angeles',
+CITIES = ['Athens', 'Paris', 'St Louis', 'London', 'Stockholm', 'Antwerp', 'Amsterdam', 'Beijing', 'Los Angeles',
           'Berlin', 'Helsinki', 'Melbourne / Stockholm', 'Rome', 'Tokyo', 'Mexico', 'Munich', 'Montreal', 'Moscow',
           'Seoul', 'Barcelona', 'Atlanta', 'Sydney']
 COUNTIES = ['Greece', 'France', 'United States of America', 'England', 'Sweden', 'Belgium', 'Netherlands', 'China',
@@ -326,7 +326,25 @@ class Graph:
             medals = year.neighbours[participant].total_medal()
             played_medals[int(year.item)] = medals
 
-    def compare_medals(self, country1: str, country2: str, year: int) -> str:
+    def compare_medals(self, country1: str, country2: str, year: int) -> Any:
+        """Compare the number of Gold, Silver, and Bronze medals between two countries for a specific year.
+        Return a tuple of two lists [num_g, num_s, num_b] for each country, if they participated together that year.
+        Otherwise, return None. If any of these inputs is not in this graph items, also return None.
+
+            country1: The name of the first country.
+            country2: The name of the second country.
+            year: The year for which to compare the medals.
+        """
+        if country1 in self._vertices and country2 in self._vertices and year in self._vertices:
+            if self.adjacent(country1, year) and self.adjacent(country2, year):
+                sport1, sport2 = self.get_edge(country1, year), self.get_edge(country2, year)
+                return sport1.medals_by_kind(), sport2.medals_by_kind()
+            else:
+                return None
+        else:
+            return None
+
+    def compare_medal(self, country1: str, country2: str, year: int) -> str:
         """Compare the number of Gold, Silver, and Bronze medals between two countries for a specific year.
         Return a string summarizing the comparison of medals between the two countries.
 
@@ -385,7 +403,7 @@ class Graph:
         else:
             raise ValueError
 
-    def years_during(self, start: int, end: int) -> list[int]:
+    def years_during_selected(self, start: int, end: int) -> list[int]:  # AMY CHANGED THE NAME
         """Return a list of years that are expected to have Olympics games, from the first year (min year)
         to the end year (max year) recorded in this graph. That means we record the year from
         range(min_year, max_year + 1, 4).
@@ -405,6 +423,22 @@ class Graph:
         # for y in range(start, end + 1, 4):
         #     lst_year.append(y)
         # return lst_year
+
+    def years_during(self) -> list:
+        """Return a list of years that are expected to have Olympics games, from the first year (min year)
+        to the end year (max year) recorded in this graph. That means we record the year from
+        range(min_year, max_year + 1, 4).
+        Secial years when the Olympics was cancelled (1916, 1940, 1944) still count to this list.
+
+        Representation Invariants:
+            - There must be at least one 'year' vertex in this graph.
+        """
+        all_years = self.get_all_vertices('year')
+        min_year, max_year = min(all_years), max(all_years)
+        lst_year = []
+        for y in range(min_year, max_year + 1, 4):
+            lst_year.append(y)
+        return lst_year
 
     def annual_data_sentence(self, country: str, year: int) -> str:
         """Print out annual data based on user's input about a country name and a year.
@@ -453,7 +487,7 @@ class Graph:
             for year in years_participated:
                 v_year = self._vertices[year]
                 sport_data = v_country.neighbours[v_year]
-                curr_weight = sport_data.total_medals_weight()
+                curr_weight = sport_data.total_scores()
                 sum_of_change += (curr_weight - prev_medals_weight)
                 prev_medals_weight = curr_weight
             country_wise_performance[country] = sum_of_change / len(years_participated)
@@ -559,6 +593,20 @@ class Graph:
             selected_years.append(self.medal_number_in_year(y))
 
         return selected_years
+
+    def weight_in_year(self, input_year: int) -> int:
+        """Return the weighted score of medals in the given year."""
+        if input_year not in self._vertices:
+            return 0
+        else:
+            v_year = self._vertices[input_year]
+            count = 0
+            countries = v_year.get_neighbours('country')
+            for country in countries:
+                sport = self.get_edge(input_year, country.item)
+                count += sport.total_scores()
+
+            return count
 
     def participation_all_years(self, start_year: int, end_year: int) -> list:
         """Return the total number of countries participated in each year from start_year to end_year, INCLUSIVE"""
@@ -755,11 +803,11 @@ class Graph:
                     weight.append(0)
                     percentage.append(0)
                 else:
-                    medal_this_region = self.weight_year_by_region(yr, region)
-                    medal_world = self.medal_number_in_year(yr)  # It must not be 0, since as soon as this year exists
+                    weight_this_region = self.weight_year_by_region(yr, region)
+                    weight_world = self.weight_in_year(yr)  # It must not be 0, since as soon as this year exists
                     # in this region, there is at least one country took part in that year.
-                    weight.append(medal_this_region)
-                    percentage.append(medal_this_region / medal_world)
+                    weight.append(weight_this_region)
+                    percentage.append(weight_this_region / weight_world)
 
             return weight, percentage
 
@@ -841,13 +889,6 @@ class Sport:
         else:
             self.individual_sports[name].add_medal(kind_medal, num)
 
-    def total_medals_weight(self) -> int:
-        """Returns the total weighted values for the given sport class's each medal."""
-
-        total_team_medals_weight = sum([medal.weighted_score() for medal in self.team_sports.values()])
-        total_indi_medals_weight = sum([medal.weighted_score() for medal in self.individual_sports.values()])
-        return total_team_medals_weight + total_indi_medals_weight
-
     def total_medal(self, kind: str = '') -> int:
         """Return the total number of medals for all sports, according to whether kind is team or individual.
         If kind is left blanked, return total medals from both groups.
@@ -865,7 +906,9 @@ class Sport:
 
     def total_scores(self, kind: str = '') -> int:
         """Return the total number of weighted medals for all sports, according to whether kind is team of individual.
-        If kind is left lanked, return towal weighted scores of medals for both groups.
+        If kind is left blanked, return towal weighted scores of medals for both groups.
+        Representation Invariants:
+            - kind in {'team', 'individual'}
         """
         if kind == '':
             total_team_scores = sum([medal.weighted_score() for medal in self.team_sports.values()])
@@ -890,6 +933,21 @@ class Sport:
             return len(self.team_sports)
         else:
             return len(self.individual_sports)
+
+    def medals_by_kind(self) -> list[int]:
+        """Return the list of total number of medals by kind (Gold, Silver, Bronze)."""
+        gold = 0
+        silver = 0
+        bronze = 0
+        for medal in self.team_sports.values():
+            gold += medal.num_g
+            silver += medal.num_s
+            bronze += medal.num_b
+        for medal in self.individual_sports.values():
+            gold += medal.num_g
+            silver += medal.num_s
+            bronze += medal.num_b
+        return [gold, silver, bronze]
 
 
 def insertion_sort(lst: list[tuple[str, int]]) -> None:

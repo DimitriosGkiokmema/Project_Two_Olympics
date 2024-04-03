@@ -242,6 +242,7 @@ def horizontal_bar_graph(name: str, x_names: list[str], y: list[int]) -> None:
     # Show the plot
     plt.show()
 
+
 def generate_random_colour() -> tuple[float, float, float]:
     """ Generates a random tuple of rgb values which will be used for the line colours in the graphs
     """
@@ -276,7 +277,7 @@ def display_info(button_name: str) -> None:
 
         display_text(output)
     elif button_name == 'Given Area':
-        question = 'Enter the location you want to see the number of medals awarded overtime: '
+        question = 'Enter the region you want to see the number of medals awarded overtime: '
         location = get_user_response(question)
         medals = graph.medal_number_location(location)
 
@@ -295,11 +296,10 @@ def display_info(button_name: str) -> None:
         year = int(get_user_response(question3))
         output = graph.compare_medals(country1, country2, year)
 
-        if len(output) > 1:
-            nums = extract_integers(output)
+        if output is not None:
             names = [country1 + "'s Medals", country2 + "'s Medals"]
-            y1 = [nums[0], nums[1], nums[2]]
-            y2 = [nums[3], nums[4], nums[5]]
+            y1 = output[0]
+            y2 = output[1]
             y = [y1, y2]
             x = ['gold', 'silver', 'bronze']
             bar = [True, True]
