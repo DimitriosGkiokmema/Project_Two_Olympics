@@ -308,6 +308,7 @@ def display_info(button_name: str) -> None:
         else:
             display_text(f'In {year}, {country1} and {country2} never participated together!')
     elif button_name == 'Rank':
+        # SHOW COUNTRY NAME
         year = int(get_user_response('Enter the year: '))
         rank = int(get_user_response('Enter the desired rank: '))
         output = graph.i_th_place(rank, year)
@@ -388,6 +389,7 @@ def display_info(button_name: str) -> None:
     # elif button_name == 'Country Statistics':
     #   participation_all_years
     # elif button_name == 'Sport Statistics':
+    #   sport_flow
     if button_name == 'Visualize Graph':
         vis.visualize_graph(graph)
 
@@ -560,6 +562,7 @@ def redraw_window():
 
 
 # print('performance: ', graph.performance())
+print(graph.compare_medals('Greece', 'France', 1896))
 run = True
 while run:
     for event in pygame.event.get():
