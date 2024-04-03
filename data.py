@@ -1,5 +1,5 @@
 """
-TODO
+CSC111 Project 2: The Analysis of Summer Olympics Through External Effects (1896 - 2012)
 """
 from __future__ import annotations
 from typing import Any, List, Tuple

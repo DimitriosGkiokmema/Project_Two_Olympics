@@ -243,7 +243,7 @@ def display_info(button_name: str) -> None:
             y1 = [nums[0], nums[1], nums[2]]
             y2 = [nums[3], nums[4], nums[5]]
             x = [1, 2, 3]
-            ps = 'Click the back button to see graph(we know that its not ideal)'
+            ps = 'Click the back button to see graph (we know that its not ideal)'
             display_text('Note that 1, 2 and 3 on the x-axis represent\ngold, silver, and bronze\n' + ps)
             two_plots(names, title, [True, True], 'single', y1, y2, [x, x])
         else:
@@ -288,6 +288,18 @@ def display_info(button_name: str) -> None:
             display_text(output)
 
     # elif button_name == 'Team vs Individual Sports':
+        question = 'Enter a country to compare Team and Individual Sports scores: '
+        country = get_user_response(question)
+        output = graph.wins_multiple(country)
+
+        x1 = [year for year in range(1896, 2013, 4)]
+        x2 = [year for year in range(1896, 2013, 4)]
+        y1 = output[0]
+        y2 = output[1]
+        title = 'Weighted Scores by Medals Awarded'
+        names = ['Team Sports', 'Individual Sports']
+        two_plots(names, title, [True, True], 'single', y1, y2, [x1, x2])
+
     # elif button_name == 'Performance':
     # elif button_name == 'Country Statistics':
     # elif button_name == 'Sport Statistics':
