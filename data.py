@@ -745,7 +745,7 @@ class Graph:
 
             return weight_so_far
 
-    def total_medal_by_region(self, region: str) -> tuple[list, list] | str:
+    def total_medal_by_region(self, region: str) -> Any:
         """
         Return a tuple of 2 lists: the first list contains the total number of medals gained in the given region in
         each year, and the second one contains the percentage of number of medals gained here to the world's total.
@@ -753,7 +753,7 @@ class Graph:
         If the region input is not valid, return a message.
         """
         if region not in self.get_all_vertices('region'):
-            return 'Region not found. Please check your input.'
+            return None
         else:
             v_region = self._vertices[region]
             year_neighbours = v_region.get_neighbours('year')
@@ -774,7 +774,7 @@ class Graph:
 
             return number, percentage
 
-    def weight_by_region(self, region: str) -> tuple[list, list] | str:
+    def weight_by_region(self, region: str) -> Any:
         """
         Return a tuple of 2 lists: the first list contains the weighted score gained in the given region in each year,
         and the second one contains the percentage of weighted score gained here to the world's total. The time period
@@ -782,7 +782,7 @@ class Graph:
         If the region input is not valid, return a message.
         """
         if region not in self.get_all_vertices('region'):
-            return 'Region not found. Please check your input.'
+            return None
         else:
             v_region = self._vertices[region]
             year_neighbours = v_region.get_neighbours('year')
