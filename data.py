@@ -643,6 +643,54 @@ class Graph:
             indiv.append(one[1])
         return team, indiv
 
+##########################################
+# For Region: compute the total number of medals gained in each year (bar), as well as the percentage from the world's
+# total number of medal (line), displaying on the same graph. Do similar thing for the total weighted scores.
+##########################################
+    def medal_year_by_region(self, year: int, region: str) -> int:
+        """Return the number of medals gained in the given region in that year. It means that we only choose countries
+        who are adjacent to that region instead of traversing through the whole country neighbours of that year.
+        Representation Invariants:
+            - region in self.get_all_vertices('region')
+        """
+        if year not in self._vertices:
+            return 0
+        else:
+            all_countries = self._vertices[year].get_neighbours('country')
+            medal_so_far = 0
+            for country in all_countries:
+                if self.adjacent(country, region):
+                    medal_so_far += self.get_edge(year, country).total_medal()
+
+            return medal_so_far
+
+    def total_medal_by_region(self, region: str) -> tuple[list, list] | str:
+        """Return a list of the total number of medals gained in each year in the given region, from the start year to
+        the end year of this recorded period.
+        If the region input is not valid, return a message.
+        """
+        if region not in self.get_all_vertices('region'):
+            return 'Region not found. Please check your input.'
+        else:
+            v_region = self._vertices[region]
+            year_neighbours = v_region.get_neighbours('year')
+
+            number = []
+            percentage = []
+
+            for yr in self.years_during():
+                if yr not in year_neighbours:  # Might be redundant, but just to ensure everything goes right
+                    number.append(0)
+                    percentage.append(0)
+                else:
+                    medal_this_region = self.medal_year_by_region(yr, region)
+                    medal_world = self.medal_number_in_year(yr)  # It must not be 0, since as soon as this year exists
+                    # in this region, there is at least one country took part in that year.
+                    number.append(medal_this_region)
+                    percentage.append(medal_this_region / medal_world)
+
+            return number, percentage
+
 
 class Medal:
     """A place to store number of medals for a given edge (which country - in which year - on which sport).

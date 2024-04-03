@@ -289,6 +289,7 @@ def display_info(button_name: str) -> None:
         two_plots(names, title, [False, False], 'single', y1, y2, [x1, x2])
         ps = 'Click the back button to proceed (we know that its not ideal)'
         display_text(ps)
+        # HELP ME CONTINUE CONSTRUCTING IT
         question1 = 'Enter a start year (within known years): '
         start_year = get_user_response(question1)
         question2 = 'Enter an end year (within known years): '
