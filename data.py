@@ -1,5 +1,5 @@
 """
-TODO
+CSC111 Project 2: The Analysis of Summer Olympics Through External Effects (1896 - 2012)
 """
 from __future__ import annotations
 from typing import Any, List, Tuple
@@ -80,6 +80,14 @@ class _SportVertex(_Vertex):
         super().__init__(item, kind)
         self.host = host
         self.neighbours = {}
+
+    def get_years(self) -> list[int]:
+        """Return a list of year vertices that this vertex is adjacent to, in ascending order."""
+        lst_yr = []
+        for y in self.neighbours:
+            if y.kind == 'year':
+                lst_yr.append(y.item)
+        return sorted(lst_yr)
 
 
 class Graph:
@@ -357,8 +365,21 @@ class Graph:
         else:
             raise ValueError
 
-    def update_sport(self) -> None:
-        """Update sport, as we want to add more sport data into the edge during load_graph."""
+    def years_during(self) -> list[int]:
+        """Return a list of years that are expected to have Olympics games, from the first year (min year)
+        to the end year (max year) recorded in this graph. That means we record the year from
+        range(min_year, max_year + 1, 4).
+        Secial years when the Olympics was cancelled (1916, 1940, 1944) still count to this list.
+
+        Representation Invariants:
+            - There must be at least one 'year' vertex in this graph.
+        """
+        all_years = self.get_all_vertices('year')
+        min_year, max_year = min(all_years), max(all_years)
+        lst_year = []
+        for y in range(min_year, max_year, 4):
+            lst_year.append(y)
+        return lst_year
 
     def annual_data_sentence(self, country: str, year: int) -> str:
         """Print out annual data based on user's input about a country name and a year.
@@ -377,11 +398,11 @@ class Graph:
                 sport_data = v_country.neighbours[v_year]  # type Sport
 
                 return (f"In {year}, {country} participated and had medals on {sport_data.total_num_sport()} sports,\n"
-                      f"including {sport_data.total_num_sport('team')} team sports and "
-                      f"{sport_data.total_num_sport('individual')} individual sports. \n In terms of the number of \n"
-                      f"medals, {country} in that year has achieved the total of {sport_data.total_medal()} medals,\n"
-                      f"with {sport_data.total_medal('team')} medals on team sports and the other "
-                      f"{sport_data.total_medal('individual')} on individuals.")
+                        f"including {sport_data.total_num_sport('team')} team sports and "
+                        f"{sport_data.total_num_sport('individual')} individual sports. \n In terms of the number of "
+                        f"medals, {country} in that year \nhas achieved the total of \n{sport_data.total_medal()} "
+                        f"medals, with {sport_data.total_medal('team')} medals on team sports and \n the other"
+                        f"{sport_data.total_medal('individual')} medals earned individually.")
         else:
             return 'Something went wrong. Please check your input and try again.'
 
@@ -445,7 +466,7 @@ class Graph:
         Computes the number of medals in the given year (= input_year).
         """
         # Raises ValueError if the input_year is not in the Graph.
-        if input_year not in [year.item for year in self._vertices]:
+        if input_year not in self._vertices:
             return 0  # AMY CHANGED THIS
         else:
 
@@ -507,6 +528,7 @@ class Graph:
         """Return the total number of medals for each year from start_year to end_year, INCLUSIVE"""
         selected_years = []
         for y in range(start_year, end_year + 1, 4):
+
             selected_years.append(self.medal_number_in_year(y))
 
         return selected_years

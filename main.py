@@ -266,9 +266,9 @@ def display_info(button_name: str) -> None:
         if 'Invalid' not in output:
             y = [i[1] for i in output]
             x = [1, 2, 3]
-            ps = 'Click the back button to see graph(we know that its not ideal)'
-            txt = f'{output[0][0]} in rank {rank} gold, {output[1][0]} in rank {rank} silver,'
-            txt += f'\n and {output[2][0]} in rank {rank} bronze\n'
+            ps = 'Click the back button to see graph (we know that its not ideal)'
+            txt = f'{output[0][0]} in rank {rank} gold, \n{output[1][0]} in rank {rank} silver,\n'
+            txt += f'and {output[2][0]} in rank {rank} bronze\n'
             display_text('Note that 1, 2 and 3 on the x-axis represent\n' + txt + ps)
             single_plot([name], 'Ranking', True, 'single', [y], x)
         else:
@@ -278,7 +278,22 @@ def display_info(button_name: str) -> None:
         year = int(get_user_response('Enter the year: '))
         output = graph.annual_data_sentence(country, year)
         display_text(output)
-    # elif button_name == 'Impact of Historical Events':
+
+    elif button_name == 'Impact of Historical Events':
+        x1 = graph.years_during()
+        x2 = graph.years_during()
+        y1 = graph.medal_all_years(x1[0], x1[-1])
+        y2 = graph.participation_all_years(x2[0], x2[-1])
+        title = "World's Medal and Participation over years"
+        names = ["Total Number of Medals", "Total Number of Participants"]
+        two_plots(names, title, [False, False], 'single', y1, y2, [x1, x2])
+        ps = 'Click the back button to proceed (we know that its not ideal)'
+        display_text(ps)
+        question1 = 'Enter a start year (within known years): '
+        start_year = get_user_response(question1)
+        question2 = 'Enter an end year (within known years): '
+        end_year = get_user_response(question2)
+
     if button_name == 'Host Effect':
         question = 'Enter a country to see its Host Effect: '
         country = get_user_response(question)
@@ -295,7 +310,19 @@ def display_info(button_name: str) -> None:
         else:
             display_text(output)
 
-    # elif button_name == 'Team vs Individual Sports':
+    elif button_name == 'Team vs Individual Sports':
+        question = 'Enter a country to compare Team and Individual Sports scores: '
+        country = get_user_response(question)
+        output = graph.wins_multiple(country)
+
+        x1 = [year for year in range(1896, 2013, 4)]
+        x2 = [year for year in range(1896, 2013, 4)]
+        y1 = output[0]
+        y2 = output[1]
+        title = 'Weighted Scores by Medals Awarded'
+        names = ['Team Sports', 'Individual Sports']
+        two_plots(names, title, [True, True], 'single', y1, y2, [x1, x2])
+
     # elif button_name == 'Performance':
     # elif button_name == 'Country Statistics':
     # elif button_name == 'Sport Statistics':
