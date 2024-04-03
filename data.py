@@ -334,30 +334,43 @@ class Graph:
             country2 : The name of the second country.
             year : The year for which to compare the medals.
         """
-        try:
-            # Get the annual data for both countries
-            country1_data = self.annual_data_dict(country1, year)
-            country2_data = self.annual_data_dict(country2, year)
+        country1_gold = 0
+        country1_silver = 0
+        country1_bronze = 0
+        country2_gold = 0
+        country2_silver = 0
+        country2_bronze = 0
+        # Get the annual data for both countries
+        if country1 in self._vertices and year in self._vertices:
+            v_country = self._vertices[country1]
+            v_year = self._vertices[year]
+            if v_country in v_year.neighbours:
+                sport_data = v_country.neighbours[v_year]
+                teams = sport_data.team_sports
+                for sport in teams:
+                    medals = teams[sport]
+                    country1_gold += medals.num_g
+                    country1_silver += medals.num_s
+                    country1_bronze += medals.num_b
+        if country2 in self._vertices and year in self._vertices:
+            v_country = self._vertices[country1]
+            v_year = self._vertices[year]
+            if v_country in v_year.neighbours:
+                sport_data = v_country.neighbours[v_year]
+                teams = sport_data.team_sports
+                for sport in teams:
+                    medals = teams[sport]
+                    country2_gold += medals.num_g
+                    country2_silver += medals.num_s
+                    country2_bronze += medals.num_b
+        # Generate the comparison summary string
+        comparison_summary = f"Comparison of Medals in {year}:\n"
+        comparison_summary += f"{country1}:\n"
+        comparison_summary += f"Gold: {country1_gold}, Silver: {country1_silver}, Bronze: {country1_bronze}\n"
+        comparison_summary += f"{country2}:\n"
+        comparison_summary += f"Gold: {country2_gold}, Silver: {country2_silver}, Bronze: {country2_bronze}\n"
 
-            # Extract medal counts for each country
-            country1_gold = country1_data.get('total medals', 0)
-            country1_silver = country1_data.get('team medals', 0)
-            country1_bronze = country1_data.get('indiv medals', 0)
-
-            country2_gold = country2_data.get('total medals', 0)
-            country2_silver = country2_data.get('team medals', 0)
-            country2_bronze = country2_data.get('indiv medals', 0)
-
-            # Generate the comparison summary string
-            comparison_summary = f"Comparison of Medals in {year}:\n"
-            comparison_summary += f"{country1}:\n"
-            comparison_summary += f"Gold: {country1_gold}, Silver: {country1_silver}, Bronze: {country1_bronze}\n"
-            comparison_summary += f"{country2}:\n"
-            comparison_summary += f"Gold: {country2_gold}, Silver: {country2_silver}, Bronze: {country2_bronze}\n"
-
-            return comparison_summary
-        except ValueError as e:
-            return str(e)
+        return comparison_summary
 
 ##################################################################################
 # Our additional methods
@@ -521,7 +534,6 @@ class Graph:
         Computes the number of medals in the input_location overtime.
         Whenever the input_location is not in self, raise ValueError.
         """
-        # Raises ValueError if the input_location is not in the Graph.
         if input_location not in self._vertices:
             raise ValueError
         else:
@@ -965,6 +977,9 @@ def load_graph(olympic_games: str, countries: str, groups: dict[str, str]) -> Gr
             # Add new edge (empty Sport) if not already adjacent
             if not graph.adjacent(country_dict[row[6]][0], yr):
                 graph.add_edge(country_dict[row[6]][0], yr, Sport())
+                
+            if not graph.adjacent(country_dict[row[6]][1], yr):
+                graph.add_edge(country_dict[row[6]][1], yr, Sport())
 
             # Update Sport
             sport_class = graph.get_edge(country_dict[row[6]][0], yr)  # get edge with that country and that year
