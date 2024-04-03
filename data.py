@@ -89,6 +89,13 @@ class _SportVertex(_Vertex):
                 lst_yr.append(y.item)
         return sorted(lst_yr)
 
+    def get_neighbours(self, kind: str = '') -> list:
+        """Return a list of _SportVertex according to the input kind."""
+        if kind != '':
+            return [v for v in self.neighbours if v.kind == kind]
+        else:
+            return [v for v in self.neighbours]
+
 
 class Graph:
     """A graph used to represent a book review network.
@@ -451,9 +458,13 @@ class Graph:
 
             # Follows an accumulator pattern.
             medals_so_far = 0
-            for country in self._vertices[input_year].neighbours:
-                sport = self._vertices[input_year].neighbours[country]
 
+            v_year = self._vertices[input_year]
+
+            countries = v_year.get_neighbours('country')
+
+            for country in countries:
+                sport = self.get_edge(input_year, country.item)
                 # Counts separatedly the number of medal achieved in team_sport and individual_sport.
                 for team_sport in sport.team_sports:
                     medals_so_far += sport.team_sports[team_sport].total_medal()
