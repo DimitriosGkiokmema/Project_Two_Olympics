@@ -257,9 +257,9 @@ def display_info(button_name: str) -> None:
         if 'Invalid' not in output:
             y = [i[1] for i in output]
             x = [1, 2, 3]
-            ps = 'Click the back button to see graph(we know that its not ideal)'
-            txt = f'{output[0][0]} in rank {rank} gold, {output[1][0]} in rank {rank} silver,'
-            txt += f'\n and {output[2][0]} in rank {rank} bronze\n'
+            ps = 'Click the back button to see graph (we know that its not ideal)'
+            txt = f'{output[0][0]} in rank {rank} gold, \n{output[1][0]} in rank {rank} silver,\n'
+            txt += f'and {output[2][0]} in rank {rank} bronze\n'
             display_text('Note that 1, 2 and 3 on the x-axis represent\n' + txt + ps)
             single_plot([name], 'Ranking', True, 'single', [y], x)
         else:
