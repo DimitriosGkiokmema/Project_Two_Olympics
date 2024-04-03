@@ -598,10 +598,18 @@ class Graph:
             sport_number = 0
             if y in self._vertices:
                 for country in self._vertices[y].neighbours:
-                    sport_number += len(self._vertices[y].neighbours[country].team_sports) + len(
-                        self._vertices[y].neighbours[country].team_sports)
+                    sport_number += self.sport_flow_helper(y, country)
             years_flow[y] = sport_number
         return years_flow
+
+    def sport_flow_helper(self, y: int, country: _SportVertex) -> int:
+        """ Helper function for up above
+        If the given country is kind country (and not kind region), add the length of its sports
+        """
+        if country.kind == 'country':
+            return len(self._vertices[y].neighbours[country].team_sports) + len(
+                self._vertices[y].neighbours[country].individual_sports)
+        return 0
 
     def participation_overall_average(self) -> float | int:
         """Return the overall average number of participants for all years between the first recorded year and the

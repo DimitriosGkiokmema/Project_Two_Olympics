@@ -569,7 +569,6 @@ def redraw_window():
 
 
 # print('performance: ', graph.performance())
-print(graph.compare_medals('Greece', 'France', 1896))
 run = True
 while run:
     for event in pygame.event.get():
