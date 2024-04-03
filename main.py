@@ -330,8 +330,8 @@ def display_info(button_name: str) -> None:
         start_year = int(get_user_response(question1))
         question2 = 'Enter an end year (within known years): '
         end_year = int(get_user_response(question2))
-        x1 = graph.years_during(start_year, end_year)
-        x2 = graph.years_during(start_year, end_year)
+        x1 = graph.years_during_selected(start_year, end_year)
+        x2 = graph.years_during_selected(start_year, end_year)
         y1 = graph.medal_all_years(x1[0], x1[-1])
         y2 = graph.participation_all_years(x2[0], x2[-1])
         title = "World's Medal and Participation over years"
@@ -397,7 +397,7 @@ def display_info(button_name: str) -> None:
         y = [stats[year] for year in stats]
         title = 'Change in the Number of Sports Played'
         single_plot([''], title, False, 'single', [y], x)
-    if button_name == 'Visualize Graph':
+    elif button_name == 'Visualize Graph':
         vis.visualize_graph(graph)
 
 
@@ -568,8 +568,8 @@ def redraw_window():
         curr_button.draw((0, 0, 0))
 
 
-# print('performance: ', graph.performance())
-run = True
+print('performance: ', graph.medal_number_location('Greece'))
+run = False
 while run:
     for event in pygame.event.get():
         pos = pygame.mouse.get_pos()
