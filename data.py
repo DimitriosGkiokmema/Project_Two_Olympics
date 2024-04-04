@@ -271,7 +271,7 @@ class Graph:
 
         return [g, s, b]
 
-    def host_wins(self, country: str, b: int, e:int) -> list[dict[Any, int]] | str:
+    def host_wins(self, country: str, b: int, e: int) -> list[dict[Any, int]] | str:
         """ This function returns a dict in the format [{year_hosted, num of wins}, {year_played: num of wins}]
         If the inputted country never held the Olympics, a message stating this is returned
         """
@@ -340,11 +340,9 @@ class Graph:
         else:
             return None
 
-
 ##################################################################################
 # Our additional methods
 ##################################################################################
-
     def get_edge(self, item1: Any, item2: Any) -> Sport:
         """Return the Sport class of that edge if item1 and item2 are adjacent and are in the graph.
         Raise ValueError otherwise."""
@@ -480,22 +478,17 @@ class Graph:
         if input_year not in self._vertices:
             return 0  # AMY CHANGED THIS
         else:
-
             # Follows an accumulator pattern.
             medals_so_far = 0
 
             v_year = self._vertices[input_year]
 
-            countries = v_year.get_neighbours('country')
+            countries = v_year.get_neighbours('country')  # collection of _SportVertex
 
             for country in countries:
                 sport = self.get_edge(input_year, country.item)
                 # Counts separately the number of medal achieved in team_sport and individual_sport.
-                for team_sport in sport.team_sports:
-                    medals_so_far += sport.team_sports[team_sport].total_medal()
-
-                for individual_sport in sport.team_sports:
-                    medals_so_far += sport.team_sports[individual_sport].total_medal()
+                medals_so_far += sport.total_medal()
 
             return medals_so_far
 
@@ -683,8 +676,8 @@ class Graph:
             all_countries = self._vertices[year].get_neighbours('country')
             medal_so_far = 0
             for country in all_countries:
-                if self.adjacent(country, region):
-                    medal_so_far += self.get_edge(year, country).total_medal()
+                if self.adjacent(country.item, region):
+                    medal_so_far += self.get_edge(year, country.item).total_medal()
 
             return medal_so_far
 
@@ -700,8 +693,8 @@ class Graph:
             all_countries = self._vertices[year].get_neighbours('country')
             weight_so_far = 0
             for country in all_countries:
-                if self.adjacent(country, region):
-                    weight_so_far += self.get_edge(year, country).total_scores()
+                if self.adjacent(country.item, region):
+                    weight_so_far += self.get_edge(year, country.item).total_scores()
 
             return weight_so_far
 
@@ -709,20 +702,21 @@ class Graph:
         """
         Return a tuple of 2 lists: the first list contains the total number of medals gained in the given region in
         each year, and the second one contains the percentage of number of medals gained here to the world's total.
-        The time period is from the min year to the max year recorded in this graph.
+        The time period is from the min year to the max year recorded in this graph. Rounded to one decimal place.
         If the region input is not valid, return a message.
         """
         if region not in self.get_all_vertices('region'):
             return None
         else:
             v_region = self._vertices[region]
-            year_neighbours = v_region.get_neighbours('year')
+            year_neighbours = [x.item for x in v_region.get_neighbours('year')]
 
             number = []
             percentage = []
 
             for yr in self.years_during():
-                if yr not in year_neighbours:  # Might be redundant, but just to ensure everything goes right
+                if yr not in year_neighbours or yr not in self._vertices:
+                    # Might be redundant, but just to ensure everything goes right
                     number.append(0)
                     percentage.append(0)
                 else:
@@ -730,7 +724,8 @@ class Graph:
                     medal_world = self.medal_number_in_year(yr)  # It must not be 0, since as soon as this year exists
                     # in this region, there is at least one country took part in that year.
                     number.append(medal_this_region)
-                    percentage.append(medal_this_region / medal_world)
+
+                    percentage.append(round((medal_this_region / medal_world) * 100, 1))
 
             return number, percentage
 
@@ -738,20 +733,21 @@ class Graph:
         """
         Return a tuple of 2 lists: the first list contains the weighted score gained in the given region in each year,
         and the second one contains the percentage of weighted score gained here to the world's total. The time period
-        is from the min year to the max year recorded in this graph.
+        is from the min year to the max year recorded in this graph. Rounded to one decimal place.
         If the region input is not valid, return a message.
         """
         if region not in self.get_all_vertices('region'):
             return None
         else:
             v_region = self._vertices[region]
-            year_neighbours = v_region.get_neighbours('year')
+            year_neighbours = [x.item for x in v_region.get_neighbours('year')]
 
             weight = []
             percentage = []
 
             for yr in self.years_during():
-                if yr not in year_neighbours:  # Might be redundant, but just to ensure everything goes right
+                if yr not in year_neighbours or yr not in self._vertices:
+                    # Might be redundant, but just to ensure everything goes right
                     weight.append(0)
                     percentage.append(0)
                 else:
@@ -759,7 +755,7 @@ class Graph:
                     weight_world = self.weight_in_year(yr)  # It must not be 0, since as soon as this year exists
                     # in this region, there is at least one country took part in that year.
                     weight.append(weight_this_region)
-                    percentage.append(weight_this_region / weight_world)
+                    percentage.append(round((weight_this_region / weight_world) * 100, 1))
 
             return weight, percentage
 
@@ -794,7 +790,7 @@ class Medal:
 
     def total_medal(self) -> int:
         """Return the total number of medals."""
-        return sum([self.num_g, self.num_s, self.num_b])
+        return self.num_g + self.num_s + self.num_b
 
     def weighted_score(self) -> int:
         """Calculate weighted score according to the number of medals.
@@ -1104,8 +1100,8 @@ if __name__ == '__main__':
 
     import python_ta
 
-    python_ta.check_all(config={
-        'extra-imports': ['csv', 'networkx', 'pandas'],  # the names (strs) of imported modules
-        'allowed-io': ['print', 'open', 'input'],     # the names (strs) of functions that call print/open/input
-        'max-line-length': 120
-    })
+    # python_ta.check_all(config={
+    #     'extra-imports': ['csv', 'networkx', 'pandas'],  # the names (strs) of imported modules
+    #     'allowed-io': ['print', 'open', 'input'],     # the names (strs) of functions that call print/open/input
+    #     'max-line-length': 120
+    # })

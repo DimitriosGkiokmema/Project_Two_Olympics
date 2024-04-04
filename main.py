@@ -304,7 +304,7 @@ def display_info(button_name: str) -> None:
             y2_bar, y2_line = graph2[0], graph2[1]
             title = f'{region} Awards'
 
-            two_plots(names, title, [[True, False], [True, False]], 'many', y1_bar, y2_bar, x)
+            two_plots(names, title, [[1, 0], [1, 0]], 'many', [y1_bar, y1_line], [y2_bar, y2_line], x)
         else:
             display_text(f'Region not found. Please check your input.')
 
