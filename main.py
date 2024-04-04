@@ -88,7 +88,7 @@ class Button:
 ####################################################
 
 
-def single_plot(names: list[str], title: str, bar: bool, style: str, y: list[list[int]], x: list[int], y_lab: str = ''):
+def single_plot(names: list[str], title: str, bar: list, style: str, y: list[list[int]], x: list[int], y_lab: str = ''):
     # def single_plot():  # Used for quickly testing this function
     """ An instance of this class requires the graph name, y and (optionally) the x values. x and y MUST be lists
     This class will display a single or multiple graphs on the same window, depending on how many
@@ -99,7 +99,7 @@ def single_plot(names: list[str], title: str, bar: bool, style: str, y: list[lis
         - bar: the type of graph, True if a bar graph, False if a line graph
         - style: many or single lined graph
         - y: a list of y coordinates
-        - x: a list of x coordinates. If nothing is entered for it, the x coordinates are every num 1940-2020
+        - x: a list of x coordinates. If nothing is entered for it, the x coordinates are every num 1896-2012, 4.
 
     Representation Invariants:
         - len(names) > 0
@@ -108,15 +108,26 @@ def single_plot(names: list[str], title: str, bar: bool, style: str, y: list[lis
         - len(y) == len(x) or x == 0
         - if a value is given for x cords, then y must have the same number of values
     """
-    line_explanation = {names[i]: y[i] for i in range(len(names))}
+    # line_explanation = {names[i]: y[i] for i in range(len(names))}
 
-    if style == 'many':  # Graph with one or multiple lines in it
-        # Single graph, multiple lines
-        df = pd.DataFrame(line_explanation)  # Shows a small table on the graph of what each line means
+    # if style == 'many':  # Graph with one or multiple lines in it
+    #     # Single graph, multiple lines
+    #     df = pd.DataFrame(line_explanation)  # Shows a small table on the graph of what each line means
+
+    if style == 'many':  # THIS CASE FOR 2 LINES/BARS ONLY
+        # Amy modified this case for the "Host Effect" and it works! This will only be used for that button so,
+        # although not generalized enough (I guess cuz I just somehow made it worked idk), still be good for one case.
+        fig, ax = plt.subplots()
+
+        for i in range(len(y)):
+            if bar[i]:
+                ax.bar(x, y[i], label=names[i], color=generate_random_colour())
+            else:
+                ax.plot(x, y[i], label=names[i], color=generate_random_colour())
 
         # Plot individual lines
-        for i in line_explanation:
-            plt.plot(x, df[i], label=i, linewidth=4, color=generate_random_colour())
+        # for i in line_explanation:
+        #     plt.plot(x, df[i], label=i, linewidth=4, color=generate_random_colour())
 
     elif style == 'single':
         if bar:
@@ -164,7 +175,7 @@ def two_plots(names: list, title: str, bar: list, s: str, y1: list[list[int]], y
         if not bar[1]:
             axs[1].plot(x2, y2[0], color=generate_random_colour())
         else:
-            axs[1].bar(x=x2, height=y2[1], color=generate_random_colour())
+            axs[1].bar(x=x2, height=y2[0], color=generate_random_colour())
 
         # Putting details on first graph
         axs[0].set_title(names[0])  # Sets graph title
@@ -354,11 +365,19 @@ def display_info(button_name: str) -> None:
         end_year = int(get_user_response(question2))
         x1 = graph.years_during_selected(start_year, end_year)
         x2 = graph.years_during_selected(start_year, end_year)
-        y1 = graph.medal_all_years(x1[0], x1[-1])
-        y2 = graph.participation_all_years(x2[0], x2[-1])
+        y1 = graph.medal_all_years(start_year, end_year)
+        y2 = graph.participation_all_years(start_year, end_year)
         title = "World's Medal and Participation over years"
         names = ["Total Number of Medals", "Total Number of Participants"]
-        two_plots(names, title, [False, False], 'single', y1, y2, [x1, x2])
+        two_plots(names, title, [False, False], 'single', [y1], [y2], [x1, x2])
+        # The Impact of historical events hasn't been fully constructed. After showing the graphs, we proceed to
+        # the next text display about the differences between this period's medal_period_average compared to
+        # medal_overall_average ("While the average number of medals in the whole period was {medal_overall_average}, in
+        # the period from {start_year} to {end_year}, the average number of medals was {medal_period_average}.
+        # Therefore, the difference between the two is {medal_period_average - medal_overall_average}."
+        # Do similar sentence for participation_overall_average and participation_period_average.
+
+        # With everything already implemented, Amy still doesn't know how to call the back/proceed button. Please help!
 
     elif button_name == 'Host Effect':
         question1 = 'Enter a start year (within known years): '
@@ -367,14 +386,19 @@ def display_info(button_name: str) -> None:
         end = int(get_user_response(question2))
         question = 'Enter a country to see its Host Effect: '
         country = get_user_response(question)
-        output = graph.host_wins(country, start, end)  # {year_played: num of wins}
+        output = graph.host_wins(country, start, end)  # ([wins_hosted], [wins_all])
 
         if not isinstance(output, str):
-            x = [year for year in output]
-            y = [output[win] for win in output]
+            x = [year for year in range(start, end + 1, 4)]
+            y1, y2 = output[0], output[1]
             title = 'Host Country Effect'
-            names = ['Total Medals Won']
-            single_plot(names, title, False, 'single', [y], x)
+            names = ['Host Years Achievements', 'Overall Achievements']
+            single_plot(names, title, [True, False], 'many', [y1, y2], x)
+            # x = [year for year in output]
+            # y = [output[win] for win in output]
+            # title = 'Host Country Effect'
+            # names = ['Total Medals Won']
+            # single_plot(names, title, False, 'single', [y], x)
         else:
             display_text(output)
 
@@ -389,7 +413,7 @@ def display_info(button_name: str) -> None:
         y2 = output[1]
         title = 'Weighted Scores by Medals Awarded'
         names = ['Team Sports', 'Individual Sports']
-        two_plots(names, title, [True, True], 'single', y1, y2, [x1, x2])
+        two_plots(names, title, [True, True], 'single', [y1], [y2], [x1, x2])
 
     elif button_name == 'Performance':
         perform = graph.performance()
@@ -412,7 +436,7 @@ def display_info(button_name: str) -> None:
         y = graph.participation_all_years(start, end)
         x = [year for year in range(start, end + 1, 4)]
         title = 'Change in the Number of Participating Countries'
-        single_plot([''], title, False, 'single', [y], x, 'Number of Countries')
+        single_plot([''], title, [False], 'single', [y], x, 'Number of Countries')
 
     elif button_name == 'Sport Statistics':
         start = int(get_user_response('Enter the starting year: '))
@@ -421,7 +445,7 @@ def display_info(button_name: str) -> None:
         x = [year for year in stats]
         y = [stats[year] for year in stats]
         title = 'Change in the Number of Sports Played'
-        single_plot([''], title, False, 'single', [y], x, 'Number of Sports')
+        single_plot([''], title, [False], 'single', [y], x, 'Number of Sports')
 
     elif button_name == 'Visualize Graph':
         vis.visualize_graph(graph)

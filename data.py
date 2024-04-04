@@ -271,20 +271,59 @@ class Graph:
 
         return [g, s, b]
 
-    def host_wins(self, country: str, b: int, e: int) -> dict[Any, int] | str:
-        """ This function returns a dict in the format [{year_hosted, num of wins}, {year_played: num of wins}]
-        If the inputted country never held the Olympics, a message stating this is returned
+    def host_wins(self, country: str, b: int, e: int) -> tuple[list, list] | str:
+        """Return a tuple with two lists with e - b + 1 elements:
+        - The first list contains the number of wins (medals) in the year that this country hosted, from b to e,
+        inclusive.
+        - The second list contains the number of wins (medals) in the year that this country was awarded, from b to be,
+        inclusive.
+        Representation Invariants:
+            - b in self._vertices and e in self._vertices
         """
-        is_host = False
+        if country in self._vertices:
+            is_host = False
 
-        for year in self._vertices:
-            if self._vertices[year].kind == 'year' and self._vertices[year].host == country and b <= year <= e:
-                is_host = True
+            wins_hosted = []
+            wins_all = []
 
-        if is_host:
-            return self.host_wins_helper(country)
+            for yr in range(b, e + 1, 4):
+                data = self.annual_data_dict(country, yr)
+                if data is not None and self._vertices[yr].host != country:
+                    wins_all.append(data['total medals'])
+                    wins_hosted.append(0)
+                elif data is not None and self._vertices[yr].host == country:  # I tried to avoid PyTA complaints
+                    wins_hosted.append(data['total medals'])
+                    wins_all.append(data['total medals'])
+                    is_host = True
+                else:
+                    wins_all.append(0)
+                    wins_hosted.append(0)
+
+            if is_host:
+                return wins_hosted, wins_all
+            else:
+                return f'{country} has never hosted the Olympics from {b} to {e}!'
         else:
-            return f'The given country has never hosted the Olympics from {b} to {e}!'
+            return f'Invalid input for country. Please check again.'
+
+    # def host_wins(self, country: str, b: int, e: int) -> dict[Any, int] | str:
+    #     """ This function returns a dict in the format [{year_hosted, num of wins}, {year_played: num of wins}]
+    #     If the inputted country never held the Olympics, a message stating this is returned
+    #     """
+    #     is_host = False
+    #
+    #     year_hosted = {}
+    #
+    #     for year in self._vertices:
+    #         if self._vertices[year].kind == 'year' and self._vertices[year].host == country and b <= year <= e:
+    #             is_host = True
+    #             sport = self.get_edge(year, country)
+    #             year_hosted[year] = sport.total_medal()
+    #
+    #     if is_host:
+    #         return self.host_wins_helper(country)
+    #     else:
+    #         return f'The given country has never hosted the Olympics from {b} to {e}!'
 
     def host_wins_helper(self, country: str) -> dict[Any, int]:
         """ Searches the Graph for the years the given country participated in the Olympics and returns
@@ -341,7 +380,7 @@ class Graph:
         else:
             raise ValueError
 
-    def years_during_selected(self, start: int, end: int) -> list[int]:  # AMY CHANGED THE NAME
+    def years_during_selected(self, start: int, end: int) -> list[int]:
         """Return a list of years that are expected to have Olympics games, from the first year (min year)
         to the end year (max year) recorded in this graph. That means we record the year from
         range(min_year, max_year + 1, 4).
@@ -354,7 +393,7 @@ class Graph:
         # all_years = self.get_all_vertices('year')
         # min_year, max_year = min(all_years), max(all_years)
         lst_year = []
-        for y in range(start, end, 4):
+        for y in range(start, end + 1, 4):
             lst_year.append(y)
         return lst_year
         # lst_year = []
@@ -453,10 +492,8 @@ class Graph:
                         'total medals': sport_data.total_medal(),
                         'team medals': sport_data.total_medal('team'),
                         'indiv medals': sport_data.total_medal('individual')}
-            else:
-                return
         else:
-            raise ValueError
+            return
 
     def medal_number_in_year(self, input_year: int) -> int:
         """
@@ -592,23 +629,22 @@ class Graph:
                 self._vertices[y].neighbours[country].individual_sports)
         return 0
 
-    def participation_overall_average(self) -> float | int:
+    def participation_overall_average(self) -> int:
         """Return the overall average number of participants for all years between the first recorded year and the
-        last recorded year. Rounded to the second decimal place.
+        last recorded year. Rounded to an integer.
         Similar notice as medal_overall_average.
         """
         all_years = self.get_all_vertices('year')
         min_year, max_year = min({year.item for year in all_years}), max({year.item for year in all_years})
         total = sum(self.participation_all_years(min_year, max_year))
-        return round(total / (max_year - min_year + 1), 2)
+        return round(total / (max_year - min_year + 1))
 
     def participation_period_average(self, start_year: int, end_year: int) -> float | int:
-        """Return the period average number of participants from start_year to end_year, INCLUSIVE. Rounded to the
-        second decimal place.
+        """Return the period average number of participants from start_year to end_year, INCLUSIVE. Round to an integer.
         Representation Invariants:
             - start_year and end_year must be among [min_year, max_year] recorded in the dataset."""
         total = sum(self.participation_all_years(start_year, end_year))
-        return round(total / (end_year - start_year + 1), 2)
+        return round(total / (end_year - start_year + 1))
 
 #######################################################
     def wins_one(self, year: int, country: str) -> tuple:
