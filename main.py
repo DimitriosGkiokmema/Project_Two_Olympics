@@ -132,7 +132,7 @@ def single_plot(names: list[str], title: str, bar: bool, style: str, y: list[lis
     plt.show()
 
 
-def two_plots(names: list[str], title: str, bar: list, s: str, y1: list[int], y2: list[int], x: list = 0):
+def two_plots(names: list, title: str, bar: list, s: str, y1: list[list[int]], y2: list[list[int]], x: list = 0):
     """ An instance of this class requires the graph name, y and (optionally) the x values. x and y MUST be lists
     This class will display one or two graphs on the same window, depending on how many are needed
 
@@ -157,14 +157,14 @@ def two_plots(names: list[str], title: str, bar: list, s: str, y1: list[int], y2
         fig, axs = plt.subplots(1, 2)
 
         if not bar[0]:
-            axs[0].plot(x1, y1, color=generate_random_colour())
+            axs[0].plot(x1, y1[0], color=generate_random_colour())
         else:
-            axs[0].bar(x=x1, height=y1, color=generate_random_colour())
+            axs[0].bar(x=x1, height=y1[0], color=generate_random_colour())
 
         if not bar[1]:
-            axs[1].plot(x2, y2, color=generate_random_colour())
+            axs[1].plot(x2, y2[0], color=generate_random_colour())
         else:
-            axs[1].bar(x=x2, height=y2, color=generate_random_colour())
+            axs[1].bar(x=x2, height=y2[1], color=generate_random_colour())
 
         # Putting details on first graph
         axs[0].set_title(names[0])  # Sets graph title
@@ -175,24 +175,35 @@ def two_plots(names: list[str], title: str, bar: list, s: str, y1: list[int], y2
         axs[1].set_title(names[1])  # Sets graph title
         axs[1].set_xlabel('Years')  # Sets x-axis title
         axs[1].set_ylabel('Medals')  # Sets y-axis title
+
+        fig.canvas.manager.set_window_title(title)
     elif s == 'many':  # Two graphs with  multiple lines
         fig, axs = plt.subplots(1, 2)
 
-        if bar[0]:
-            axs[0].bar(x=x1, height=y1, color=generate_random_colour())
-        else:
-            axs[0].plot(x1, y1, label=names[0], color=generate_random_colour())
+        for i in range(len(y1)):
+            if bar[0][i]:
+                axs[0].bar(x=x, height=y1[i], color=generate_random_colour())
+            else:
+                axs[0].plot(x, y1[i], label=names[0][i], color=generate_random_colour())
 
-        if bar[1]:
-            axs[1].bar(x=x2, height=y2, color=generate_random_colour())
-        else:
-            axs[1].plot(x2, y2, label=names[1], color=generate_random_colour())
+        for i in range(len(y2)):
+            if bar[1][i]:
+                axs[0].bar(x=x, height=y2[i], color=generate_random_colour())
+            else:
+                axs[0].plot(x, y2[i], label=names[0][i], color=generate_random_colour())
+
+        # if bar[1]:
+        #     axs[1].bar(x=x2, height=y2, color=generate_random_colour())
+        # else:
+        #     axs[1].plot(x2, y2, label=names[1], color=generate_random_colour())
 
         for i in range(2):
             axs[i].set_title(names[i])
             axs[i].set_xlabel('Years')
             axs[i].set_ylabel('Medals')
             axs[i].legend()
+
+        fig.canvas.manager.set_window_title(title)
 
     plt.grid(True)
     plt.show()
@@ -277,25 +288,22 @@ def display_info(button_name: str) -> None:
 
         display_text(output)
     elif button_name == 'Given Area':
-        question = 'Enter the region you want to see the number of medals awarded overtime: '
-        region = get_user_response(question)
+        # question = 'Enter the region you want to see the number of medals awarded overtime: '
+        # region = get_user_response(question)
+        region = 'Europe'
         graph1 = graph.total_medal_by_region(region)  # either a tuple of 2 lists or none
         graph2 = graph.weight_by_region(region)  # either a tuple of 2 lists or none
+        print('graph1: ', graph1)
+        print('graph2: ', graph2)
 
         if graph1 is not None and graph2 is not None:
             names = ['Medals in ' + region, 'Weighted scores in ' + region]
             x = graph.years_during()  # list of years from the beginning to the end
             y1_bar, y1_line = graph1[0], graph1[1]
             y2_bar, y2_line = graph2[0], graph2[1]
+            title = f'{region} Awards'
 
-        # medals = graph.medal_number_location(location)
-        #
-        # if medals == ValueError:
-        #     output = f'There were no medals ever awarded in {location}'
-        # else:
-        #     output = f'In {location}, {medals} medals were awarded!'
-
-        # display_text(output)
+            two_plots(names, title, [[True, False], [True, False]], 'many', y1_bar, y2_bar, x)
         else:
             display_text(f'Region not found. Please check your input.')
 
