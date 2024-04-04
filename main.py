@@ -38,6 +38,7 @@ group = {'Archery': 0, 'Athletics': 0, 'Badminton': 0, 'Baseball': 1, 'Basketbal
 
 graph = data.load_graph('summer_modified.csv', 'country_codes_modified.csv', group)
 
+
 ####################################################
 # Buttons
 ####################################################
@@ -45,6 +46,7 @@ graph = data.load_graph('summer_modified.csv', 'country_codes_modified.csv', gro
 
 class Button:
     """ template for the buttons"""
+
     def __init__(self, x, y, text='', image=None):
         self.colour = (208, 206, 206)
         self.x = x
@@ -82,6 +84,7 @@ class Button:
                 return True
 
         return False
+
 
 ####################################################
 # Making the graphs
@@ -276,6 +279,7 @@ def generate_random_colour() -> tuple[float, float, float]:
 
     return rgb[0], rgb[1], rgb[2]
 
+
 ####################################################
 # Shows graphs and displays text
 ####################################################
@@ -359,6 +363,7 @@ def display_info(button_name: str) -> None:
         display_text(output)
 
     elif button_name == 'Impact of Historical Events':
+        # Displays graphs
         question1 = 'Enter a start year (within known years): '
         start_year = int(get_user_response(question1))
         question2 = 'Enter an end year (within known years): '
@@ -370,14 +375,20 @@ def display_info(button_name: str) -> None:
         title = "World's Medal and Participation over years"
         names = ["Total Number of Medals", "Total Number of Participants"]
         two_plots(names, title, [False, False], 'single', [y1], [y2], [x1, x2])
-        # The Impact of historical events hasn't been fully constructed. After showing the graphs, we proceed to
-        # the next text display about the differences between this period's medal_period_average compared to
-        # medal_overall_average ("While the average number of medals in the whole period was {medal_overall_average}, in
-        # the period from {start_year} to {end_year}, the average number of medals was {medal_period_average}.
-        # Therefore, the difference between the two is {medal_period_average - medal_overall_average}."
-        # Do similar sentence for participation_overall_average and participation_period_average.
 
-        # With everything already implemented, Amy still doesn't know how to call the back/proceed button. Please help!
+        # Displays analysis
+        medal_overall = graph.medal_period_average(start_year, end_year)
+        medal_average = graph.medal_overall_average()
+        part_overall = graph.participation_overall_average()
+        part_average = graph.participation_period_average(start_year, end_year)
+        txt = (f'While the average number of medals in the whole period was {medal_overall}, in\n' +
+               f'the period from {start_year} to {end_year}, the average number of medals was {medal_average}.\n' +
+               f'Therefore, the difference between the two is {abs(medal_average - medal_overall)}.\n\n'
+               f'While the average number of participation in the whole period was {part_overall}, in the\n' +
+               f'period from {start_year} to {end_year}, the average number of participants was {part_average}.\n' +
+               f'Therefore, the difference between the two is {abs(part_average - part_overall)}.\n\n'
+               )
+        display_text(txt)
 
     elif button_name == 'Host Effect':
         question1 = 'Enter a start year (within known years): '
@@ -584,6 +595,7 @@ def get_user_response(question: str) -> str:
 
     redraw_window()
     return response.title()
+
 
 ####################################################
 # Game loop
