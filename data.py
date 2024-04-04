@@ -284,7 +284,7 @@ class Graph:
         if is_host:
             return self.host_wins_helper(country)
         else:
-            return 'The given country has never hosted the Olympics!'
+            return f'The given country has never hosted the Olympics from {b} to {e}!'
 
     def host_wins_helper(self, country: str) -> dict[Any, int]:
         """ Searches the Graph for the years the given country participated in the Olympics and returns

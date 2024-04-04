@@ -188,9 +188,9 @@ def two_plots(names: list, title: str, bar: list, s: str, y1: list[list[int]], y
 
         for i in range(len(y2)):
             if bar[1][i]:
-                axs[0].bar(x=x, height=y2[i], color=generate_random_colour())
+                axs[1].bar(x=x, height=y2[i], color=generate_random_colour())
             else:
-                axs[0].plot(x, y2[i], label=names[0][i], color=generate_random_colour())
+                axs[1].plot(x, y2[i], label=names[0][i], color=generate_random_colour())
 
         # if bar[1]:
         #     axs[1].bar(x=x2, height=y2, color=generate_random_colour())
@@ -210,7 +210,7 @@ def two_plots(names: list, title: str, bar: list, s: str, y1: list[list[int]], y
 
 
 def plot_word(names: list[str], bar: list[bool], x: list[list[int]], x_names: list[list[str]], y: list[list[int]]):
-    """Word"""
+    """Plot a graph with the x-axis values being categorical variables (such as countries)."""
     x1 = np.array(x[0])
     y1 = np.array(y[0])
 
@@ -289,9 +289,9 @@ def display_info(button_name: str) -> None:
 
         display_text(output)
     elif button_name == 'Given Area':
-        # question = 'Enter the region you want to see the number of medals awarded overtime: '
-        # region = get_user_response(question)
-        region = 'Europe'
+        question = 'Enter the region you want to see the number of medals awarded overtime: '
+        region = get_user_response(question)
+        # region = 'Europe'
         graph1 = graph.total_medal_by_region(region)  # either a tuple of 2 lists or none
         graph2 = graph.weight_by_region(region)  # either a tuple of 2 lists or none
         print('graph1: ', graph1)
@@ -332,7 +332,7 @@ def display_info(button_name: str) -> None:
         year = int(get_user_response('Enter the year: '))
         rank = int(get_user_response('Enter the desired rank: '))
         output = graph.i_th_place(rank, year)
-        name = f'Country at ith place in {year}'
+        name = f'Country at {rank} place in {year}'
 
         if 'Invalid' not in output:
             y = [i[1] for i in output]
