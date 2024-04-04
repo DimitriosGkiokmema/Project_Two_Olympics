@@ -378,6 +378,8 @@ def display_info(button_name: str) -> None:
         # Do similar sentence for participation_overall_average and participation_period_average.
 
         # With everything already implemented, Amy still doesn't know how to call the back/proceed button. Please help!
+        medal_overall_average = graph.medal_period_average(start_year, end_year)
+        medal_period_average = graph.medal_period_average(start_year, end_year)
 
     elif button_name == 'Host Effect':
         question1 = 'Enter a start year (within known years): '
