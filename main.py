@@ -210,6 +210,7 @@ def two_plots(names: list, title: str, bar: list, s: str, y1: list[list[int]], y
 
 
 def plot_word(names: list[str], bar: list[bool], x: list[list[int]], x_names: list[list[str]], y: list[list[int]]):
+    """Word"""
     x1 = np.array(x[0])
     y1 = np.array(y[0])
 
@@ -345,6 +346,7 @@ def display_info(button_name: str) -> None:
         year = int(get_user_response('Enter the year: '))
         output = graph.annual_data_sentence(country, year)
         display_text(output)
+
     elif button_name == 'Impact of Historical Events':
         question1 = 'Enter a start year (within known years): '
         start_year = int(get_user_response(question1))
@@ -357,6 +359,7 @@ def display_info(button_name: str) -> None:
         title = "World's Medal and Participation over years"
         names = ["Total Number of Medals", "Total Number of Participants"]
         two_plots(names, title, [False, False], 'single', y1, y2, [x1, x2])
+
     elif button_name == 'Host Effect':
         question1 = 'Enter a start year (within known years): '
         start = int(get_user_response(question1))
@@ -376,6 +379,7 @@ def display_info(button_name: str) -> None:
             two_plots(names, title, [True, False], 'single', y1, y2, [x1, x2])
         else:
             display_text(output)
+
     elif button_name == 'Team vs Individual Sports':
         question = 'Enter a country to compare Team and Individual Sports scores: '
         country = get_user_response(question)
@@ -388,6 +392,7 @@ def display_info(button_name: str) -> None:
         title = 'Weighted Scores by Medals Awarded'
         names = ['Team Sports', 'Individual Sports']
         two_plots(names, title, [True, True], 'single', y1, y2, [x1, x2])
+
     elif button_name == 'Performance':
         perform = graph.performance()
         print(perform)
@@ -402,6 +407,7 @@ def display_info(button_name: str) -> None:
                 '(Click the back arrow to see the graph)')
         display_text(text)
         horizontal_bar_graph('Performance of regions and countries', x_names, y)
+
     elif button_name == 'Country Statistics':
         start = int(get_user_response('Enter the starting year: '))
         end = int(get_user_response('Enter the ending year: '))
@@ -409,6 +415,7 @@ def display_info(button_name: str) -> None:
         x = [year for year in range(start, end + 1, 4)]
         title = 'Change in the Number of Participating Countries'
         single_plot([''], title, False, 'single', [y], x)
+
     elif button_name == 'Sport Statistics':
         start = int(get_user_response('Enter the starting year: '))
         end = int(get_user_response('Enter the ending year: '))
@@ -589,7 +596,11 @@ def redraw_window():
 
 
 # print('performance: ', graph.medal_number_location('Greece'))
+# <<<<<<< HEAD
 run = True
+# =======
+# run = True
+# >>>>>>> 9faf3b93d0970136e7f3aeee893c5627f28c1588
 while run:
     for event in pygame.event.get():
         pos = pygame.mouse.get_pos()
