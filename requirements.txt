@@ -4,6 +4,7 @@
 hypothesis
 pytest
 python-ta~=2.7.0
+__future__
 
 # Graphics and data visualization
 plotly>=5.18.0
@@ -15,4 +16,6 @@ numpy
 scipy
 kaleido
 pandas
-matplotlib
+matplotlib.pyplot
+typing
+csv
