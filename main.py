@@ -367,16 +367,14 @@ def display_info(button_name: str) -> None:
         end = int(get_user_response(question2))
         question = 'Enter a country to see its Host Effect: '
         country = get_user_response(question)
-        output = graph.host_wins(country, start, end)  # [{year_hosted, num of wins}, {year_played: num of wins}]
+        output = graph.host_wins(country, start, end)  # {year_played: num of wins}
 
         if not isinstance(output, str):
-            x1 = [year for year in output[0]]
-            x2 = [year for year in output[1]]
-            y1 = [output[0][win] for win in output[0]]
-            y2 = [output[1][win] for win in output[1]]
+            x = [year for year in output]
+            y = [output[win] for win in output]
             title = 'Host Country Effect'
-            names = ['Medals Won When Hosted by Country', 'Total Medals Won']
-            two_plots(names, title, [True, False], 'single', y1, y2, [x1, x2])
+            names = ['Total Medals Won']
+            single_plot(names, title, False, 'single', [y], x)
         else:
             display_text(output)
 
@@ -596,11 +594,7 @@ def redraw_window():
 
 
 # print('performance: ', graph.medal_number_location('Greece'))
-# <<<<<<< HEAD
 run = True
-# =======
-# run = True
-# >>>>>>> 9faf3b93d0970136e7f3aeee893c5627f28c1588
 while run:
     for event in pygame.event.get():
         pos = pygame.mouse.get_pos()

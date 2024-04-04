@@ -271,32 +271,20 @@ class Graph:
 
         return [g, s, b]
 
-    def host_wins(self, country: str, b: int, e: int) -> list[dict[Any, int]] | str:
+    def host_wins(self, country: str, b: int, e: int) -> dict[Any, int] | str:
         """ This function returns a dict in the format [{year_hosted, num of wins}, {year_played: num of wins}]
         If the inputted country never held the Olympics, a message stating this is returned
         """
         is_host = False
-        host_medals = {}
 
         for year in self._vertices:
             if self._vertices[year].kind == 'year' and self._vertices[year].host == country and b <= year <= e:
                 is_host = True
-                for participant in self._vertices[year].neighbours:
-                    self.add_to_host_medals(year, country, participant, host_medals)
 
         if is_host:
-            return [host_medals, self.host_wins_helper(country)]
+            return self.host_wins_helper(country)
         else:
             return 'The given country has never hosted the Olympics!'
-
-    def add_to_host_medals(self, year: Any, country: str, participant: _SportVertex, host_medals: dict[int, int]):
-        """ This is a helper for the function above.
-        It calculates the total medals for a country at a specific year,
-        and assigns it to the host_medals by mutating host_medals
-        """
-        if participant.kind == 'country' and participant.item == country:
-            medals = self._vertices[year].neighbours[participant].total_medal()
-            host_medals[int(self._vertices[year].item)] = medals
 
     def host_wins_helper(self, country: str) -> dict[Any, int]:
         """ Searches the Graph for the years the given country participated in the Olympics and returns
