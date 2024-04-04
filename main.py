@@ -400,11 +400,6 @@ def display_info(button_name: str) -> None:
             title = 'Host Country Effect'
             names = ['Host Years Achievements', 'Overall Achievements']
             single_plot(names, title, [True, False], 'many', [y1, y2], x)
-            # x = [year for year in output]
-            # y = [output[win] for win in output]
-            # title = 'Host Country Effect'
-            # names = ['Total Medals Won']
-            # single_plot(names, title, False, 'single', [y], x)
         else:
             display_text(output)
 
@@ -643,3 +638,12 @@ while run:
     # updates the visuals
     redraw_window()
     pygame.display.update()
+
+if __name__ == '__main__':
+    import python_ta
+
+    python_ta.check_all(config={
+        'extra-imports': ['csv', 'networkx', 'pandas'],  # the names (strs) of imported modules
+        'allowed-io': ['print', 'open', 'input'],  # the names (strs) of functions that call print/open/input
+        'max-line-length': 120
+    })

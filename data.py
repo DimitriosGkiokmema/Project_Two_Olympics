@@ -2,11 +2,10 @@
 CSC111 Project 2: The Analysis of Summer Olympics Through External Effects (1896 - 2012)
 """
 from __future__ import annotations
-from typing import Any, List, Tuple
+from typing import Any
 import csv
 import networkx as nx
-import pandas as pd  # remember to install the package pandas! (my version is 2.2.1)
-
+import pandas as pd
 
 CITIES = ['Athens', 'Paris', 'St Louis', 'London', 'Stockholm', 'Antwerp', 'Amsterdam', 'Beijing', 'Los Angeles',
           'Berlin', 'Helsinki', 'Melbourne / Stockholm', 'Rome', 'Tokyo', 'Mexico', 'Munich', 'Montreal', 'Moscow',
@@ -71,9 +70,7 @@ class _SportVertex(_Vertex):
 
     def __init__(self, item: Any, kind: str, host: str) -> None:
         """Initialize a new vertex with the given item and kind.
-
         This vertex is initialized with no neighbours.
-
         Preconditions:
             - kind in {'year', 'country', 'region'}
         """
@@ -94,7 +91,7 @@ class _SportVertex(_Vertex):
         if kind != '':
             return [v for v in self.neighbours if v.kind == kind]
         else:
-            return [v for v in self.neighbours]
+            return list(self.neighbours)
 
 
 class Graph:
@@ -124,9 +121,7 @@ class Graph:
 
     def add_edge(self, item1: Any, item2: Any, sport: Sport = None) -> None:
         """Add an edge between the two vertices with the given items in this graph.
-
         Raise a ValueError if item1 or item2 do not appear as vertices in this graph.
-
         Preconditions:
             - item1 != item2
         """
@@ -141,7 +136,6 @@ class Graph:
 
     def adjacent(self, item1: Any, item2: Any) -> bool:
         """Return whether item1 and item2 are adjacent vertices in this graph.
-
         Return False if item1 or item2 do not appear as vertices in this graph.
         """
         if item1 in self._vertices and item2 in self._vertices:
@@ -152,9 +146,7 @@ class Graph:
 
     def get_neighbours(self, item: Any) -> set:
         """Return a set of the neighbours of the given item.
-
         Note that the *items* are returned, not the _Vertex objects themselves.
-
         Raise a ValueError if item does not appear as a vertex in this graph.
         """
         if item in self._vertices:
@@ -165,9 +157,7 @@ class Graph:
 
     def get_all_vertices(self, kind: str = '') -> set:
         """Return a set of all vertex items in this graph.
-
         If kind != '', only return the items of the given vertex kind.
-
         Preconditions:
             - kind in {'year', 'country', 'region'}
         """
@@ -239,8 +229,8 @@ class Graph:
 
         if 0 < i < len(country_medals):
             insertion_sort(country_medals)
-            medals = self._vertices[year].neighbours[country_medals[len(country_medals) - 1][0]].medals_by_kind()
-            return [country_medals[len(country_medals) - 1][0].item, medals[0], medals[1], medals[2]]
+            medals = self._vertices[year].neighbours[country_medals[len(country_medals) - i][0]].medals_by_kind()
+            return [country_medals[len(country_medals) - i][0].item, medals[0], medals[1], medals[2]]
         else:
             num_participants = len(self._vertices[year].neighbours)
             return f'Invalid rank; only {num_participants} countries participated in the {year} Olympic games'
@@ -316,7 +306,8 @@ class Graph:
 
         return played_medals
 
-    def add_to_played_medals(self, year: Any, country: str, participant: _SportVertex, played_medals: dict[int, int]):
+    def add_to_played_medals(self, year: Any, country: str, participant: _SportVertex, played_medals: dict[int, int]) \
+            -> None:
         """ This is a helper for the function above.
         It calculates the total medals for a country at a specific year,
         and assigns it to the host_medals
@@ -571,7 +562,7 @@ class Graph:
         (20 + 0 + 10) / 3, not (20 + 10) / 2.
         """
         all_years = self.get_all_vertices('year')
-        min_year, max_year = min({year for year in all_years}), max({year for year in all_years})
+        min_year, max_year = min(all_years), max(all_years)
         total = sum(self.medal_all_years(min_year, max_year))
         return round(total / (max_year - min_year + 1), 2)
 
@@ -611,7 +602,7 @@ class Graph:
         Similar notice as medal_overall_average.
         """
         all_years = self.get_all_vertices('year')
-        min_year, max_year = min({year for year in all_years}), max({year for year in all_years})
+        min_year, max_year = min(all_years), max(all_years)
         total = sum(self.participation_all_years(min_year, max_year))
         return round(total / (max_year - min_year + 1))
 
@@ -1100,8 +1091,8 @@ if __name__ == '__main__':
 
     import python_ta
 
-    # python_ta.check_all(config={
-    #     'extra-imports': ['csv', 'networkx', 'pandas'],  # the names (strs) of imported modules
-    #     'allowed-io': ['print', 'open', 'input'],     # the names (strs) of functions that call print/open/input
-    #     'max-line-length': 120
-    # })
+    python_ta.check_all(config={
+        'extra-imports': ['csv', 'networkx', 'pandas'],  # the names (strs) of imported modules
+        'allowed-io': ['print', 'open', 'input'],     # the names (strs) of functions that call print/open/input
+        'max-line-length': 120
+    })
