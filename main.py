@@ -588,7 +588,11 @@ def redraw_window():
 
 
 # print('performance: ', graph.medal_number_location('Greece'))
+# <<<<<<< HEAD
 run = False
+# =======
+# run = True
+# >>>>>>> 9faf3b93d0970136e7f3aeee893c5627f28c1588
 while run:
     for event in pygame.event.get():
         pos = pygame.mouse.get_pos()
