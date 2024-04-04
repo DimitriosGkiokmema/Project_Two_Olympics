@@ -88,7 +88,7 @@ class Button:
 ####################################################
 
 
-def single_plot(names: list[str], title: str, bar: bool, style: str, y: list[list[int]], x: list[int]):
+def single_plot(names: list[str], title: str, bar: bool, style: str, y: list[list[int]], x: list[int], y_lab: str = ''):
     # def single_plot():  # Used for quickly testing this function
     """ An instance of this class requires the graph name, y and (optionally) the x values. x and y MUST be lists
     This class will display a single or multiple graphs on the same window, depending on how many
@@ -125,7 +125,7 @@ def single_plot(names: list[str], title: str, bar: bool, style: str, y: list[lis
             plt.plot(x, y[0], label="My Line", color="blue", linewidth=2)
 
     # Add legend, axis labels, and title
-    plt.ylabel('Medals', fontsize=14)
+    plt.ylabel(y_lab, fontsize=14)
     plt.xlabel('Years', fontsize=14)
     plt.title(title, fontsize=16)
     plt.grid(True)
@@ -414,7 +414,7 @@ def display_info(button_name: str) -> None:
         y = graph.participation_all_years(start, end)
         x = [year for year in range(start, end + 1, 4)]
         title = 'Change in the Number of Participating Countries'
-        single_plot([''], title, False, 'single', [y], x)
+        single_plot([''], title, False, 'single', [y], x, 'Number of Countries')
 
     elif button_name == 'Sport Statistics':
         start = int(get_user_response('Enter the starting year: '))
@@ -423,7 +423,8 @@ def display_info(button_name: str) -> None:
         x = [year for year in stats]
         y = [stats[year] for year in stats]
         title = 'Change in the Number of Sports Played'
-        single_plot([''], title, False, 'single', [y], x)
+        single_plot([''], title, False, 'single', [y], x, 'Number of Sports')
+
     elif button_name == 'Visualize Graph':
         vis.visualize_graph(graph)
 
