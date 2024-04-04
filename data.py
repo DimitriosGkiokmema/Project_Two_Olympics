@@ -287,7 +287,7 @@ class Graph:
         if is_host:
             return [host_medals, self.host_wins_helper(country)]
         else:
-            return 'The given country has never hosted the Olympics!'
+            return f'The given country has never hosted the Olympics from {b} to {e}!'
 
     def add_to_host_medals(self, year: Any, country: str, participant: _SportVertex, host_medals: dict[int, int]):
         """ This is a helper for the function above.

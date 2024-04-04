@@ -289,9 +289,9 @@ def display_info(button_name: str) -> None:
 
         display_text(output)
     elif button_name == 'Given Area':
-        # question = 'Enter the region you want to see the number of medals awarded overtime: '
-        # region = get_user_response(question)
-        region = 'Europe'
+        question = 'Enter the region you want to see the number of medals awarded overtime: '
+        region = get_user_response(question)
+        # region = 'Europe'
         graph1 = graph.total_medal_by_region(region)  # either a tuple of 2 lists or none
         graph2 = graph.weight_by_region(region)  # either a tuple of 2 lists or none
         print('graph1: ', graph1)
