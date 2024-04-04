@@ -595,7 +595,7 @@ class Graph:
         (20 + 0 + 10) / 3, not (20 + 10) / 2.
         """
         all_years = self.get_all_vertices('year')
-        min_year, max_year = min({year.item for year in all_years}), max({year.item for year in all_years})
+        min_year, max_year = min({year for year in all_years}), max({year for year in all_years})
         total = sum(self.medal_all_years(min_year, max_year))
         return round(total / (max_year - min_year + 1), 2)
 
@@ -635,7 +635,7 @@ class Graph:
         Similar notice as medal_overall_average.
         """
         all_years = self.get_all_vertices('year')
-        min_year, max_year = min({year.item for year in all_years}), max({year.item for year in all_years})
+        min_year, max_year = min({year for year in all_years}), max({year for year in all_years})
         total = sum(self.participation_all_years(min_year, max_year))
         return round(total / (max_year - min_year + 1))
 
