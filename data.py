@@ -94,7 +94,7 @@ class _SportVertex(_Vertex):
         if kind != '':
             return [v for v in self.neighbours if v.kind == kind]
         else:
-            return [v for v in self.neighbours]
+            return list(self.neighbours)
 
 
 class Graph:
@@ -299,7 +299,7 @@ class Graph:
             else:
                 return f'{country} has never hosted the Olympics from {b} to {e}!'
         else:
-            return f'Invalid input for country. Please check again.'
+            return 'Invalid input for country. Please check again.'
 
     def host_wins_helper(self, country: str) -> dict[Any, int]:
         """ Searches the Graph for the years the given country participated in the Olympics and returns
@@ -316,14 +316,14 @@ class Graph:
 
         return played_medals
 
-    def add_to_played_medals(self, year: Any, country: str, participant: _SportVertex, played_medals: dict[int, int]):
+    def add_to_played_medals(self, year: Any, country: str, participant: _SportVertex, played: dict[int, int]) -> None:
         """ This is a helper for the function above.
         It calculates the total medals for a country at a specific year,
         and assigns it to the host_medals
         """
         if participant.item == country:
             medals = year.neighbours[participant].total_medal()
-            played_medals[int(year.item)] = medals
+            played[int(year.item)] = medals
 
     def compare_medals(self, country1: str, country2: str, year: int) -> Any:
         """Compare the number of Gold, Silver, and Bronze medals between two countries for a specific year.
@@ -365,17 +365,10 @@ class Graph:
         Representation Invariants:
             - There must be at least one 'year' vertex in this graph.
         """
-        # This is Amy's original code, I changed it to start and end at select years
-        # all_years = self.get_all_vertices('year')
-        # min_year, max_year = min(all_years), max(all_years)
         lst_year = []
         for y in range(start, end + 1, 4):
             lst_year.append(y)
         return lst_year
-        # lst_year = []
-        # for y in range(start, end + 1, 4):
-        #     lst_year.append(y)
-        # return lst_year
 
     def years_during(self) -> list:
         """Return a list of years that are expected to have Olympics games, from the first year (min year)
@@ -404,8 +397,8 @@ class Graph:
             v_country = self._vertices[country]
             v_year = self._vertices[year]
             if v_country not in v_year.neighbours:  # or vice versa
-                print(f"Unfortunately, {country} didn't attend or didn't achieve any medals in {year}."
-                      f"Please try looking for other data.")
+                return (f"Unfortunately, {country} didn't attend or didn't achieve any medals in {year}."
+                        f"Please try looking for other data.")
             else:
                 sport_data = v_country.neighbours[v_year]  # type Sport
 
@@ -415,8 +408,7 @@ class Graph:
                         f"medals, {country} in that year \nhas achieved the total of \n{sport_data.total_medal()} "
                         f"medals, with {sport_data.total_medal('team')} medals on team sports and \n the other"
                         f"{sport_data.total_medal('individual')} medals earned individually.")
-        else:
-            return 'Something went wrong. Please check your input and try again.'
+        return 'Something went wrong. Please check your input and try again.'
 
     def performance(self) -> dict:
         """Returns the average rate of change of medals weight starting from the start year of participation to the last
@@ -468,8 +460,7 @@ class Graph:
                         'total medals': sport_data.total_medal(),
                         'team medals': sport_data.total_medal('team'),
                         'indiv medals': sport_data.total_medal('individual')}
-        else:
-            return
+        return f'{country} does not have any data in {year}'
 
     def medal_number_in_year(self, input_year: int) -> int:
         """
@@ -571,7 +562,7 @@ class Graph:
         (20 + 0 + 10) / 3, not (20 + 10) / 2.
         """
         all_years = self.get_all_vertices('year')
-        min_year, max_year = min({year for year in all_years}), max({year for year in all_years})
+        min_year, max_year = min(all_years), max(all_years)
         total = sum(self.medal_all_years(min_year, max_year))
         return round(total / (max_year - min_year + 1), 2)
 
@@ -611,7 +602,7 @@ class Graph:
         Similar notice as medal_overall_average.
         """
         all_years = self.get_all_vertices('year')
-        min_year, max_year = min({year for year in all_years}), max({year for year in all_years})
+        min_year, max_year = min(all_years), max(all_years)
         total = sum(self.participation_all_years(min_year, max_year))
         return round(total / (max_year - min_year + 1))
 
@@ -758,6 +749,16 @@ class Graph:
                     percentage.append(round((weight_this_region / weight_world) * 100, 1))
 
             return weight, percentage
+
+    def get_all_countries(self) -> set[str]:
+        """ Returns a set of every country that either participated or hosted the Olympic Games"""
+        countries = set()
+
+        for host in self._vertices:
+            if self._vertices[host].kind == 'country':
+                countries.add(self._vertices[host].item)
+
+        return countries
 
 
 class Medal:
@@ -1098,8 +1099,8 @@ if __name__ == '__main__':
              'Trampoline': 0, 'Triathlon': 0, 'Tug of War': 1, 'Vaulting': 0, 'Volleyball': 1, 'Water Motorsport': 1,
              'Water Polo': 1, 'Weightlifting': 0, 'Wrestling Freestyle': 0, 'Wrestling Gre-R': 0}
 
-    import python_ta
-
+    # import python_ta
+    #
     # python_ta.check_all(config={
     #     'extra-imports': ['csv', 'networkx', 'pandas'],  # the names (strs) of imported modules
     #     'allowed-io': ['print', 'open', 'input'],     # the names (strs) of functions that call print/open/input

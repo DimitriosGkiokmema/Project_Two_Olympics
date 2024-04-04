@@ -37,6 +37,10 @@ group = {'Archery': 0, 'Athletics': 0, 'Badminton': 0, 'Baseball': 1, 'Basketbal
 
 graph = data.load_graph('summer_modified.csv', 'country_codes_modified.csv', group)
 
+REGIONS = ['Africa', 'Americas', 'Asia', 'Europe', 'Oceania', 'World']
+COUNTRIES = graph.get_all_countries()
+YEARS = [x for x in range(1896, 2013, 4)]
+
 
 ####################################################
 # Buttons
@@ -277,7 +281,7 @@ def display_info(button_name: str) -> None:
     """
     if button_name == 'Annual Medals':
         question = 'Enter the year you want to see the number of medals awarded: '
-        year = int(get_user_response(question))
+        year = int(get_user_response(question, 'year'))
         medals = graph.medal_number_in_year(year)
 
         if medals == 0:
@@ -288,7 +292,7 @@ def display_info(button_name: str) -> None:
         display_text(output)
     elif button_name == 'Given Area':
         question = 'Enter the region you want to see the number of medals awarded overtime: '
-        region = get_user_response(question)
+        region = get_user_response(question, 'region')
         graph1 = graph.total_medal_by_region(region)  # either a tuple of 2 lists or none
         graph2 = graph.weight_by_region(region)  # either a tuple of 2 lists or none
 
@@ -307,9 +311,9 @@ def display_info(button_name: str) -> None:
         question1 = 'Enter the first country you want to compare: '
         question2 = 'Enter a country you want to compare the first to: '
         question3 = 'Enter the year the two countries participated in the Olympics: '
-        country1 = get_user_response(question1)
-        country2 = get_user_response(question2)
-        year = int(get_user_response(question3))
+        country1 = get_user_response(question1, 'country')
+        country2 = get_user_response(question2, 'country')
+        year = int(get_user_response(question3, 'year'))
         output = graph.compare_medals(country1, country2, year)
 
         if output is not None:
@@ -323,8 +327,8 @@ def display_info(button_name: str) -> None:
         else:
             display_text(f'In {year}, {country1} and {country2} never participated together!')
     elif button_name == 'Rank':
-        year = int(get_user_response('Enter the year: '))
-        rank = int(get_user_response('Enter the desired rank: '))
+        year = int(get_user_response('Enter the year: ', 'year'))
+        rank = int(get_user_response('Enter the desired rank: ', 'rank'))
         output = graph.i_th_place(rank, year)
         name = f'{output[0]} ranked {rank} in {year}'
 
@@ -336,17 +340,23 @@ def display_info(button_name: str) -> None:
         else:
             display_text(output)
     elif button_name == 'Annual Data':
-        country = get_user_response('Enter the country you would like to see data for: ')
-        year = int(get_user_response('Enter the year: '))
+        country = get_user_response('Enter the country you would like to see data for: ', 'country')
+        year = int(get_user_response('Enter the year: ', 'year'))
         output = graph.annual_data_sentence(country, year)
         display_text(output)
 
     elif button_name == 'Impact of Historical Events':
         # Displays graphs
         question1 = 'Enter a start year (within known years): '
-        start_year = int(get_user_response(question1))
+        start_year = int(get_user_response(question1, 'year'))
         question2 = 'Enter an end year (within known years): '
-        end_year = int(get_user_response(question2))
+        end_year = int(get_user_response(question2, 'year'))
+
+        while start_year > end_year:
+            display_text('Start year must be less than end year!')
+            start_year = int(get_user_response(question1, 'year'))
+            end_year = int(get_user_response(question2, 'year'))
+
         x1 = graph.years_during_selected(start_year, end_year)
         x2 = graph.years_during_selected(start_year, end_year)
         y1 = graph.medal_all_years(start_year, end_year)
@@ -371,11 +381,17 @@ def display_info(button_name: str) -> None:
 
     elif button_name == 'Host Effect':
         question1 = 'Enter a start year (within known years): '
-        start = int(get_user_response(question1))
+        start = int(get_user_response(question1, 'year'))
         question2 = 'Enter an end year (within known years): '
-        end = int(get_user_response(question2))
+        end = int(get_user_response(question2, 'year'))
+
+        while start > end:
+            display_text('Start year must be less than end year!')
+            start = int(get_user_response(question1, 'year'))
+            end = int(get_user_response(question2, 'year'))
+
         question = 'Enter a country to see its Host Effect: '
-        country = get_user_response(question)
+        country = get_user_response(question, 'country')
         output = graph.host_wins(country, start, end)  # ([wins_hosted], [wins_all])
 
         if not isinstance(output, str):
@@ -389,7 +405,7 @@ def display_info(button_name: str) -> None:
 
     elif button_name == 'Team vs Individual Sports':
         question = 'Enter a country to compare Team and Individual Sports scores: '
-        country = get_user_response(question)
+        country = get_user_response(question, 'country')
         output = graph.wins_multiple(country)
 
         x1 = [year for year in range(1896, 2013, 4)]
@@ -415,16 +431,32 @@ def display_info(button_name: str) -> None:
         horizontal_bar_graph('Performance of regions and countries', x_names, y)
 
     elif button_name == 'Country Statistics':
-        start = int(get_user_response('Enter the starting year: '))
-        end = int(get_user_response('Enter the ending year: '))
+        question1 = 'Enter the starting year: '
+        start = int(get_user_response(question1, 'year'))
+        question2 = 'Enter the ending year: '
+        end = int(get_user_response(question2, 'year'))
+
+        while start > end:
+            display_text('Start year must be less than end year!')
+            start = int(get_user_response(question1, 'year'))
+            end = int(get_user_response(question2, 'year'))
+
         y = graph.participation_all_years(start, end)
         x = [year for year in range(start, end + 1, 4)]
         title = 'Change in the Number of Participating Countries'
         single_plot([''], title, [False], 'single', [y], x, 'Number of Countries')
 
     elif button_name == 'Sport Statistics':
-        start = int(get_user_response('Enter the starting year: '))
-        end = int(get_user_response('Enter the ending year: '))
+        question1 = 'Enter the starting year: '
+        start = int(get_user_response(question1, 'year'))
+        question2 = 'Enter the ending year: '
+        end = int(get_user_response(question2, 'year'))
+
+        while start > end:
+            display_text('Start year must be less than end year!')
+            start = int(get_user_response(question1, 'year'))
+            end = int(get_user_response(question2, 'year'))
+
         stats = graph.sport_flow(start, end)
         x = [year for year in stats]
         y = [stats[year] for year in stats]
@@ -506,7 +538,7 @@ def display_text(txt: str) -> None:
     redraw_window()
 
 
-def get_user_response(question: str) -> str:
+def get_user_response(question: str, return_type: str) -> str:
     """ Displays a new window that asks for user input, then returns that input"""
     # Set up the colors
     black = (0, 0, 0)
@@ -546,9 +578,31 @@ def get_user_response(question: str) -> str:
             if event.type == pygame.KEYDOWN:
                 if active:
                     if event.key == pygame.K_RETURN:
-                        response = text
-                        text = ''
-                        done = True
+                        if return_type == 'region' and isinstance(text, str) and text.title() in REGIONS:
+                            response = text
+                            text = ''
+                            done = True
+                        elif return_type == 'country' and isinstance(text, str) and text.title() in COUNTRIES:
+                            response = text
+                            text = ''
+                            done = True
+                        elif return_type == 'year' and text.isdigit() and int(text) in YEARS:
+                            response = text
+                            text = ''
+                            done = True
+                        elif return_type == 'rank' and text.isdigit() and int(text) > 0:
+                            response = text
+                            text = ''
+                            done = True
+                        else:
+                            if return_type == 'year':
+                                message = 'Please input a valid year from 1896-2012\nthat the Olympics took place!'
+                            elif return_type == 'year':
+                                message = 'Please input a valid rank of participants\nthat took place in the Olympics!'
+                            else:
+                                message = ('Please input a valid country / region\n' +
+                                           'that participated or hosted the Olympics!')
+                            display_text(message)
                     elif event.key == pygame.K_BACKSPACE:
                         text = text[:-1]
                     else:
@@ -603,7 +657,7 @@ def redraw_window():
         curr_button.draw((0, 0, 0))
 
 
-run = True
+run = False
 while run:
     for event in pygame.event.get():
         pos = pygame.mouse.get_pos()
@@ -621,3 +675,11 @@ while run:
     # updates the visuals
     redraw_window()
     pygame.display.update()
+
+if __name__ == '__main__':
+    import python_ta
+
+    python_ta.check_all(config={
+        'max-line-length': 120
+    })
+
