@@ -10,7 +10,6 @@ import numpy as np
 import data
 import pygame
 import matplotlib.pyplot as plt
-import pandas as pd
 import project2_visualization as vis
 
 pygame.init()
@@ -110,12 +109,6 @@ def single_plot(names: list[str], title: str, bar: list, style: str, y: list[lis
         - len(y) == len(x) or x == 0
         - if a value is given for x cords, then y must have the same number of values
     """
-    # line_explanation = {names[i]: y[i] for i in range(len(names))}
-
-    # if style == 'many':  # Graph with one or multiple lines in it
-    #     # Single graph, multiple lines
-    #     df = pd.DataFrame(line_explanation)  # Shows a small table on the graph of what each line means
-
     if style == 'many':  # THIS CASE FOR 2 LINES/BARS ONLY
         # Amy modified this case for the "Host Effect" and it works! This will only be used for that button so,
         # although not generalized enough (I guess cuz I just somehow made it worked idk), still be good for one case.
@@ -127,13 +120,9 @@ def single_plot(names: list[str], title: str, bar: list, style: str, y: list[lis
             else:
                 ax.plot(x, y[i], label=names[i], color=generate_random_colour())
 
-        # Plot individual lines
-        # for i in line_explanation:
-        #     plt.plot(x, df[i], label=i, linewidth=4, color=generate_random_colour())
-
     elif style == 'single':
-        if bar:
-            plt.bar(x=x, height=y[0])
+        if bar[0]:
+            plt.bar(x=x, height=y[0], color=generate_random_colour())
         else:
             plt.plot(x, y[0], label="My Line", color="blue", linewidth=2)
 
@@ -204,11 +193,6 @@ def two_plots(names: list, title: str, bar: list, s: str, y1: list[list[int]], y
                 axs[1].bar(x=x, height=y2[i], color=generate_random_colour())
             else:
                 axs[1].plot(x, y2[i], label=names[0][i], color=generate_random_colour())
-
-        # if bar[1]:
-        #     axs[1].bar(x=x2, height=y2, color=generate_random_colour())
-        # else:
-        #     axs[1].plot(x2, y2, label=names[1], color=generate_random_colour())
 
         for i in range(2):
             axs[i].set_title(names[i])
@@ -400,11 +384,6 @@ def display_info(button_name: str) -> None:
             title = 'Host Country Effect'
             names = ['Host Years Achievements', 'Overall Achievements']
             single_plot(names, title, [True, False], 'many', [y1, y2], x)
-            # x = [year for year in output]
-            # y = [output[win] for win in output]
-            # title = 'Host Country Effect'
-            # names = ['Total Medals Won']
-            # single_plot(names, title, False, 'single', [y], x)
         else:
             display_text(output)
 
@@ -624,7 +603,6 @@ def redraw_window():
         curr_button.draw((0, 0, 0))
 
 
-# print('performance: ', graph.medal_number_location('Greece'))
 run = True
 while run:
     for event in pygame.event.get():

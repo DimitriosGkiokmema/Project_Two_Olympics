@@ -2,7 +2,7 @@
 CSC111 Project 2: The Analysis of Summer Olympics Through External Effects (1896 - 2012)
 """
 from __future__ import annotations
-from typing import Any, List, Tuple
+from typing import Any
 import csv
 import networkx as nx
 import pandas as pd  # remember to install the package pandas! (my version is 2.2.1)
