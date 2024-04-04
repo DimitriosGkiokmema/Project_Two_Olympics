@@ -580,8 +580,8 @@ def redraw_window():
         curr_button.draw((0, 0, 0))
 
 
-print('performance: ', graph.medal_number_location('Greece'))
-run = False
+# print('performance: ', graph.medal_number_location('Greece'))
+run = True
 while run:
     for event in pygame.event.get():
         pos = pygame.mouse.get_pos()
