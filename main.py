@@ -332,7 +332,7 @@ def display_info(button_name: str) -> None:
         year = int(get_user_response('Enter the year: '))
         rank = int(get_user_response('Enter the desired rank: '))
         output = graph.i_th_place(rank, year)
-        name = f'Country at ith place in {year}'
+        name = f'Country at {rank} place in {year}'
 
         if 'Invalid' not in output:
             y = [i[1] for i in output]
