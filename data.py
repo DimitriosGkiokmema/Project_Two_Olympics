@@ -205,7 +205,7 @@ class Graph:
         return graph_nx
 
     def i_th_place(self, i: int, year: int) -> list[tuple[Any, int]] | str:
-        """ Ranking (which country, continent, or region ranked the ith place for the number of
+        """Ranking (which country, continent, or region ranked the ith place for the number of
         (gold/silver/bronze/total) medals in the given year?)
 
         Pseudocode:
