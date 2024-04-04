@@ -326,14 +326,14 @@ def display_info(button_name: str) -> None:
     elif button_name == 'Gold, Silver, and Bronze':
         question1 = 'Enter the first country you want to compare: '
         question2 = 'Enter a country you want to compare the first to: '
-        question3 = 'Enter the year the two countries participated in the Olympics'
+        question3 = 'Enter the year the two countries participated in the Olympics: '
         country1 = get_user_response(question1)
         country2 = get_user_response(question2)
         year = int(get_user_response(question3))
         output = graph.compare_medals(country1, country2, year)
 
         if output is not None:
-            names = [country1 + "'s Medals", country2 + "'s Medals"]
+            names = [country1 + "'s Medals in " + str(year), country2 + "'s Medals in " + str(year)]
             y1 = output[0]
             y2 = output[1]
             y = [y1, y2]
@@ -383,10 +383,10 @@ def display_info(button_name: str) -> None:
         part_average = graph.participation_period_average(start_year, end_year)
         txt = (f'While the average number of medals in the whole period was {medal_overall}, in\n' +
                f'the period from {start_year} to {end_year}, the average number of medals was {medal_average}.\n' +
-               f'Therefore, the difference between the two is {abs(medal_average - medal_overall)}.\n\n'
+               f'Therefore, the difference between the two is {round(abs(medal_average - medal_overall), 2)}.\n\n'
                f'While the average number of participation in the whole period was {part_overall}, in the\n' +
                f'period from {start_year} to {end_year}, the average number of participants was {part_average}.\n' +
-               f'Therefore, the difference between the two is {abs(part_average - part_overall)}.\n\n'
+               f'Therefore, the difference between the two is {round(abs(part_average - part_overall), 2)}.\n\n'
                )
         display_text(txt)
 
@@ -594,7 +594,7 @@ def get_user_response(question: str) -> str:
         pygame.display.flip()
 
     redraw_window()
-    return response.title()
+    return response
 
 
 ####################################################
