@@ -9,9 +9,10 @@ if __name__ == "__main__":
 
     screen_width = 1200
     screen_height = 750
-    # background_colour = (125, 235, 255)
-    background_colour = pygame.image.load('Olympics Wallpaper.jpg')
-    background_colour = pygame.transform.scale(background_colour, (screen_width, screen_height))
+    back_button_image = pygame.image.load('back_button.png')
+    back_button_image = pygame.transform.scale(back_button_image, (50, 50))
+    background_image = pygame.image.load('Olympics Wallpaper.jpg')
+    background_image = pygame.transform.scale(background_image, (screen_width, screen_height))
 
     window = pygame.display.set_mode((screen_width, screen_height))
     pygame.display.set_caption('CSC111 Project 2: The Analysis of Summer Olympics Through External Effects')
