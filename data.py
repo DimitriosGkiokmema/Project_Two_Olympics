@@ -204,7 +204,7 @@ class Graph:
 
         return graph_nx
 
-    def i_th_place(self, i: int, year: int) -> list[tuple[Any, int]] | str:
+    def i_th_place(self, i: int, year: int) -> list | str:
         """Ranking (which country, continent, or region ranked the ith place for the number of
         (gold/silver/bronze/total) medals in the given year?)
 
@@ -228,24 +228,19 @@ class Graph:
         if year not in self._vertices:
             return 'Invalid input for year'
 
-        gold = []
-        silver = []
-        bronze = []
+        country_medals = []
 
         for vertex in self._vertices[year].neighbours:
-            if self._vertices[year].neighbours[vertex] is not None:
-                medals = self.rank_helper(year, vertex)
+            if self._vertices[year].neighbours[vertex] is not None and vertex.kind == 'country':
+                score = 0
+                for medal in self._vertices[year].neighbours[vertex].individual_sports:
+                    score += self._vertices[year].neighbours[vertex].individual_sports[medal].weighted_score()
+                country_medals.append((vertex, score))
 
-                # Records the number of medals in dicts
-                gold.append((vertex.item, medals[0]))
-                silver.append((vertex.item, medals[1]))
-                bronze.append((vertex.item, medals[2]))
-
-        if i < len(gold):
-            insertion_sort(gold)
-            insertion_sort(silver)
-            insertion_sort(bronze)
-            return [gold[len(gold) - i], silver[len(silver) - i], bronze[len(bronze) - i]]
+        if 0 < i < len(country_medals):
+            insertion_sort(country_medals)
+            medals = self._vertices[year].neighbours[country_medals[len(country_medals) - 1][0]].medals_by_kind()
+            return [country_medals[len(country_medals) - 1][0].item, medals[0], medals[1], medals[2]]
         else:
             num_participants = len(self._vertices[year].neighbours)
             return f'Invalid rank; only {num_participants} countries participated in the {year} Olympic games'
@@ -305,25 +300,6 @@ class Graph:
                 return f'{country} has never hosted the Olympics from {b} to {e}!'
         else:
             return f'Invalid input for country. Please check again.'
-
-    # def host_wins(self, country: str, b: int, e: int) -> dict[Any, int] | str:
-    #     """ This function returns a dict in the format [{year_hosted, num of wins}, {year_played: num of wins}]
-    #     If the inputted country never held the Olympics, a message stating this is returned
-    #     """
-    #     is_host = False
-    #
-    #     year_hosted = {}
-    #
-    #     for year in self._vertices:
-    #         if self._vertices[year].kind == 'year' and self._vertices[year].host == country and b <= year <= e:
-    #             is_host = True
-    #             sport = self.get_edge(year, country)
-    #             year_hosted[year] = sport.total_medal()
-    #
-    #     if is_host:
-    #         return self.host_wins_helper(country)
-    #     else:
-    #         return f'The given country has never hosted the Olympics from {b} to {e}!'
 
     def host_wins_helper(self, country: str) -> dict[Any, int]:
         """ Searches the Graph for the years the given country participated in the Olympics and returns
@@ -922,7 +898,7 @@ class Sport:
         return [gold, silver, bronze]
 
 
-def insertion_sort(lst: list[tuple[str, int]]) -> None:
+def insertion_sort(lst: list[tuple[_SportVertex, int]]) -> None:
     """ Helper for i_th_place function.
     Takes in a list of format [(country, medals)] and sorts it in terms of medals
     Note that this is a *mutating* function.
@@ -963,7 +939,7 @@ def load_graph(olympic_games: str, countries: str, groups: dict[str, str]) -> Gr
         reader = csv.reader(file)
         next(reader)  # skip the first header line
         for row in reader:
-            country_dict[row[3]] = (row[2], row[1])
+            country_dict[row[3]] = (row[2].title(), row[1].title())
 
     with open(olympic_games, 'r', encoding='utf-8') as file:
         reader = csv.reader(file)

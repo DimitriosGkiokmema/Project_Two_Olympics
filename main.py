@@ -92,7 +92,6 @@ class Button:
 
 
 def single_plot(names: list[str], title: str, bar: list, style: str, y: list[list[int]], x: list[int], y_lab: str = ''):
-    # def single_plot():  # Used for quickly testing this function
     """ An instance of this class requires the graph name, y and (optionally) the x values. x and y MUST be lists
     This class will display a single or multiple graphs on the same window, depending on how many
 
@@ -306,11 +305,8 @@ def display_info(button_name: str) -> None:
     elif button_name == 'Given Area':
         question = 'Enter the region you want to see the number of medals awarded overtime: '
         region = get_user_response(question)
-        # region = 'Europe'
         graph1 = graph.total_medal_by_region(region)  # either a tuple of 2 lists or none
         graph2 = graph.weight_by_region(region)  # either a tuple of 2 lists or none
-        print('graph1: ', graph1)
-        print('graph2: ', graph2)
 
         if graph1 is not None and graph2 is not None:
             names = ['Medals in ' + region, 'Weighted scores in ' + region]
@@ -343,14 +339,13 @@ def display_info(button_name: str) -> None:
         else:
             display_text(f'In {year}, {country1} and {country2} never participated together!')
     elif button_name == 'Rank':
-        # SHOW COUNTRY NAME
         year = int(get_user_response('Enter the year: '))
         rank = int(get_user_response('Enter the desired rank: '))
         output = graph.i_th_place(rank, year)
-        name = f'Country at {rank} place in {year}'
+        name = f'{output[0]} ranked {rank} in {year}'
 
         if 'Invalid' not in output:
-            y = [i[1] for i in output]
+            y = [output[1], output[2], output[3]]
             x = [1, 2, 3]
             x_name = ['Gold', 'Silver', 'Bronze']
             plot_word([name], [True], [x], [x_name], [y])
@@ -428,7 +423,6 @@ def display_info(button_name: str) -> None:
 
     elif button_name == 'Performance':
         perform = graph.performance()
-        print(perform)
         x_names = []
         y = []
         for key in perform:
@@ -594,7 +588,7 @@ def get_user_response(question: str) -> str:
         pygame.display.flip()
 
     redraw_window()
-    return response
+    return response.title()
 
 
 ####################################################
