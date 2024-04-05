@@ -308,7 +308,6 @@ class Graph:
 
         return played_medals
 
-
     def add_to_played_medals(self, year: Any, country: str, participant: _SportVertex, played: dict[int, int]) -> None:
         """ This is a helper for the function above.
         It calculates the total medals for a country at a specific year,
