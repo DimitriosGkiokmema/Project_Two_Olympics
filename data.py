@@ -398,7 +398,7 @@ class Graph:
                         f"including {sport_data.total_num_sport('team')} team sports and "
                         f"{sport_data.total_num_sport('individual')} individual sports. \n In terms of the number of "
                         f"medals, {country} in that year \nhas achieved the total of \n{sport_data.total_medal()} "
-                        f"medals, with {sport_data.total_medal('team')} medals on team sports and \n the other"
+                        f"medals, with {sport_data.total_medal('team')} medals on team sports and \n the other "
                         f"{sport_data.total_medal('individual')} medals earned individually.")
         return 'Something went wrong. Please check your input and try again.'
 

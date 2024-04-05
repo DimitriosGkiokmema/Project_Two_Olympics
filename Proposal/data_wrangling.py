@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd  # remember to install the package pandas! (my version is 2.2.1)
 
-olympics = pd.read_csv("summer.csv")
+olympics = pd.read_csv("../summer.csv")
 olympics = olympics.dropna()
 # Renamed some sports to have consistent names
 olympics.loc[olympics['Discipline'] == 'Beach volley.', 'Discipline'] = 'Beach Volleyball'
@@ -68,7 +68,7 @@ olympics.loc[olympics['Country'] == 'BOT', 'Country'] = 'BWA'
 olympics.to_csv('summer_modified.csv')
 
 
-country_codes = pd.read_csv("country_codes.csv")
+country_codes = pd.read_csv("../country_codes.csv")
 country_codes = country_codes[['Region Name_en (M49)', 'Country or Area_en (M49)', 'ISO-alpha3 Code (M49)']]
 country_codes = country_codes.dropna()
 country_codes.reset_index(inplace=True, drop=True)
@@ -91,7 +91,7 @@ country_codes.loc[len(country_codes.index)] = ['Europe', 'Serbia and Montenegro'
 # Convert back to a new csv file
 country_codes.to_csv('country_codes_modified.csv')
 
-small_olympics = pd.read_csv("summer_modified.csv")
+small_olympics = pd.read_csv("../summer_modified.csv")
 small_olympics = small_olympics.iloc[0:50,]
 small_olympics = small_olympics.drop(['Unnamed: 0'], axis=1)
 small_olympics.to_csv("summer_small.csv")
