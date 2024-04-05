@@ -389,7 +389,7 @@ class Graph:
             v_country = self._vertices[country]
             v_year = self._vertices[year]
             if v_country not in v_year.neighbours:  # or vice versa
-                return (f"Unfortunately, {country} didn't attend or didn't achieve any medals in {year}."
+                return (f"Unfortunately, {country} didn't attend or didn't achieve any medals in {year}.\n"
                         f"Please try looking for other data.")
             else:
                 sport_data = v_country.neighbours[v_year]  # type Sport
