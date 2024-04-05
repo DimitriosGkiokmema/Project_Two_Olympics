@@ -69,3 +69,11 @@ if __name__ == "__main__":
         # updates the visuals
         redraw_window()
         pygame.display.update()
+
+if __name__ == '__main__':
+    import python_ta
+
+    python_ta.check_all(config={
+        'extra-imports': ['random', 'numpy', 'data', 'pygame', 'matplotlib.pyplot', 'project2_visualization'],
+        'max-line-length': 120
+    })

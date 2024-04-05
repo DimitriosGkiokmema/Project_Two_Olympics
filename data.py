@@ -1092,10 +1092,10 @@ if __name__ == '__main__':
              'Trampoline': 0, 'Triathlon': 0, 'Tug of War': 1, 'Vaulting': 0, 'Volleyball': 1, 'Water Motorsport': 1,
              'Water Polo': 1, 'Weightlifting': 0, 'Wrestling Freestyle': 0, 'Wrestling Gre-R': 0}
 
-    # import python_ta
-    #
-    # python_ta.check_all(config={
-    #     'extra-imports': ['csv', 'networkx', 'pandas'],  # the names (strs) of imported modules
-    #     'allowed-io': ['print', 'open', 'input'],     # the names (strs) of functions that call print/open/input
-    #     'max-line-length': 120
-    # })
+    import python_ta
+
+    python_ta.check_all(config={
+        'extra-imports': ['csv', 'networkx', 'pandas'],  # the names (strs) of imported modules
+        'allowed-io': ['print', 'open', 'input'],     # the names (strs) of functions that call print/open/input
+        'max-line-length': 120
+    })

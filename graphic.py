@@ -7,10 +7,10 @@ Reference for button: https://www.youtube.com/watch?v=4_9twnEduFA
 """
 import random
 import numpy as np
-import data
 import pygame
 import matplotlib.pyplot as plt
 import project2_visualization as vis
+import data
 
 SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 750
@@ -395,7 +395,7 @@ def display_info(button_name: str) -> None:
         output = GRAPH.host_wins(country, start, end)  # ([wins_hosted], [wins_all])
 
         if not isinstance(output, str):
-            x = [year for year in range(start, end + 1, 4)]
+            x = list(range(start, end + 1, 4))
             y1, y2 = output[0], output[1]
             title = 'Host Country Effect'
             names = ['Host Years Achievements', 'Overall Achievements']
@@ -458,7 +458,7 @@ def display_info(button_name: str) -> None:
 
         stats = GRAPH.sport_flow(start, end)
         x = list(stats)
-        y = [stats[year] for year in stats]
+        y = [stats[y] for y in stats]
         title = 'Change in the Number of Sports Played'
         single_plot([''], title, [False], 'single', [y], x, 'Number of Sports')
 
@@ -511,7 +511,7 @@ def display_text(txt: str) -> None:
         text_surfaces.append(text_surface)
 
     # Calculate total height of all text surfaces
-    total_height = sum(surface.get_height() for surface in text_surfaces)
+    total_height = sum(sf.get_height() for sf in text_surfaces)
 
     # Position text surfaces vertically
     y_position = (SCREEN_HEIGHT - total_height) // 2
@@ -662,10 +662,10 @@ def redraw_window():
         curr_button.draw((0, 0, 0))
 
 
-# if __name__ == '__main__':
-#     import python_ta
-#
-#     python_ta.check_all(config={
-#         'extra-imports': ['random', 'numpy', 'data', 'pygame', 'matplotlib.pyplot', 'project2_visualization'],
-#         'max-line-length': 120
-#     })
+if __name__ == '__main__':
+    import python_ta
+
+    python_ta.check_all(config={
+        'extra-imports': ['random', 'numpy', 'data', 'pygame', 'matplotlib.pyplot', 'project2_visualization'],
+        'max-line-length': 120
+    })
