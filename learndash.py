@@ -59,14 +59,14 @@ app.layout = html.Div([
     ], className='six columns'),
 
     html.Div([
-        dcc.Graph(id='my-graph')
+        dcc.Graph(id='my-GRAPH')
     ], className='six columns'),
 
 ], className='row')
 
 
 @app.callback(
-    Output('my-graph','figure'),
+    Output('my-GRAPH','figure'),
     Input('org-chart','tapNodeData'),
 )
 def update_nodes(data):

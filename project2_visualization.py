@@ -1,5 +1,5 @@
 """
-The visualization of a graph, similar to exercise 4.
+The visualization of a GRAPH, similar to exercise 4.
 """
 import networkx as nx
 from plotly.graph_objs import Scatter, Figure
@@ -24,7 +24,7 @@ def setup_graph(graph: data.Graph,
                 layout: str = 'spring_layout',
                 max_vertices: int = 5000,
                 weighted: bool = False) -> list:
-    """Use plotly and networkx to setup the visuals for the given graph.
+    """Use plotly and networkx to setup the visuals for the given GRAPH.
 
     Optional arguments:
         - weighted: True when weight data should be visualized. Weight in this case is the Sport class in the edge
@@ -95,11 +95,11 @@ def visualize_graph(graph: data.Graph,
                     layout: str = 'spring_layout',
                     max_vertices: int = 5000,
                     output_file: str = '') -> None:
-    """Use plotly and networkx to visualize the given graph.
+    """Use plotly and networkx to visualize the given GRAPH.
 
     Optional arguments:
-        - layout: which graph layout algorithm to use
-        - max_vertices: the maximum number of vertices that can appear in the graph
+        - layout: which GRAPH layout algorithm to use
+        - max_vertices: the maximum number of vertices that can appear in the GRAPH
         - output_file: a filename to save the plotly image to (rather than displaying
             in your web browser)
     """
@@ -111,11 +111,11 @@ def visualize_weighted_graph(graph: data.Graph,
                              layout: str = 'spring_layout',
                              max_vertices: int = 5000,
                              output_file: str = '') -> None:
-    """Use plotly and networkx to visualize the given weighted graph.
+    """Use plotly and networkx to visualize the given weighted GRAPH.
 
     Optional arguments:
-        - layout: which graph layout algorithm to use
-        - max_vertices: the maximum number of vertices that can appear in the graph
+        - layout: which GRAPH layout algorithm to use
+        - max_vertices: the maximum number of vertices that can appear in the GRAPH
         - output_file: a filename to save the plotly image to (rather than displaying
             in your web browser)
     """
@@ -126,12 +126,12 @@ def visualize_weighted_graph(graph: data.Graph,
 
 def draw_graph(data: list, output_file: str = '', weight_positions=None) -> None:
     """
-    Draw graph based on given data.
+    Draw GRAPH based on given data.
 
     Optional arguments:
         - output_file: a filename to save the plotly image to (rather than displaying
             in your web browser)
-        - weight_positions: weights to draw on edges for a weighted graph
+        - weight_positions: weights to draw on edges for a weighted GRAPH
     """
 
     fig = Figure(data=data)

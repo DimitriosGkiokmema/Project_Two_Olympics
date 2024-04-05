@@ -12,19 +12,17 @@ import pygame
 import matplotlib.pyplot as plt
 import project2_visualization as vis
 
-pygame.init()
+SCREEN_WIDTH = 1200
+SCREEN_HEIGHT = 750
+BACK_BUTTON_IMAGE = pygame.image.load('back_button.png')
+BACK_BUTTON_IMAGE = pygame.transform.scale(BACK_BUTTON_IMAGE, (50, 50))
+BACKGROUND_IMAGE = pygame.image.load('Olympics Wallpaper.jpg')
+BACKGROUND_IMAGE = pygame.transform.scale(BACKGROUND_IMAGE, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
-screen_width = 1200
-screen_height = 750
-back_button_image = pygame.image.load('back_button.png')
-back_button_image = pygame.transform.scale(back_button_image, (50, 50))
-background_image = pygame.image.load('Olympics Wallpaper.jpg')
-background_image = pygame.transform.scale(background_image, (screen_width, screen_height))
-
-window = pygame.display.set_mode((screen_width, screen_height))
+WINDOW = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('CSC111 Project 2: The Analysis of Summer Olympics Through External Effects')
 
-group = {'Archery': 0, 'Athletics': 0, 'Badminton': 0, 'Baseball': 1, 'Basketball': 1, 'Basque Pelota': 1,
+GROUP = {'Archery': 0, 'Athletics': 0, 'Badminton': 0, 'Baseball': 1, 'Basketball': 1, 'Basque Pelota': 1,
          'Beach Volleyball': 1, 'Boxing': 0, 'Canoe / Kayak F': 0, 'Canoe / Kayak S': 0, 'Canoe Slalom': 0,
          'Canoe Sprint': 1, 'Cricket': 1, 'Croquet': 0, 'Cycling BMX': 0, 'Cycling Road': 0, 'Cycling Track': 0,
          'Diving': 0, 'Dressage': 0, 'Eventing': 0, 'Fencing': 0, 'Figure skating': 0, 'Football': 1, 'Golf': 0,
@@ -35,11 +33,11 @@ group = {'Archery': 0, 'Athletics': 0, 'Badminton': 0, 'Baseball': 1, 'Basketbal
          'Trampoline': 0, 'Triathlon': 0, 'Tug of War': 1, 'Vaulting': 0, 'Volleyball': 1, 'Water Motorsport': 1,
          'Water Polo': 1, 'Weightlifting': 0, 'Wrestling Freestyle': 0, 'Wrestling Gre-R': 0}
 
-graph = data.load_graph('summer_modified.csv', 'country_codes_modified.csv', group)
+GRAPH = data.load_graph('summer_modified.csv', 'country_codes_modified.csv', GROUP)
 
 REGIONS = ['Africa', 'Americas', 'Asia', 'Europe', 'Oceania', 'World']
-COUNTRIES = graph.get_all_countries()
-YEARS = [x for x in range(1896, 2013, 4)]
+COUNTRIES = GRAPH.get_all_countries()
+YEARS = list(range(1896, 2013, 4))
 
 
 ####################################################
@@ -49,37 +47,36 @@ YEARS = [x for x in range(1896, 2013, 4)]
 
 class Button:
     """ template for the buttons"""
-
-    def __init__(self, x, y, text='', image=None):
+    def __init__(self, x: int, y: int, text: str = '', image: pygame.Surface = None) -> None:
         self.colour = (208, 206, 206)
         self.x = x
         self.y = y
         self.text = text
         self.image = image
 
-        if image == back_button_image:
+        if image == BACK_BUTTON_IMAGE:
             self.width = 50
             self.height = 50
         else:
             self.width = 450
             self.height = 80
 
-    def draw(self, outline=None):
+    def draw(self, outline: tuple[int, int, int] = None) -> None:
         """Draw the button on the screen"""
         # Call this method to draw the button on the screen
         if outline:
-            pygame.draw.rect(window, outline, (self.x - 2, self.y - 2, self.width + 4, self.height + 4), 0)
-        pygame.draw.rect(window, self.colour, (self.x, self.y, self.width, self.height), 0)
+            pygame.draw.rect(WINDOW, outline, (self.x - 2, self.y - 2, self.width + 4, self.height + 4), 0)
+        pygame.draw.rect(WINDOW, self.colour, (self.x, self.y, self.width, self.height), 0)
 
         if self.text != '':
             font = pygame.font.SysFont('calibri', 40)
             text = font.render(self.text, 1, (0, 0, 0))
-            window.blit(text, (self.x + (self.width / 2 - text.get_width() / 2), self.y +
+            WINDOW.blit(text, (self.x + (self.width / 2 - text.get_width() / 2), self.y +
                                (self.height / 2 - text.get_height() / 2)))
         else:
-            window.blit(self.image, (self.x, self.y))
+            WINDOW.blit(self.image, (self.x, self.y))
 
-    def is_over(self, position):
+    def is_over(self, position: tuple[int, int]) -> bool:
         """Is over"""
         # Pos is the mouse position or a tuple of (x,y) coordinates
         if self.x < position[0] < self.x + self.width:
@@ -94,14 +91,15 @@ class Button:
 ####################################################
 
 
-def single_plot(names: list[str], title: str, bar: list, style: str, y: list[list[int]], x: list[int], y_lab: str = ''):
-    """ An instance of this class requires the graph name, y and (optionally) the x values. x and y MUST be lists
+def single_plot(names: list[str], title: str, is_bar: list, style: str, y: list[list[int]], x: list[int],
+                y_label: str = '') -> None:
+    """ An instance of this class requires the GRAPH name, y and (optionally) the x values. x and y MUST be lists
     This class will display a single or multiple graphs on the same window, depending on how many
 
     Instance Attributes:
         - names: a list containing the title of each graph
-        - title: the title to display at the top of the window
-        - bar: the type of graph, True if a bar graph, False if a line graph
+        - t: the title to display at the top of the window
+        - is_bar: the type of graph, True if a bar GRAPH, False if a line GRAPH
         - style: many or single lined graph
         - y: a list of y coordinates
         - x: a list of x coordinates. If nothing is entered for it, the x coordinates are every num 1896-2012, 4.
@@ -116,37 +114,38 @@ def single_plot(names: list[str], title: str, bar: list, style: str, y: list[lis
     if style == 'many':  # THIS CASE FOR 2 LINES/BARS ONLY
         # Amy modified this case for the "Host Effect" and it works! This will only be used for that button so,
         # although not generalized enough (I guess cuz I just somehow made it worked idk), still be good for one case.
-        fig, ax = plt.subplots()
+        ax = plt.subplots()[1]
 
         for i in range(len(y)):
-            if bar[i]:
+            if is_bar[i]:
                 ax.bar(x, y[i], label=names[i], color=generate_random_colour())
             else:
                 ax.plot(x, y[i], label=names[i], color=generate_random_colour())
 
     elif style == 'single':
-        if bar[0]:
+        if is_bar[0]:
             plt.bar(x=x, height=y[0], color=generate_random_colour())
         else:
             plt.plot(x, y[0], label="My Line", color="blue", linewidth=2)
 
     # Add legend, axis labels, and title
-    plt.ylabel(y_lab, fontsize=14)
+    plt.ylabel(y_label, fontsize=14)
     plt.xlabel('Years', fontsize=14)
     plt.title(title, fontsize=16)
     plt.grid(True)
     plt.show()
 
 
-def two_plots(names: list, title: str, bar: list, s: str, y1: list[list[int]], y2: list[list[int]], x: list = 0):
-    """ An instance of this class requires the graph name, y and (optionally) the x values. x and y MUST be lists
+def two_plots(names: list, title: str, is_bar: list, graph_type: str, y1: list[list[int]], y2: list[list[int]],
+              x: list = 0) -> None:
+    """ An instance of this class requires the GRAPH name, y and (optionally) the x values. x and y MUST be lists
     This class will display one or two graphs on the same window, depending on how many are needed
 
     Instance Attributes:
-        - names: a list containing the title of each graph
+        - names: a list containing the title of each GRAPH
         - title: the title to display at the top of the window
-        - bar: a list of bools representing the type of graph, True if a bar graph, False if a line graph
-        - s: many or single lined graph. Same as style variable from above function
+        - is_bar: a list of bools representing the type of GRAPH, True if a bar GRAPH, False if a line GRAPH
+        - s: many or single lined GRAPH. Same as style variable from above function
         - y: a list of y coordinates
         - x: a list of x coordinates. If nothing is entered for it, the x coordinates are every num 1940-2020
 
@@ -159,41 +158,41 @@ def two_plots(names: list, title: str, bar: list, s: str, y1: list[list[int]], y
     x1 = x[0]
     x2 = x[1]
 
-    if s == 'single':  # Two graphs with one line
+    if graph_type == 'single':  # Two graphs with one line
         fig, axs = plt.subplots(1, 2)
 
-        if not bar[0]:
+        if not is_bar[0]:
             axs[0].plot(x1, y1[0], color=generate_random_colour())
         else:
             axs[0].bar(x=x1, height=y1[0], color=generate_random_colour())
 
-        if not bar[1]:
+        if not is_bar[1]:
             axs[1].plot(x2, y2[0], color=generate_random_colour())
         else:
             axs[1].bar(x=x2, height=y2[0], color=generate_random_colour())
 
-        # Putting details on first graph
-        axs[0].set_title(names[0])  # Sets graph title
+        # Putting details on first GRAPH
+        axs[0].set_title(names[0])  # Sets GRAPH title
         axs[0].set_xlabel('Years')  # Sets x-axis title
         axs[0].set_ylabel('Medals')  # Sets y-axis title
 
-        # Putting details on second graph
-        axs[1].set_title(names[1])  # Sets graph title
+        # Putting details on second GRAPH
+        axs[1].set_title(names[1])  # Sets GRAPH title
         axs[1].set_xlabel('Years')  # Sets x-axis title
         axs[1].set_ylabel('Medals')  # Sets y-axis title
 
         fig.canvas.manager.set_window_title(title)
-    elif s == 'many':  # Two graphs with  multiple lines
+    elif graph_type == 'many':  # Two graphs with  multiple lines
         fig, axs = plt.subplots(1, 2)
 
         for i in range(len(y1)):
-            if bar[0][i]:
+            if is_bar[0][i]:
                 axs[0].bar(x=x, height=y1[i], color=generate_random_colour())
             else:
                 axs[0].plot(x, y1[i], label=names[0][i], color=generate_random_colour())
 
         for i in range(len(y2)):
-            if bar[1][i]:
+            if is_bar[1][i]:
                 axs[1].bar(x=x, height=y2[i], color=generate_random_colour())
             else:
                 axs[1].plot(x, y2[i], label=names[0][i], color=generate_random_colour())
@@ -210,7 +209,8 @@ def two_plots(names: list, title: str, bar: list, s: str, y1: list[list[int]], y
     plt.show()
 
 
-def plot_word(names: list[str], bar: list[bool], x: list[list[int]], x_names: list[list[str]], y: list[list[int]]):
+def plot_word(names: list[str], is_bar: list[bool], x: list[list[int]], x_names: list[list[str]], y: list[list[int]])\
+        -> None:
     """Plot a graph with the x-axis values being categorical variables (such as countries)."""
     x1 = np.array(x[0])
     y1 = np.array(y[0])
@@ -218,14 +218,14 @@ def plot_word(names: list[str], bar: list[bool], x: list[list[int]], x_names: li
     if len(x) == 2:
         fig, axs = plt.subplots(1, 2)
 
-        if bar[0]:
+        if is_bar[0]:
             axs[0].bar(x=x1, height=y1, tick_label=x_names[0], color=generate_random_colour())
         else:
             axs[0].plot(x1, y1, tick_label=x_names[0], color=generate_random_colour())
 
         x2 = np.array(x[1])
         y2 = np.array(y[1])
-        if bar[1]:
+        if is_bar[1]:
             axs[1].bar(x=x2, height=y2, tick_label=x_names[1], color=generate_random_colour())
         else:
             axs[1].plot(x2, y2, tick_label=x_names[1], color=generate_random_colour())
@@ -243,8 +243,8 @@ def plot_word(names: list[str], bar: list[bool], x: list[list[int]], x_names: li
 
 
 def horizontal_bar_graph(name: str, x_names: list[str], y: list[int]) -> None:
-    """ Unlike the above graph functions, this function displays a vertical bar graph """
-    # Create a horizontal bar graph
+    """ Unlike the above GRAPH functions, this function displays a vertical bar graph """
+    # Create a horizontal bar GRAPH
     plt.barh(x_names, y, color=generate_random_colour())
 
     # Customize labels and title
@@ -261,7 +261,7 @@ def generate_random_colour() -> tuple[float, float, float]:
     """
     rgb = []
 
-    for i in range(3):
+    for _ in range(3):
         rgb.append(random.randint(0, 255) / 255)
 
     return rgb[0], rgb[1], rgb[2]
@@ -276,13 +276,13 @@ def generate_random_colour() -> tuple[float, float, float]:
 def display_info(button_name: str) -> None:
     """ This function is only ever called when a button is clicked.
     The name of the button is given in the function header adn depending on what it is,
-    this function changes the screen display accordingly, shows a graph, and prints
+    this function changes the screen display accordingly, shows a GRAPH, and prints
     text on the screen (if required)
     """
     if button_name == 'Annual Medals':
         question = 'Enter the year you want to see the number of medals awarded: '
         year = int(get_user_response(question, 'year'))
-        medals = graph.medal_number_in_year(year)
+        medals = GRAPH.medal_number_in_year(year)
 
         if medals == 0:
             output = 'There were no medals awarded that year'
@@ -293,12 +293,12 @@ def display_info(button_name: str) -> None:
     elif button_name == 'Given Area':
         question = 'Enter the region you want to see the number of medals awarded overtime: '
         region = get_user_response(question, 'region')
-        graph1 = graph.total_medal_by_region(region)  # either a tuple of 2 lists or none
-        graph2 = graph.weight_by_region(region)  # either a tuple of 2 lists or none
+        graph1 = GRAPH.total_medal_by_region(region)  # either a tuple of 2 lists or none
+        graph2 = GRAPH.weight_by_region(region)  # either a tuple of 2 lists or none
 
         if graph1 is not None and graph2 is not None:
             names = ['Medals in ' + region, 'Weighted scores in ' + region]
-            x = graph.years_during()  # list of years from the beginning to the end
+            x = GRAPH.years_during()  # list of years from the beginning to the end
             y1_bar, y1_line = graph1[0], graph1[1]
             y2_bar, y2_line = graph2[0], graph2[1]
             title = f'{region} Awards'
@@ -314,7 +314,7 @@ def display_info(button_name: str) -> None:
         country1 = get_user_response(question1, 'country')
         country2 = get_user_response(question2, 'country')
         year = int(get_user_response(question3, 'year'))
-        output = graph.compare_medals(country1, country2, year)
+        output = GRAPH.compare_medals(country1, country2, year)
 
         if output is not None:
             names = [country1 + "'s Medals in " + str(year), country2 + "'s Medals in " + str(year)]
@@ -329,7 +329,7 @@ def display_info(button_name: str) -> None:
     elif button_name == 'Rank':
         year = int(get_user_response('Enter the year: ', 'year'))
         rank = int(get_user_response('Enter the desired rank: ', 'rank'))
-        output = graph.i_th_place(rank, year)
+        output = GRAPH.i_th_place(rank, year)
         name = f'{output[0]} ranked {rank} in {year}'
 
         if 'Invalid' not in output:
@@ -342,7 +342,7 @@ def display_info(button_name: str) -> None:
     elif button_name == 'Annual Data':
         country = get_user_response('Enter the country you would like to see data for: ', 'country')
         year = int(get_user_response('Enter the year: ', 'year'))
-        output = graph.annual_data_sentence(country, year)
+        output = GRAPH.annual_data_sentence(country, year)
         display_text(output)
 
     elif button_name == 'Impact of Historical Events':
@@ -357,19 +357,19 @@ def display_info(button_name: str) -> None:
             start_year = int(get_user_response(question1, 'year'))
             end_year = int(get_user_response(question2, 'year'))
 
-        x1 = graph.years_during_selected(start_year, end_year)
-        x2 = graph.years_during_selected(start_year, end_year)
-        y1 = graph.medal_all_years(start_year, end_year)
-        y2 = graph.participation_all_years(start_year, end_year)
+        x1 = GRAPH.years_during_selected(start_year, end_year)
+        x2 = GRAPH.years_during_selected(start_year, end_year)
+        y1 = GRAPH.medal_all_years(start_year, end_year)
+        y2 = GRAPH.participation_all_years(start_year, end_year)
         title = "World's Medal and Participation over years"
         names = ["Total Number of Medals", "Total Number of Participants"]
         two_plots(names, title, [False, False], 'single', [y1], [y2], [x1, x2])
 
         # Displays analysis
-        medal_overall = graph.medal_period_average(start_year, end_year)
-        medal_average = graph.medal_overall_average()
-        part_overall = graph.participation_overall_average()
-        part_average = graph.participation_period_average(start_year, end_year)
+        medal_overall = GRAPH.medal_period_average(start_year, end_year)
+        medal_average = GRAPH.medal_overall_average()
+        part_overall = GRAPH.participation_overall_average()
+        part_average = GRAPH.participation_period_average(start_year, end_year)
         txt = (f'While the average number of medals in the whole period was {medal_overall}, in\n' +
                f'the period from {start_year} to {end_year}, the average number of medals was {medal_average}.\n' +
                f'Therefore, the difference between the two is {round(abs(medal_average - medal_overall), 2)}.\n\n'
@@ -392,7 +392,7 @@ def display_info(button_name: str) -> None:
 
         question = 'Enter a country to see its Host Effect: '
         country = get_user_response(question, 'country')
-        output = graph.host_wins(country, start, end)  # ([wins_hosted], [wins_all])
+        output = GRAPH.host_wins(country, start, end)  # ([wins_hosted], [wins_all])
 
         if not isinstance(output, str):
             x = [year for year in range(start, end + 1, 4)]
@@ -406,27 +406,26 @@ def display_info(button_name: str) -> None:
     elif button_name == 'Team vs Individual Sports':
         question = 'Enter a country to compare Team and Individual Sports scores: '
         country = get_user_response(question, 'country')
-        output = graph.wins_multiple(country)
+        output = GRAPH.wins_multiple(country)
 
-        x1 = [year for year in range(1896, 2013, 4)]
-        x2 = [year for year in range(1896, 2013, 4)]
+        x1 = YEARS
         y1 = output[0]
         y2 = output[1]
         title = 'Weighted Scores by Medals Awarded'
         names = ['Team Sports', 'Individual Sports']
-        two_plots(names, title, [True, True], 'single', [y1], [y2], [x1, x2])
+        two_plots(names, title, [True, True], 'single', [y1], [y2], [x1, x1])
 
     elif button_name == 'Performance':
-        perform = graph.performance()
+        perform = GRAPH.performance()
         x_names = []
         y = []
         for key in perform:
             x_names.append(key)
             y.append(perform[key])
-        text = ('There are a lot of regions / countries in this graph.\n'
+        text = ('There are a lot of regions / countries in this GRAPH.\n'
                 'To view it more clearly, click the magnifying glass\n'
-                'symbol and draw a rectangle in the graph to zoom in.\n'
-                '(Click the back arrow to see the graph)')
+                'symbol and draw a rectangle in the GRAPH to zoom in.\n'
+                '(Click the back arrow to see the GRAPH)')
         display_text(text)
         horizontal_bar_graph('Performance of regions and countries', x_names, y)
 
@@ -441,7 +440,7 @@ def display_info(button_name: str) -> None:
             start = int(get_user_response(question1, 'year'))
             end = int(get_user_response(question2, 'year'))
 
-        y = graph.participation_all_years(start, end)
+        y = GRAPH.participation_all_years(start, end)
         x = [year for year in range(start, end + 1, 4)]
         title = 'Change in the Number of Participating Countries'
         single_plot([''], title, [False], 'single', [y], x, 'Number of Countries')
@@ -457,14 +456,14 @@ def display_info(button_name: str) -> None:
             start = int(get_user_response(question1, 'year'))
             end = int(get_user_response(question2, 'year'))
 
-        stats = graph.sport_flow(start, end)
-        x = [year for year in stats]
+        stats = GRAPH.sport_flow(start, end)
+        x = list(stats)
         y = [stats[year] for year in stats]
         title = 'Change in the Number of Sports Played'
         single_plot([''], title, [False], 'single', [y], x, 'Number of Sports')
 
     elif button_name == 'Visualize Graph':
-        vis.visualize_graph(graph)
+        vis.visualize_graph(GRAPH)
 
 
 def extract_integers(text: str) -> list[int]:
@@ -498,7 +497,7 @@ def display_text(txt: str) -> None:
     font = pygame.font.Font('freesansbold.ttf', 32)
     text_colour = (255, 255, 0)
     background_colour = (0, 0, 128)
-    window.fill((255, 255, 255))
+    WINDOW.fill((255, 255, 255))
 
     # Split the input text into separate lines
     lines = txt.split('\n')
@@ -515,13 +514,13 @@ def display_text(txt: str) -> None:
     total_height = sum(surface.get_height() for surface in text_surfaces)
 
     # Position text surfaces vertically
-    y_position = (screen_height - total_height) // 2
+    y_position = (SCREEN_HEIGHT - total_height) // 2
     for surface in text_surfaces:
-        text_rect = surface.get_rect(center=(screen_width // 2, y_position))
-        window.blit(surface, text_rect)
+        text_rect = surface.get_rect(center=(SCREEN_WIDTH // 2, y_position))
+        WINDOW.blit(surface, text_rect)
         y_position += surface.get_height()
 
-    back_button = buttons_main[len(buttons_main) - 1]
+    back_button = BUTTONS_MAIN[len(BUTTONS_MAIN) - 1]
 
     show_txt = True
     while show_txt:
@@ -548,7 +547,7 @@ def get_user_response(question: str, return_type: str) -> str:
     font = pygame.font.Font(None, 32)
 
     # Set up the input box
-    input_box = pygame.Rect(screen_width // 2 - 100, screen_height // 2, 140, 32)
+    input_box = pygame.Rect(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2, 140, 32)
     color_inactive = pygame.Color('lightskyblue3')
     color_active = pygame.Color('dodgerblue2')
     color = color_inactive
@@ -558,7 +557,7 @@ def get_user_response(question: str, return_type: str) -> str:
 
     # Set up the question
     question = font.render(question, True, black)
-    question_rect = question.get_rect(center=(screen_width // 2, screen_height // 2 - 50))
+    question_rect = question.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 50))
 
     # Main loop
     done = False
@@ -614,10 +613,10 @@ def get_user_response(question: str, return_type: str) -> str:
         input_box.w = width
 
         # Blit everything to the screen
-        window.fill(gray)
-        pygame.draw.rect(window, color, input_box, 2)
-        window.blit(question, question_rect)
-        window.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
+        WINDOW.fill(gray)
+        pygame.draw.rect(WINDOW, color, input_box, 2)
+        WINDOW.blit(question, question_rect)
+        WINDOW.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
         pygame.display.flip()
 
     redraw_window()
@@ -628,58 +627,45 @@ def get_user_response(question: str, return_type: str) -> str:
 # Game loop
 ####################################################
 
+def create_buttons():
+    """ Create Button objects, store them in a list, and return that list"""
+    # Create buttons
+    annual_medals = Button(100, 50, 'Annual Medals')
+    given_area = Button(600, 50, 'Given Area')
+    gsb = Button(100, 170, 'Gold, Silver, and Bronze')
+    rankings = Button(600, 170, 'Rank')
+    annual_data = Button(100, 290, 'Annual Data')
+    historical = Button(600, 290, 'Impact of Historical Events')
+    host_effect = Button(100, 410, 'Host Effect')
+    team_vs_indi = Button(600, 410, 'Team vs Individual Sports')
+    performance = Button(100, 530, 'Performance')
+    countries = Button(600, 530, 'Country Statistics')
+    sports = Button(100, 650, 'Sport Statistics')
+    visualize = Button(600, 650, 'Visualize Graph')
+    back = Button(SCREEN_WIDTH - 55, 5, image=BACK_BUTTON_IMAGE)
 
-# Create buttons
-annual_medals = Button(100, 50, 'Annual Medals')
-given_area = Button(600, 50, 'Given Area')
-gsb = Button(100, 170, 'Gold, Silver, and Bronze')
-rankings = Button(600, 170, 'Rank')
-annual_data = Button(100, 290, 'Annual Data')
-historical = Button(600, 290, 'Impact of Historical Events')
-host_effect = Button(100, 410, 'Host Effect')
-team_vs_indi = Button(600, 410, 'Team vs Individual Sports')
-performance = Button(100, 530, 'Performance')
-countries = Button(600, 530, 'Country Statistics')
-sports = Button(100, 650, 'Sport Statistics')
-visualize = Button(600, 650, 'Visualize Graph')
-back = Button(screen_width - 55, 5, image=back_button_image)
+    # Store buttons in a list
+    buttons_main = [annual_medals, given_area, gsb, rankings, annual_data, historical, host_effect, team_vs_indi]
+    buttons_main.extend([performance, countries, sports, visualize, back])
 
-# Store buttons in a list
-buttons_main = [annual_medals, given_area, gsb, rankings, annual_data, historical, host_effect, team_vs_indi]
-buttons_main.extend([performance, countries, sports, visualize, back])
+    return buttons_main
+
+
+BUTTONS_MAIN = create_buttons()
 
 
 def redraw_window():
     """Redraw window"""
-    window.blit(background_image, (0, 0))
+    WINDOW.blit(BACKGROUND_IMAGE, (0, 0))
 
-    for curr_button in buttons_main[:len(buttons_main) - 1]:
+    for curr_button in BUTTONS_MAIN[:len(BUTTONS_MAIN) - 1]:
         curr_button.draw((0, 0, 0))
 
-
-run = True
-while run:
-    for event in pygame.event.get():
-        pos = pygame.mouse.get_pos()
-        if event.type == pygame.QUIT:
-            pygame.quit()
-        for button in buttons_main:
-            if event.type == pygame.MOUSEBUTTONDOWN and button.is_over(pos):
-                display_info(button.text)
-            if event.type == pygame.MOUSEMOTION:
-                if button.is_over(pos):
-                    button.colour = (255, 0, 0)
-                else:
-                    button.colour = (208, 206, 206)
-
-    # updates the visuals
-    redraw_window()
-    pygame.display.update()
 
 # if __name__ == '__main__':
 #     import python_ta
 #
 #     python_ta.check_all(config={
+#         'extra-imports': ['random', 'numpy', 'data', 'pygame', 'matplotlib.pyplot', 'project2_visualization'],
 #         'max-line-length': 120
 #     })
-

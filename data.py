@@ -17,7 +17,7 @@ CITY_TO_COUNTRY = {CITIES[i]: COUNTIES[i] for i in range(len(CITIES))}
 
 
 class _Vertex:
-    """A vertex in a book review graph, used to represent a user or a book.
+    """A vertex in a book review GRAPH, used to represent a user or a book.
 
     Each vertex item is either a user id or book title. Both are represented as strings,
     even though we've kept the type annotation as Any to be consistent with lecture.
@@ -95,23 +95,23 @@ class _SportVertex(_Vertex):
 
 
 class Graph:
-    """A graph used to represent a book review network.
+    """A GRAPH used to represent a book review network.
     """
     # Private Instance Attributes:
     #     - _vertices:
-    #         A collection of the vertices contained in this graph.
+    #         A collection of the vertices contained in this GRAPH.
     #         Maps item to _Vertex object.
     _vertices: dict[Any, _SportVertex]  # Amy changed this into _SportVertex !?
 
     def __init__(self) -> None:
-        """Initialize an empty graph (no vertices or edges)."""
+        """Initialize an empty GRAPH (no vertices or edges)."""
         self._vertices = {}
 
     def add_vertex(self, item: Any, kind: str, host: str) -> None:
-        """Add a vertex with the given item and kind to this graph.
+        """Add a vertex with the given item and kind to this GRAPH.
 
         The new vertex is not adjacent to any other vertices.
-        Do nothing if the given item is already in this graph.
+        Do nothing if the given item is already in this GRAPH.
 
         Preconditions:
             - kind in {'year', 'country', 'region'}
@@ -120,8 +120,8 @@ class Graph:
             self._vertices[item] = _SportVertex(item, kind, host)
 
     def add_edge(self, item1: Any, item2: Any, sport: Sport = None) -> None:
-        """Add an edge between the two vertices with the given items in this graph.
-        Raise a ValueError if item1 or item2 do not appear as vertices in this graph.
+        """Add an edge between the two vertices with the given items in this GRAPH.
+        Raise a ValueError if item1 or item2 do not appear as vertices in this GRAPH.
         Preconditions:
             - item1 != item2
         """
@@ -135,8 +135,8 @@ class Graph:
             raise ValueError
 
     def adjacent(self, item1: Any, item2: Any) -> bool:
-        """Return whether item1 and item2 are adjacent vertices in this graph.
-        Return False if item1 or item2 do not appear as vertices in this graph.
+        """Return whether item1 and item2 are adjacent vertices in this GRAPH.
+        Return False if item1 or item2 do not appear as vertices in this GRAPH.
         """
         if item1 in self._vertices and item2 in self._vertices:
             v1 = self._vertices[item1]
@@ -147,7 +147,7 @@ class Graph:
     def get_neighbours(self, item: Any) -> set:
         """Return a set of the neighbours of the given item.
         Note that the *items* are returned, not the _Vertex objects themselves.
-        Raise a ValueError if item does not appear as a vertex in this graph.
+        Raise a ValueError if item does not appear as a vertex in this GRAPH.
         """
         if item in self._vertices:
             v = self._vertices[item]
@@ -156,7 +156,7 @@ class Graph:
             raise ValueError
 
     def get_all_vertices(self, kind: str = '') -> set:
-        """Return a set of all vertex items in this graph.
+        """Return a set of all vertex items in this GRAPH.
         If kind != '', only return the items of the given vertex kind.
         Preconditions:
             - kind in {'year', 'country', 'region'}
@@ -171,9 +171,9 @@ class Graph:
     ##################################################################################
 
     def to_networkx(self, max_vertices: int = 5000) -> nx.Graph:
-        """Convert this graph into a networkx Graph.
+        """Convert this GRAPH into a networkx Graph.
 
-        max_vertices specifies the maximum number of vertices that can appear in the graph.
+        max_vertices specifies the maximum number of vertices that can appear in the GRAPH.
         (This is necessary to limit the visualization output for large graphs.)
 
         Note that this method is provided for you, and you shouldn't change it.
@@ -273,10 +273,12 @@ class Graph:
 
             for yr in range(b, e + 1, 4):
                 data = self.annual_data_dict(country, yr)
-                if data is not None and self._vertices[yr].host != country:
+                is_yr = yr in self._vertices
+                if is_yr and data is not None and self._vertices[yr].host != country and not isinstance(data, str):
                     wins_all.append(data['total medals'])
                     wins_hosted.append(0)
-                elif data is not None and self._vertices[yr].host == country:  # I tried to avoid PyTA complaints
+                elif is_yr and data is not None and self._vertices[yr].host == country and not isinstance(data, str):
+                    # I tried to avoid PyTA complaints
                     wins_hosted.append(data['total medals'])
                     wins_all.append(data['total medals'])
                     is_host = True
@@ -319,7 +321,7 @@ class Graph:
     def compare_medals(self, country1: str, country2: str, year: int) -> Any:
         """Compare the number of Gold, Silver, and Bronze medals between two countries for a specific year.
         Return a tuple of two lists [num_g, num_s, num_b] for each country, if they participated together that year.
-        Otherwise, return None. If any of these inputs is not in this graph items, also return None.
+        Otherwise, return None. If any of these inputs is not in this GRAPH items, also return None.
 
             country1: The name of the first country.
             country2: The name of the second country.
@@ -338,7 +340,7 @@ class Graph:
 # Our additional methods
 ##################################################################################
     def get_edge(self, item1: Any, item2: Any) -> Sport:
-        """Return the Sport class of that edge if item1 and item2 are adjacent and are in the graph.
+        """Return the Sport class of that edge if item1 and item2 are adjacent and are in the GRAPH.
         Raise ValueError otherwise."""
         if item1 in self._vertices and item2 in self._vertices and self.adjacent(item1, item2):
             v1 = self._vertices[item1]
@@ -349,12 +351,12 @@ class Graph:
 
     def years_during_selected(self, start: int, end: int) -> list[int]:
         """Return a list of years that are expected to have Olympics games, from the first year (min year)
-        to the end year (max year) recorded in this graph. That means we record the year from
+        to the end year (max year) recorded in this GRAPH. That means we record the year from
         range(min_year, max_year + 1, 4).
         Secial years when the Olympics was cancelled (1916, 1940, 1944) still count to this list.
 
         Representation Invariants:
-            - There must be at least one 'year' vertex in this graph.
+            - There must be at least one 'year' vertex in this GRAPH.
         """
         lst_year = []
         for y in range(start, end + 1, 4):
@@ -363,12 +365,12 @@ class Graph:
 
     def years_during(self) -> list:
         """Return a list of years that are expected to have Olympics games, from the first year (min year)
-        to the end year (max year) recorded in this graph. That means we record the year from
+        to the end year (max year) recorded in this GRAPH. That means we record the year from
         range(min_year, max_year + 1, 4).
         Secial years when the Olympics was cancelled (1916, 1940, 1944) still count to this list.
 
         Representation Invariants:
-            - There must be at least one 'year' vertex in this graph.
+            - There must be at least one 'year' vertex in this GRAPH.
         """
         all_years = self.get_all_vertices('year')
         min_year, max_year = min(all_years), max(all_years)
@@ -548,7 +550,7 @@ class Graph:
         """Return the overall average number of medals for all years between the first recorded year and the last
         recorded year. Rounded to the second decimal place.
         Notice: Still need to count the year with no medals. For example our data has two years: 2013, and 2015 with
-        the number of medals respectively are 20,10. Although the vertice 2014 isn't shown in the graph, it is still
+        the number of medals respectively are 20,10. Although the vertice 2014 isn't shown in the GRAPH, it is still
         between the start and end years, so we still need to count the year 2014, to make the average to be
         (20 + 0 + 10) / 3, not (20 + 10) / 2.
         """
@@ -644,7 +646,7 @@ class Graph:
 
 ##########################################
 # For Region: compute the total number of medals gained in each year (bar), as well as the percentage from the world's
-# total number of medals (line), displayed on the same graph. Do a similar thing for the total weighted scores.
+# total number of medals (line), displayed on the same GRAPH. Do a similar thing for the total weighted scores.
 ##########################################
     def medal_year_by_region(self, year: int, region: str) -> int:
         """Return the number of medals gained in the given region in that year. It means that we only choose countries
@@ -684,7 +686,7 @@ class Graph:
         """
         Return a tuple of 2 lists: the first list contains the total number of medals gained in the given region in
         each year, and the second one contains the percentage of number of medals gained here to the world's total.
-        The time period is from the min year to the max year recorded in this graph. Rounded to one decimal place.
+        The time period is from the min year to the max year recorded in this GRAPH. Rounded to one decimal place.
         If the region input is not valid, return a message.
         """
         if region not in self.get_all_vertices('region'):
@@ -715,7 +717,7 @@ class Graph:
         """
         Return a tuple of 2 lists: the first list contains the weighted score gained in the given region in each year,
         and the second one contains the percentage of weighted score gained here to the world's total. The time period
-        is from the min year to the max year recorded in this graph. Rounded to one decimal place.
+        is from the min year to the max year recorded in this GRAPH. Rounded to one decimal place.
         If the region input is not valid, return a message.
         """
         if region not in self.get_all_vertices('region'):
